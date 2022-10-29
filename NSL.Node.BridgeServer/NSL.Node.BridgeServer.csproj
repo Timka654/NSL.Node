@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -11,18 +11,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\Base\NSL.Logger\NSL.Logger.csproj" />
-		<ProjectReference Include="..\..\..\..\ConfigurationEngine\NSL.ConfigurationEngine\NSL.ConfigurationEngine.csproj" />
-		<ProjectReference Include="..\..\..\..\ConfigurationEngine\Providers\NSL.ConfigurationEngine.Providers.Json\NSL.ConfigurationEngine.Providers.Json.csproj" />
-		<ProjectReference Include="..\..\..\..\Core\BuilderExtensions\NSL.BuilderExtensions.SocketCore\NSL.BuilderExtensions.SocketCore.csproj" />
-		<ProjectReference Include="..\..\..\..\Core\Extensions\SocketCore.Extensions.Buffer\NSL.SocketCore.Extensions.Buffer.csproj" />
-		<ProjectReference Include="..\..\..\..\Core\NSL.EndPointBuilder\NSL.EndPointBuilder.csproj" />
-		<ProjectReference Include="..\..\..\..\Core\NSL.SocketCore\NSL.SocketCore.csproj" />
-		<ProjectReference Include="..\..\..\..\Core\NSL.SocketServer\NSL.SocketServer.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsClient\NSL.BuilderExtensions.WebSocketsClient.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSocketsServer\NSL.BuilderExtensions.WebSocketsServer.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\BuilderExtensions\NSL.BuilderExtensions.WebSockets\NSL.BuilderExtensions.WebSockets.csproj" />
-		<ProjectReference Include="..\..\..\..\Protocols\WebSockets\NSL.WebSockets.Server\NSL.WebSockets.Server.csproj" />
+	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2022.10.30.34" />
+	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2022.10.30.34" />
+	  <PackageReference Include="NSL.ConfigurationEngine" Version="2022.10.30.34" />
+	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2022.10.30.34" />
+	  <PackageReference Include="NSL.Logger" Version="2022.10.30.34" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 	</ItemGroup>
 
