@@ -17,9 +17,9 @@ namespace NSL.Node.LobbyServerExample
             builder.Services.AddSingleton<LobbyManager>();
 
             builder.Services.AddBridgeLobbyClient(
-                builder.Configuration.GetValue("bridge:server:url", "ws://localhost:6999"),
-                builder.Configuration.GetValue("bridge:server:identity", "270E1B1E-4889-4D46-8B9D-9325404FFD69"),
-                builder.Configuration.GetValue("bridge:server:key", "270E1B1E-4889-4D46-8B9D-9325404FFD69"),
+                builder.Configuration.GetValue<string>("bridge:server:url"),
+                builder.Configuration.GetValue<string>("bridge:server:identity"),
+                builder.Configuration.GetValue<string>("bridge:server:key"),
                 (services, builder) => {
 
                 });

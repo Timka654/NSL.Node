@@ -1,4 +1,6 @@
-﻿using NSL.BuilderExtensions.SocketCore;
+﻿using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Configuration;
+using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using NSL.Node.BridgeLobbyClient;
 using NSL.Node.LobbyServerExample.Shared.Enums;
@@ -15,8 +17,9 @@ namespace NSL.Node.LobbyServerExample.Managers
 {
     public class LobbyManager
     {
-        private ConcurrentDictionary<Guid, LobbyNetworkClientModel> clientMap = new ConcurrentDictionary<Guid, LobbyNetworkClientModel>();
+        private readonly IConfiguration configuration;
 
+        private ConcurrentDictionary<Guid, LobbyNetworkClientModel> clientMap = new ConcurrentDictionary<Guid, LobbyNetworkClientModel>();
 
         private ConcurrentDictionary<Guid, LobbyRoomInfoModel> roomMap = new ConcurrentDictionary<Guid, LobbyRoomInfoModel>();
 
@@ -34,6 +37,12 @@ namespace NSL.Node.LobbyServerExample.Managers
             builder.AddPacketHandle(ServerReceivePacketEnum.SendChatMessage, SendChatMessageRequestHandle);
             builder.AddPacketHandle(ServerReceivePacketEnum.StartRoom, RunRoomRequestHandle);
             builder.AddPacketHandle(ServerReceivePacketEnum.RemoveRoom, RemoveRoomRequestHandle);
+            builder.AddPacketHandle(ServerReceivePacketEnum.GetRoomList, GetRoomListRequestHandle);
+        }
+
+        public LobbyManager(IConfiguration configuration)
+        {
+            this.configuration = configuration;
         }
 
         #region NetworkHandle
@@ -88,9 +97,28 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         #region PacketHandle
 
+        private void GetRoomListRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
+        {
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.GetRoomListResult).WithWaitableAnswer(data);
+
+            packet.WriteCollection(roomMap, item =>
+            {
+                packet.WriteGuid(item.Value.Id);
+
+                packet.WriteString16(item.Value.Name);
+            });
+
+            client.Network.Send(packet);
+        }
+
         private void CreateRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.CreateRoomResult)
+                .WithWaitableAnswer(data);
+
             LobbyRoomInfoModel room = data.ReadJson16<LobbyRoomInfoModel>();
+
+            bool result = true; // if need
 
             room.OwnerId = client.UID;
 
@@ -105,9 +133,12 @@ namespace NSL.Node.LobbyServerExample.Managers
 
             room.JoinMember(client);
 
-            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.CreateRoomResult);
+            packet.WriteBool(result);
 
-            packet.WriteGuid(rid);
+            if (result)
+            {
+                packet.WriteGuid(rid);
+            }
 
             client.Network.Send(packet);
 
@@ -116,37 +147,43 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         private void RemoveRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
-            if (client.CurrentRoom == null)
-                return;
-
             var room = client.CurrentRoom;
 
-            if (client.UID == room.OwnerId)
-            {
-                room.RemoveRoom();
+            if (room == null || room.State != LobbyRoomState.Lobby)
+                return;
 
-                BroadcastRemoveLobbyRoom(room);
+            if (client.UID == room.OwnerId) // only owner can remove room
+            {
+                if (roomMap.Remove(room.Id, out room))
+                {
+                    room.RemoveRoom();
+
+                    BroadcastRemoveLobbyRoom(room);
+                }
             }
         }
 
         private void RunRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
-            if (client.CurrentRoom == null)
-                return;
-
             var room = client.CurrentRoom;
+
+            if (client.CurrentRoom == null || room.State != LobbyRoomState.Lobby)
+                return;
 
             if (client.UID == room.OwnerId) // only owner can run game
             {
-                room.StartRoom();
 
-                processingRoomMap.TryAdd(room.Id, room);
+                if (roomMap.TryRemove(room.Id, out _))
+                {
+                    room.StartRoom(configuration);
 
-                roomMap.TryRemove(room.Id, out _);
+                    processingRoomMap.TryAdd(room.Id, room);
 
-                BroadcastRemoveLobbyRoom(room);
+                    BroadcastRemoveLobbyRoom(room);
+                }
             }
         }
+
         private void SendChatMessageRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
             if (client.CurrentRoom == null)
@@ -169,8 +206,18 @@ namespace NSL.Node.LobbyServerExample.Managers
                     packet.WriteByte((byte)JoinResultEnum.InvalidPassword);
                 else
                 {
-                    packet.WriteByte((byte)room.JoinMember(client));
-                    BroadcastChangeLobbyRoom(room);
+                    var joinResult = room.JoinMember(client);
+                    packet.WriteByte((byte)joinResult);
+                    if (joinResult == JoinResultEnum.Ok)
+                    {
+                        packet.WriteGuid(room.Id);
+                        packet.WriteString16(room.Name);
+                        packet.WriteGuid(room.OwnerId);
+
+                        packet.WriteCollection(room.GetMembers(), item => packet.WriteGuid(item.Client.UID));
+
+                        BroadcastChangeLobbyRoom(room);
+                    }
                 }
             }
             else
@@ -193,6 +240,7 @@ namespace NSL.Node.LobbyServerExample.Managers
 
                 BroadcastChangeLobbyRoom(room);
             }
+
             client.Network.Send(packet);
         }
 
@@ -204,11 +252,15 @@ namespace NSL.Node.LobbyServerExample.Managers
         {
             var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.NewRoomMessage);
 
-            packet.WriteGuid(room.Id);
-            packet.WriteGuid(room.OwnerId);
-            packet.WriteString16(room.Name);
-            packet.WriteInt32(room.MaxMembers);
-            packet.WriteInt32(room.MemberCount());
+            packet.WriteJson16(new
+            {
+                room.Id,
+                room.OwnerId,
+                room.Name,
+                room.MaxMembers,
+                MemberCount = room.MemberCount(),
+                room.PasswordEnabled
+            });
 
             Broadcast(packet);
         }

@@ -19,6 +19,7 @@ namespace NSL.Node.LobbyServerExample.Shared.Enums
         ChatMessage,
         NewUserIdentity,
         RoomStartedMessage,
-        RoomRemoveMessage
+        RoomRemoveMessage,
+        GetRoomListResult
     }
 }

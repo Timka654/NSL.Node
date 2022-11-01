@@ -53,8 +53,8 @@ namespace NSL.Node.BridgeServer.CS
             packet.WriteBool(result);
 
             if (result)
-            { 
-            
+            {
+                // add transport servers
             }
 
             client.Network.Send(packet);

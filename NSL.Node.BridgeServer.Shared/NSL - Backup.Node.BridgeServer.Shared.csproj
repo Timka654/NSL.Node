@@ -4,6 +4,8 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<Configurations>Debug;Release;UnityDebug;Unity</Configurations>
 		
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>

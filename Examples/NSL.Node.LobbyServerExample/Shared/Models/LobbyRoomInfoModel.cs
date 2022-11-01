@@ -7,13 +7,11 @@ using System.Diagnostics.Metrics;
 
 namespace NSL.Node.LobbyServerExample.Shared.Models
 {
-    public class LobbyRoomInfoModel
+    public class LobbyRoomInfoModel : BaseLobbyRoomModel
     {
-        public Guid Id { get; set; }
-
-        public string Name { get; set; }
-
         public string Password { get; set; }
+
+        public bool PasswordEnabled => !string.IsNullOrWhiteSpace(Password);
 
         public int MaxMembers { get; set; }
 
@@ -40,7 +38,6 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
                 return JoinResultEnum.MaxMemberCount;
 
             client.CurrentRoom = this;
-            client.CurrentRoomId = Id;
 
             BroadcastJoinMember(member);
 
@@ -51,26 +48,26 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
         {
             if (members.TryRemove(client.UID, out var member))
             {
-
                 client.CurrentRoom = default;
-                client.CurrentRoomId = default;
                 BroadcastLeaveMember(member);
             }
         }
 
-        public void StartRoom()
+        public void StartRoom(IConfiguration configuration)
         {
             State = LobbyRoomState.Processing;
 
-            BroadcastStartRoom();
+            BroadcastStartRoom(configuration);
         }
 
         public void RemoveRoom()
         {
-            foreach (var member in members)
+            foreach (var memberID in members.Keys.ToArray())
             {
-                member.Value.Client.CurrentRoom = this;
-                member.Value.Client.CurrentRoomId = Id;
+                if (members.TryRemove(memberID, out var member))
+                {
+                    LeaveMember(member.Client);
+                }
             }
 
             BroadcastRemoveRoom();
@@ -89,26 +86,29 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
         public int MemberCount()
             => members.Count;
 
+        public IEnumerable<LobbyRoomMemberModel> GetMembers()
+            => members.Values;
+
         #region Broadcast
 
-        private void BroadcastStartRoom()
+        private void BroadcastStartRoom(IConfiguration configuration)
         {
             foreach (var item in members)
             {
-                var packet = new OutputPacketBuffer();
-
-                packet.PacketId = (ushort)ClientReceivePacketEnum.RoomStartedMessage;
+                var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.RoomStartedMessage);
 
                 packet.WriteString16($"{Id}:{item.Value.Client.UID}");
+                packet.WriteCollection(
+                    Enumerable.Repeat(configuration.GetValue<string>("bridge:server:clients_endpoint"), 1),
+                    item => packet.WriteString16(item));
 
                 item.Value.Client.Network.Send(packet);
             }
         }
+
         private void BroadcastChatMessage(LobbyNetworkClientModel client, string text)
         {
-            var packet = new OutputPacketBuffer();
-
-            packet.PacketId = (ushort)ClientReceivePacketEnum.ChatMessage;
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.ChatMessage);
 
             packet.WriteGuid(client.UID);
             packet.WriteString16(text);
@@ -118,9 +118,7 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
 
         private void BroadcastJoinMember(LobbyRoomMemberModel member)
         {
-            var packet = new OutputPacketBuffer();
-
-            packet.PacketId = (ushort)ClientReceivePacketEnum.RoomMemberJoinMessage;
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.RoomMemberJoinMessage);
 
             packet.WriteGuid(member.Client.UID);
 
@@ -129,9 +127,7 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
 
         private void BroadcastLeaveMember(LobbyRoomMemberModel member)
         {
-            var packet = new OutputPacketBuffer();
-
-            packet.PacketId = (ushort)ClientReceivePacketEnum.RoomMemberLeaveMessage;
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.RoomMemberLeaveMessage);
 
             packet.WriteGuid(member.Client.UID);
 
@@ -140,9 +136,7 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
 
         private void BroadcastRemoveRoom()
         {
-            var packet = new OutputPacketBuffer();
-
-            packet.PacketId = (ushort)ClientReceivePacketEnum.RoomRemoveMessage;
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.RoomRemoveMessage);
 
             packet.WriteGuid(Id);
 

@@ -13,6 +13,7 @@ namespace NSL.Node.LobbyServerExample.Shared.Enums
         LeaveRoom,
         SendChatMessage,
         StartRoom,
-        RemoveRoom
+        RemoveRoom,
+        GetRoomList
     }
 }

@@ -15,11 +15,6 @@ namespace NSL.Node.BridgeLobbyClient
 
     public class BridgeLobbyNetwork
     {
-        private const ushort SignServerPID = 1;
-        private const ushort SignServerResultPID = SignServerPID;
-        private const ushort ValidateSessionPID = 2;
-        private const ushort ValidateSessionResultPID = ValidateSessionPID;
-
         public Uri WsUrl { get; }
 
         public string ServerIdentity { get; }
@@ -43,17 +38,15 @@ namespace NSL.Node.BridgeLobbyClient
                 .WithUrl(wsUrl)
                 .WithCode(builder =>
                  {
-                     builder.AddPacketHandle(SignServerResultPID, (c, d) =>
-                     {
-                         signResult = d.ReadBool();
-                         signLocker.Set();
-                     });
+                     builder.AddReceivePacketHandle(
+                         BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.SignServerResultPID,
+                         c => c.PacketWaitBuffer);
 
-                     builder.AddPacketHandle(ValidateSessionPID, async (c, d) =>
+                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.ValidateSessionPID, async (c, d) =>
                      {
                          var packet = d.CreateWaitBufferResponse();
 
-                         packet.PacketId = ValidateSessionResultPID;
+                         packet.WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.ValidateSessionResultPID);
 
                          var sessionId = d.ReadString16();
 
@@ -69,7 +62,6 @@ namespace NSL.Node.BridgeLobbyClient
 
                      builder.AddDisconnectHandle(async client =>
                      {
-                         signLocker.Reset();
                          signResult = false;
 
                          OnStateChanged(State);
@@ -102,8 +94,6 @@ namespace NSL.Node.BridgeLobbyClient
                 .Build();
         }
 
-        AutoResetEvent signLocker = new AutoResetEvent(false);
-
         bool _signResult = false;
 
         bool signResult { get => _signResult; set { _signResult = value; OnStateChanged(State); } }
@@ -135,29 +125,28 @@ namespace NSL.Node.BridgeLobbyClient
 
         private async Task<bool> TrySign()
         {
-            return await Task.Run(() =>
+            var client = network.Data;
+
+            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.SignServerPID);
+
+            output.WriteString16(ServerIdentity);
+
+            output.WriteString16(IdentityKey);
+
+            bool signResult = false;
+
+            await client.PacketWaitBuffer.SendWaitRequest(output, data =>
             {
-                IdentityFailed = false;
+                signResult = data.ReadBool();
 
-                var output = new OutputPacketBuffer();
-
-                output.PacketId = SignServerPID;
-
-                output.WriteString16(ServerIdentity);
-
-                output.WriteString16(IdentityKey);
-
-                network.Send(output);
-
-                signLocker.WaitOne();
-
-                if (!signResult)
-                    IdentityFailed = true;
+                IdentityFailed = !signResult;
 
                 OnStateChanged(State);
 
-                return signResult;
+                return Task.CompletedTask;
             });
+
+            return signResult;
         }
 
         public event Action<bool> OnStateChanged = (state) => { };

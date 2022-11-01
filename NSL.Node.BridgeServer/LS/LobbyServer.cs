@@ -34,7 +34,9 @@ namespace NSL.Node.BridgeServer.LS
 
                     builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignServerReceiveHandle);
 
-                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.ValidateSessionResultPID, ValidateSessionReceiveHandle);
+                    builder.AddReceivePacketHandle(
+                        NodeBridgeLobbyPacketEnum.ValidateSessionResultPID, 
+                        client => client.ValidateRequestBuffer);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}/")
                 .Build();
@@ -44,7 +46,10 @@ namespace NSL.Node.BridgeServer.LS
 
         private static void SignServerReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            client.Identity = data.ReadString16();
+            var packet = data.CreateWaitBufferResponse()
+                .WithPid(NodeBridgeLobbyPacketEnum.SignServerResultPID);
+
+            var serverIdentity = client.Identity = data.ReadString16();
 
             var identityKey = data.ReadString16();
 
@@ -53,21 +58,14 @@ namespace NSL.Node.BridgeServer.LS
 
             if (result)
             {
-                connectedServers.Remove(client.Identity, out _);
+                connectedServers.Remove(serverIdentity, out _);
 
-                connectedServers.TryAdd(client.Identity, client);
+                connectedServers.TryAdd(serverIdentity, client);
             }
-
-            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.SignServerResultPID);
 
             packet.WriteBool(result);
 
             client.Network.Send(packet);
-        }
-
-        private static void ValidateSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
-        {
-            client.ValidateRequestBuffer.ProcessWaitResponse(data);
         }
 
         public static async Task<bool> ValidateSession(string serverIdentity, string session)
