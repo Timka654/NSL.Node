@@ -8,7 +8,9 @@ namespace NSL.Node.BridgeServer.Shared.Enums
 {
     public enum NodeBridgeTransportPacketEnum : ushort
     {
-        SignSessionPID = 1,
+        SignServerPID = 1,
+        SignServerResultPID = SignServerPID,
+        SignSessionPID,
         SignSessionResultPID = SignSessionPID
 }
 }

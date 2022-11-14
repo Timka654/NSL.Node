@@ -54,8 +54,6 @@ namespace NSL.Node.LobbyServerExample.Managers
                 client.UID = Guid.NewGuid();
             } while (!clientMap.TryAdd(client.UID, client));
 
-            client.UID = client.UID;
-
             var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.NewUserIdentity);
 
             packet.WriteGuid(client.UID);
@@ -194,7 +192,7 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         private void JoinRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
-            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.JoinRoomResult);
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.JoinRoomResult).WithWaitableAnswer(data);
 
             var rid = data.ReadGuid();
 
@@ -228,7 +226,7 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         private void LeaveRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
-            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.LeaveRoomResult);
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.LeaveRoomResult).WithWaitableAnswer(data);
 
             packet.WriteBool(true);
 
@@ -267,7 +265,7 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         private void BroadcastRemoveLobbyRoom(LobbyRoomInfoModel room)
         {
-            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.NewRoomMessage);
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.RoomRemoveMessage);
 
             packet.WriteGuid(room.Id);
 
@@ -276,7 +274,7 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         private void BroadcastChangeLobbyRoom(LobbyRoomInfoModel room)
         {
-            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.NewRoomMessage);
+            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.ChangeTitleRoomInfo);
 
             packet.WriteGuid(room.Id);
             packet.WriteInt32(room.MaxMembers);

@@ -10,12 +10,17 @@ using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeSe
 using System.Collections.Concurrent;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.ConfigurationEngine;
 
 namespace NSL.Node.BridgeServer.LS
 {
     internal class LobbyServer
     {
-        public static int BindingPort => Program.Configuration.GetValue("lobby.server.port", 6999);
+        private static BaseConfigurationManager Configuration => Program.Configuration;
+
+        public static int BindingPort => Configuration.GetValue("lobby.server.port", 6999);
+
+        public static string IdentityKey => Configuration.GetValue("lobby.server.identityKey", "AABBCC");
 
         public static NetworkListener Listener { get; private set; }
 

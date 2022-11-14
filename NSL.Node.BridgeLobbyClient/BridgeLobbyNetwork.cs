@@ -156,6 +156,5 @@ namespace NSL.Node.BridgeLobbyClient
         public bool IdentityFailed { get; private set; }
 
         public ValidateSessionDelegate ValidateSession { set; private get; }
-
     }
 }

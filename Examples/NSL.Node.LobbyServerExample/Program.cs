@@ -30,6 +30,10 @@ namespace NSL.Node.LobbyServerExample
 
             app.MapWebSocketsPoint<LobbyNetworkClientModel>("/lobby_ws", builder =>
             {
+                builder.AddReceiveHandle((client, pid, len) =>
+                {
+                    app.Services.GetService<ILogger<LobbyNetworkClientModel>>().Log(LogLevel.Information, $"receive pid : {pid}");
+                });
                 app.Services.GetRequiredService<LobbyManager>().BuildNetwork(builder);
             });
 

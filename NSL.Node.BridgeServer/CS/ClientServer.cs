@@ -9,6 +9,7 @@ using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServ
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.CS.ClientServerNetworkClient>;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.BridgeServer.TS;
 
 namespace NSL.Node.BridgeServer.CS
 {
@@ -54,7 +55,14 @@ namespace NSL.Node.BridgeServer.CS
 
             if (result)
             {
-                // add transport servers
+                var sessions = TransportServer.CreateSignSession(client.SessionIdentity);
+
+                packet.WriteCollection(sessions, i =>
+                {
+                    packet.WriteString16(i.ipAddr);
+                    packet.WriteInt32(i.port);
+                    packet.WriteGuid(i.id);
+                });
             }
 
             client.Network.Send(packet);
