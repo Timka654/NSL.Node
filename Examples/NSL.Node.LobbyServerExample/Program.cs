@@ -32,7 +32,11 @@ namespace NSL.Node.LobbyServerExample
             {
                 builder.AddReceiveHandle((client, pid, len) =>
                 {
-                    app.Services.GetService<ILogger<LobbyNetworkClientModel>>().Log(LogLevel.Information, $"receive pid : {pid}");
+                    app.Services.GetService<ILogger<LobbyNetworkClientModel>>().Log(LogLevel.Information, $"receive pid : {pid} from {client.GetRemotePoint()}");
+                });
+                builder.AddSendHandle((client, pid, len,stack) =>
+                {
+                    app.Services.GetService<ILogger<LobbyNetworkClientModel>>().Log(LogLevel.Information, $"send pid : {pid} to {client.GetRemotePoint()}");
                 });
                 app.Services.GetRequiredService<LobbyManager>().BuildNetwork(builder);
             });

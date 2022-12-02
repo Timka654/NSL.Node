@@ -7,16 +7,24 @@ namespace NSL.Node.BridgeServer.TS
     {
         public Guid Id { get; set; }
 
-        public string PublicIPAddr { get; set; }
-
-        public int PublicPort { get; set; }
+        public string ConnectionEndPoint { get; set; }
 
         public ConcurrentDictionary<Guid, TransportSession> SessionMap { get; } = new ConcurrentDictionary<Guid, TransportSession>();
     }
 
     internal class TransportSession
     {
-        public string IdentityKey { get; set; }
+        public TransportSession(string identityKey, Guid roomId)
+        {
+            IdentityKey = identityKey;
+            RoomId = roomId;
+        }
+
+        public string IdentityKey { get; }
+
+        public Guid RoomId { get; }
+
+        public Guid TransportIdentity { get; set; }
 
         public DateTime? LogInTime { get; set; }
 

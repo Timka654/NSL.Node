@@ -76,13 +76,11 @@ namespace NSL.Node.LobbyServerExample.Managers
 
         #endregion
 
-        internal Task<bool> BridgeValidateSessionAsync(string sessionIdentity)
+        internal Task<bool> BridgeValidateSessionAsync(Guid roomId, string sessionIdentity)
         {
             var splited = sessionIdentity.Split(':');
 
-            var roomId = Guid.Parse(splited.First());
-
-            var uid = Guid.Parse(splited.Last());
+            var uid = Guid.Parse(splited.First());
 
             if (processingRoomMap.TryGetValue(roomId, out var room))
             {

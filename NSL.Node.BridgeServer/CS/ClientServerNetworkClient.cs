@@ -7,5 +7,6 @@ namespace NSL.Node.BridgeServer.CS
         public string ServerIdentity { get; set; }
 
         public string SessionIdentity { get; set; }
+        public Guid RoomId { get; internal set; }
     }
 }

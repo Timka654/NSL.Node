@@ -6,6 +6,7 @@ using System;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore;
+using System.Net;
 
 namespace NSL.Node.BridgeTransportClient.Bridge
 {
@@ -82,12 +83,16 @@ namespace NSL.Node.BridgeTransportClient.Bridge
 
         bool initialized = false;
 
-        public async void Initialize()
+        string transportEndPoint;
+
+        public async void Initialize(string transportEndPoint)
         {
             if (initialized)
                 return;
 
             initialized = true;
+
+            this.transportEndPoint = transportEndPoint;
 
             await TryConnect();
         }
@@ -112,17 +117,19 @@ namespace NSL.Node.BridgeTransportClient.Bridge
 
             output.WriteGuid(ServerIdentity);
 
+            output.WriteString16(transportEndPoint);
+
             output.WriteString16(IdentityKey);
 
-            bool signResult = false;
+            _signResult = false;
 
             await client.PacketWaitBuffer.SendWaitRequest(output, data =>
             {
-                signResult = data.ReadBool();
+                _signResult = data.ReadBool();
 
-                IdentityFailed = !signResult;
+                IdentityFailed = !_signResult;
 
-                if (signResult)
+                if (_signResult)
                     ServerIdentity = data.ReadGuid();
 
                 OnStateChanged(State);
@@ -139,7 +146,7 @@ namespace NSL.Node.BridgeTransportClient.Bridge
 
             bool signResult = false;
 
-            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignSessionResultPID);
+            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignSessionPID);
 
             output.WriteString16(identityKey);
 

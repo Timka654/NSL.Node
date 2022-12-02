@@ -73,7 +73,7 @@ namespace NSL.Node.BridgeServer.LS
             client.Network.Send(packet);
         }
 
-        public static async Task<bool> ValidateSession(string serverIdentity, string session)
+        public static async Task<bool> ValidateSession(string serverIdentity, Guid roomId, string session)
         {
             if (!connectedServers.TryGetValue(serverIdentity, out var server))
                 return false;
@@ -82,6 +82,7 @@ namespace NSL.Node.BridgeServer.LS
 
             var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.ValidateSessionPID);
 
+            packet.WriteGuid(roomId);
             packet.WriteString16(session);
 
             await server.ValidateRequestBuffer.SendWaitRequest(packet, data =>

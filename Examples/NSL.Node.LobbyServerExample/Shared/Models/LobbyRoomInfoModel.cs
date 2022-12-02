@@ -97,7 +97,9 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
             {
                 var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.RoomStartedMessage);
 
-                packet.WriteString16($"{Id}:{item.Value.Client.UID}");
+                packet.WriteGuid(Id);
+                packet.WriteString16($"{item.Value.Client.UID}"); // split data with ':' char
+                packet.WriteString16(configuration.GetValue<string>("bridge:server:identity"));
                 packet.WriteCollection(
                     Enumerable.Repeat(configuration.GetValue<string>("bridge:server:clients_endpoint"), 1),
                     item => packet.WriteString16(item));

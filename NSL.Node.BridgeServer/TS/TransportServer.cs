@@ -22,7 +22,9 @@ namespace NSL.Node.BridgeServer.TS
 
         public static int BindingPort => Configuration.GetValue("transport.server.port", 6998);
 
-        public static string IdentityKey => Configuration.GetValue("transport.server.identityKey", "AABBCC");
+        public static string IdentityKey => Configuration.GetValue<string>("transport.server.identityKey", "AABBCC");
+
+        private static int TransportServerCountPerRoom => Configuration.GetValue("transport.server.count.perRoom", 1);
 
         public static NetworkListener Listener { get; private set; }
 
@@ -55,9 +57,10 @@ namespace NSL.Node.BridgeServer.TS
 
             client.Id = data.ReadGuid();
 
+            client.ConnectionEndPoint = data.ReadString16();
+
             var serverIdentityKey = data.ReadString16();
 
-            //var endPoint = data.ReadString16();
 
             if (!IdentityKey.Equals(serverIdentityKey))
             {
@@ -94,6 +97,8 @@ namespace NSL.Node.BridgeServer.TS
                     return;
                 }
             }
+            else
+                client.Id = Guid.NewGuid();
 
             while (!serverMap.TryAdd(client.Id, client))
             {
@@ -124,35 +129,67 @@ namespace NSL.Node.BridgeServer.TS
                 return;
             }
 
-
             packet.WriteBool(true);
 
             client.Send(packet);
         }
 
-        internal static List<CreateSignResult> CreateSignSession(string identityKey)
+        internal static List<CreateSignResult> CreateSignSession(string identityKey, Guid roomId)
         {
             List<CreateSignResult> result = new List<CreateSignResult>();
 
-            foreach (var item in serverMap.Values.ToArray())
+            var serverArray = serverMap.Values.ToArray();
+
+            var offset = roomId.GetHashCode() % serverArray.Length;
+
+            // single server for now - maybe change to multiple later
+
+            var selectedServers = serverArray.Skip(offset).Take(TransportServerCountPerRoom).SingleOrDefault();
+
+
+            var tsession = new TransportSession(identityKey, roomId);
+
+            Guid newId;
+
+            do
             {
-                Guid newid = default;
+                newId = Guid.NewGuid();
+            } while (!selectedServers.SessionMap.TryAdd(newId, tsession));
 
-                var tsession = new TransportSession() { IdentityKey = identityKey };
+            tsession.TransportIdentity = newId;
 
-                do
-                {
-                    newid = Guid.NewGuid();
-                } while (!item.SessionMap.TryAdd(newid, tsession));
-
-                result.Add(new CreateSignResult(item.PublicIPAddr, item.PublicPort, newid));
-            }
+            result.Add(new CreateSignResult(selectedServers.ConnectionEndPoint, newId));
 
             return result;
+
+
+            //if (selectedServers.Count() < TransportServerCountPerRoom)
+            //{
+            //    offset = 0;
+
+            //    serverArray = selectedServers.Concat(serverArray.Skip(offset).Take(TransportServerCountPerRoom - selectedServers.Count())).ToArray();
+            //}
+
+
+            //foreach (var item in serverArray)
+            //{
+            //    Guid newid = default;
+
+            //    var tsession = new TransportSession() { IdentityKey = identityKey };
+
+            //    do
+            //    {
+            //        newid = Guid.NewGuid();
+            //    } while (!item.SessionMap.TryAdd(newid, tsession));
+
+            //    result.Add(new CreateSignResult(item.ConnectionEndPoint, newid));
+            //}
+
+            //return result;
         }
 
         private static ConcurrentDictionary<Guid, NetworkClient> serverMap = new ConcurrentDictionary<Guid, NetworkClient>();
 
-        public record CreateSignResult(string ipAddr, int port, Guid id);
+        public record CreateSignResult(string endPoint, Guid id);
     }
 }

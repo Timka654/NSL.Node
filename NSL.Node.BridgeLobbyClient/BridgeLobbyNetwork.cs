@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeLobbyClient
 {
-    public delegate Task<bool> ValidateSessionDelegate(string sessionIdentity);
+    public delegate Task<bool> ValidateSessionDelegate(Guid roomId, string sessionIdentity);
 
     public class BridgeLobbyNetwork
     {
@@ -48,12 +48,13 @@ namespace NSL.Node.BridgeLobbyClient
 
                          packet.WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.ValidateSessionResultPID);
 
+                         var roomId = d.ReadGuid();
                          var sessionId = d.ReadString16();
 
                          bool result = default;
 
                          if (ValidateSession != null)
-                             result = await ValidateSession(sessionId);
+                             result = await ValidateSession(roomId, sessionId);
 
                          packet.WriteBool(result);
 

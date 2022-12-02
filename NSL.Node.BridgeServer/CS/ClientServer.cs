@@ -45,9 +45,10 @@ namespace NSL.Node.BridgeServer.CS
         private static async void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             client.ServerIdentity = data.ReadString16();
+            client.RoomId = data.ReadGuid();
             client.SessionIdentity = data.ReadString16();
 
-            var result = await LobbyServer.ValidateSession(client.ServerIdentity, client.SessionIdentity);
+            var result = await LobbyServer.ValidateSession(client.ServerIdentity, client.RoomId, client.SessionIdentity);
 
             var packet = OutputPacketBuffer.Create(NodeBridgeClientPacketEnum.SignSessionResultPID);
 
@@ -55,12 +56,11 @@ namespace NSL.Node.BridgeServer.CS
 
             if (result)
             {
-                var sessions = TransportServer.CreateSignSession(client.SessionIdentity);
+                var sessions = TransportServer.CreateSignSession(client.SessionIdentity, client.RoomId);
 
                 packet.WriteCollection(sessions, i =>
                 {
-                    packet.WriteString16(i.ipAddr);
-                    packet.WriteInt32(i.port);
+                    packet.WriteString16(i.endPoint);
                     packet.WriteGuid(i.id);
                 });
             }

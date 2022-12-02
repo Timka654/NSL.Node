@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "NSL.Node.BridgeTransportExample": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "transport__public__endpoint": "ws://localhost:5920"
+      }
+    }
+  }
+}
