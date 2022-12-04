@@ -10,6 +10,14 @@ namespace NSL.Node.BridgeTransportClient.Transport
 {
     public class TransportNetworkClient : IServerNetworkClient
     {
+        public string Token { get; set; }
+
         public Guid Id { get; set; }
+
+        public Guid RoomId { get; set; }
+
+        public RoomInfo Room { get; set; }
+
+        public string EndPoint { get; set; }
     }
 }

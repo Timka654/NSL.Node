@@ -131,6 +131,8 @@ namespace NSL.Node.BridgeServer.TS
 
             packet.WriteBool(true);
 
+            packet.WriteGuid(session.RoomId);
+
             client.Send(packet);
         }
 

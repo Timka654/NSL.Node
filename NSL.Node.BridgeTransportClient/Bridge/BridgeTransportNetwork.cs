@@ -7,6 +7,7 @@ using NSL.BuilderExtensions.SocketCore;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore;
 using System.Net;
+using NSL.Node.BridgeTransportClient.Transport;
 
 namespace NSL.Node.BridgeTransportClient.Bridge
 {
@@ -140,21 +141,24 @@ namespace NSL.Node.BridgeTransportClient.Bridge
             return signResult;
         }
 
-        public async Task<bool> TryAuthorize(string identityKey, Guid id)
+        internal async Task<bool> TryAuthorize(TransportNetworkClient client)
         {
-            var client = network.Data;
+            var bridgeClient = network.Data;
 
             bool signResult = false;
 
             var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignSessionPID);
 
-            output.WriteString16(identityKey);
+            output.WriteString16(client.Token);
 
-            output.WriteGuid(id);
+            output.WriteGuid(client.Id);
 
-            await client.PacketWaitBuffer.SendWaitRequest(output, data =>
+            await bridgeClient.PacketWaitBuffer.SendWaitRequest(output, data =>
             {
                 signResult = data.ReadBool();
+
+                if (signResult)
+                    client.RoomId = data.ReadGuid();
 
                 return Task.CompletedTask;
             });
