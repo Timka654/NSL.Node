@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Configurations>Debug;Release;UnityDebug;Unity</Configurations>
-		
+
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -13,30 +13,30 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
 		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2022.12.2.526" />
 		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2022.12.2.526" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2022.12.2.526" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
-		<PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2022.10.30.1407" />
-		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2022.10.30.1407" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2022.12.2.526" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2022.12.2.526" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsServer" Version="2022.12.2.526" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2022.12.2.526" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

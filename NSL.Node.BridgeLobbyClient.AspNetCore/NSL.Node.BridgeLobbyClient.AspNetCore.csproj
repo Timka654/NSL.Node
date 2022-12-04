@@ -3,13 +3,13 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Configurations>Debug;Release;</Configurations>
-		<Version>$(VersionSuffix)</Version>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
+		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 
 		<IsPackable>true</IsPackable>
