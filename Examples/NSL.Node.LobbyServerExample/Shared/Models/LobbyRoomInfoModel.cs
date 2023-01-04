@@ -103,6 +103,7 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
                 packet.WriteCollection(
                     Enumerable.Repeat(configuration.GetValue<string>("bridge:server:clients_endpoint"), 1),
                     item => packet.WriteString16(item));
+                packet.WriteInt32(members.Count);
 
                 item.Value.Client.Network.Send(packet);
             }

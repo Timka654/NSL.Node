@@ -5,6 +5,7 @@ using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.BridgeTransportClient.Bridge;
 using NSL.Node.BridgeTransportClient.Transport;
+using NSL.Node.BridgeTransportClient.Transport.Data;
 using NSL.UDP.Client.Info;
 using NSL.WebSockets.Client;
 using NSL.WebSockets.Server;

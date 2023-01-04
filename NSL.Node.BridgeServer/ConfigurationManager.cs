@@ -8,7 +8,7 @@ namespace NSL.Node.BridgeServer
     {
         public ConfigurationManager()
         {
-            base.OnLog += Program.Logger.Append;
+            OnLog += Program.Logger.Append;
 
             AddProvider(new JsonConfigurationProvider("configuration.json", false, true));
             AddProvider(new EnvironmentVariableConfigurationProvider());

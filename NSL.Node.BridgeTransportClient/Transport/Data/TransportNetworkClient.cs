@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Node.BridgeTransportClient.Transport
+namespace NSL.Node.BridgeTransportClient.Transport.Data
 {
     public class TransportNetworkClient : IServerNetworkClient
     {
@@ -19,5 +19,7 @@ namespace NSL.Node.BridgeTransportClient.Transport
         public RoomInfo Room { get; set; }
 
         public string EndPoint { get; set; }
+
+        public bool Ready { get; set; }
     }
 }

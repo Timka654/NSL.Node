@@ -10,8 +10,11 @@ namespace NSL.Node.BridgeServer.Shared.Enums
     {
         SignSession = 1,
         SignSessionResult = SignSession,
-        ChangePlayerList,
+        ChangeNodeList,
         Transport,
         Broadcast,
+        ReadyNodePID,
+        ReadyNodeResultPID = ReadyNodePID,
+        ReadyRoom
     }
 }

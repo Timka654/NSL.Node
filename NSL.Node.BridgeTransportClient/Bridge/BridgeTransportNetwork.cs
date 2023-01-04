@@ -7,7 +7,7 @@ using NSL.BuilderExtensions.SocketCore;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore;
 using System.Net;
-using NSL.Node.BridgeTransportClient.Transport;
+using NSL.Node.BridgeTransportClient.Transport.Data;
 
 namespace NSL.Node.BridgeTransportClient.Bridge
 {
