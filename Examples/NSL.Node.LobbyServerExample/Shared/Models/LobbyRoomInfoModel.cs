@@ -28,7 +28,7 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
                 Client = client
             };
 
-            if (!members.TryAdd(member.Client.UID, member)) // already exists
+            if (members.ContainsKey(member.Client.UID)) // already exists
                 return JoinResultEnum.Ok;
 
             if (State != LobbyRoomState.Lobby)
@@ -36,6 +36,8 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
 
             if (members.Count == MaxMembers)
                 return JoinResultEnum.MaxMemberCount;
+
+            members.TryAdd(member.Client.UID, member);
 
             client.CurrentRoom = this;
 
@@ -50,6 +52,13 @@ namespace NSL.Node.LobbyServerExample.Shared.Models
             {
                 client.CurrentRoom = default;
                 BroadcastLeaveMember(member);
+            }
+
+            if (client.UID.Equals(OwnerId))
+            {
+                RemoveRoom();
+
+                return;
             }
         }
 

@@ -71,7 +71,13 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
         }
 
         private OutputPacketBuffer CreateReadyRoomPacket()
-            => OutputPacketBuffer.Create(NodeTransportPacketEnum.ReadyRoom);
+        {
+            var p = OutputPacketBuffer.Create(NodeTransportPacketEnum.ReadyRoom);
+
+            p.WriteDateTime(CreateTime);
+
+            return p;
+        }
 
         private void BroadcastChangeNodeList()
         {

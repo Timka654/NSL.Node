@@ -21,7 +21,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.Logger.AspNetCore" Version="2022.12.21.2329" />
+	  <PackageReference Include="NSL.Logger.AspNetCore" Version="2023.1.6.515" />
 	</ItemGroup>
 
 	<ItemGroup>

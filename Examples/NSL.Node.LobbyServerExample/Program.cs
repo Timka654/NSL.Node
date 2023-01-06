@@ -30,14 +30,21 @@ namespace NSL.Node.LobbyServerExample
 
             app.MapWebSocketsPoint<LobbyNetworkClientModel>("/lobby_ws", builder =>
             {
+                builder.AddExceptionHandle((ex, c) =>
+                {
+                    Console.WriteLine($"Exception {Environment.NewLine}{ex}{Environment.NewLine} from client");
+                });
+
                 builder.AddReceiveHandle((client, pid, len) =>
                 {
-                    app.Services.GetService<ILogger<LobbyNetworkClientModel>>().Log(LogLevel.Information, $"receive pid : {pid} from {client.GetRemotePoint()}");
+                    Console.WriteLine($"receive pid : {pid} from {client.GetRemotePoint()}");
                 });
+
                 builder.AddSendHandle((client, pid, len,stack) =>
                 {
-                    app.Services.GetService<ILogger<LobbyNetworkClientModel>>().Log(LogLevel.Information, $"send pid : {pid} to {client.GetRemotePoint()}");
+                    Console.WriteLine($"send pid : {pid} to {client.GetRemotePoint()}");
                 });
+
                 app.Services.GetRequiredService<LobbyManager>().BuildNetwork(builder);
             });
 

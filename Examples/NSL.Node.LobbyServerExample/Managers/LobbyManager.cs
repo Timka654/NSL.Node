@@ -69,8 +69,7 @@ namespace NSL.Node.LobbyServerExample.Managers
             {
                 clientMap.Remove(uid.Value, out _);
 
-                if (client.CurrentRoom != default && client.CurrentRoom.State == LobbyRoomState.Lobby)
-                    client.CurrentRoom.LeaveMember(client);
+                LeaveRoomMember(client);
             }
         }
 
@@ -228,19 +227,33 @@ namespace NSL.Node.LobbyServerExample.Managers
 
             packet.WriteBool(true);
 
-            if (client.CurrentRoom != null)
-            {
-                var room = client.CurrentRoom;
-
-                room.LeaveMember(client);
-
-                BroadcastChangeLobbyRoom(room);
-            }
+            LeaveRoomMember(client);
 
             client.Network.Send(packet);
         }
 
         #endregion
+
+
+        private void LeaveRoomMember(LobbyNetworkClientModel client)
+        {
+            var room = client.CurrentRoom;
+
+            if (room != default && room.State == LobbyRoomState.Lobby)
+            {
+                // logic for destroy room if creator leave
+                if (room.OwnerId.Equals(client.UID))
+                {
+                    roomMap.TryRemove(room.Id, out _);
+                    room.LeaveMember(client);
+
+                    BroadcastRemoveLobbyRoom(room);
+                }
+                else
+                    room.LeaveMember(client);
+            }
+        }
+
 
         #region Broadcast
 
