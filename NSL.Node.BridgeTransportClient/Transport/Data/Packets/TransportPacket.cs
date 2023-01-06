@@ -22,7 +22,7 @@ namespace NSL.Node.BridgeTransportClient.Transport
             pbuf.WriteGuid(client.Id);
 
             pbuf.Write(body[0..7]);
-            pbuf.Write(body[24..]);
+            pbuf.Write(body[23..]);
 
             client.Room.SendTo(to, pbuf);
         }

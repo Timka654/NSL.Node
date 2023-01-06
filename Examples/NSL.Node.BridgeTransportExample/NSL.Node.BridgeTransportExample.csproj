@@ -14,9 +14,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.1.6.515" />
-		<PackageReference Include="NSL.Logger" Version="2023.1.6.515" />
-		<PackageReference Include="NSL.UDP.Client" Version="2023.1.6.515" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.1.6.921" />
+		<PackageReference Include="NSL.Logger" Version="2023.1.6.921" />
+		<PackageReference Include="NSL.UDP.Client" Version="2023.1.6.921" />
 	</ItemGroup>
 
 	<ItemGroup>
