@@ -1,0 +1,64 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\BridgeLobbyNetworkClient\\BridgeLobbyNetworkClient.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\BridgeLobbyNetworkClient\\BridgeLobbyNetworkClient.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\BridgeLobbyNetworkClient\\BridgeLobbyNetworkClient.csproj",
+        "projectName": "BridgeLobbyNetworkClient",
+        "projectPath": "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\BridgeLobbyNetworkClient\\BridgeLobbyNetworkClient.csproj",
+        "packagesPath": "C:\\Users\\Bohdan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\BridgeLobbyNetworkClient\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Bohdan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://nuget.twicepricegroup.com/api/Package/fdc0f390-ac03-4981-9208-a4241196ea2c-1aa7e63b-7a53-4e6c-8b47-99bcc56a1a1b-ff706b44-7248-45d9-8de5-736437532bbd/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
