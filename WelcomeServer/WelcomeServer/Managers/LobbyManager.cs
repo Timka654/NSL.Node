@@ -4,8 +4,12 @@ using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Server;
 using System.Collections.Concurrent;
+using System.Net;
+using System.Threading.Tasks;
 using WelcomeServer.Data.Models;
+using WelcomeServer.Data.Repositories.Interfaces;
 using WelcomeServer.Enums;
+using WelcomeServer.Managers.Interfaces;
 
 namespace WelcomeServer.Managers
 {
@@ -13,6 +17,7 @@ namespace WelcomeServer.Managers
     {
         private readonly IConfiguration configuration;
 
+        private ConcurrentDictionary<string, Guid> TemporaryCreds = new ConcurrentDictionary<string, Guid>();
         private ConcurrentDictionary<Guid, LobbyNetworkClientModel> clientMap = new ConcurrentDictionary<Guid, LobbyNetworkClientModel>();
 
         private ConcurrentDictionary<Guid, LobbyRoomInfoModel> roomMap = new ConcurrentDictionary<Guid, LobbyRoomInfoModel>();
@@ -33,6 +38,7 @@ namespace WelcomeServer.Managers
             builder.AddPacketHandle(ServerReceivePacketEnum.StartRoom, RunRoomRequestHandle);
             builder.AddPacketHandle(ServerReceivePacketEnum.RemoveRoom, RemoveRoomRequestHandle);
             builder.AddPacketHandle(ServerReceivePacketEnum.GetRoomList, GetRoomListRequestHandle);
+            builder.AddPacketHandle(ServerReceivePacketEnum.Handshake, CheckAuthToSocket);
         }
 
         public LobbyManager(IConfiguration configuration)
@@ -42,17 +48,14 @@ namespace WelcomeServer.Managers
 
         #region NetworkHandle
 
-        private void OnClientConnectedHandle(LobbyNetworkClientModel client)
+        private async void OnClientConnectedHandle(LobbyNetworkClientModel client)
         {
-            do
-            {
-                client.UID = Guid.NewGuid();
-            } while (!clientMap.TryAdd(client.UID, client));
+            OutputPacketBuffer packet;
 
-            var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.NewUserIdentity);
-
+            //var ip = client.Network.GetRemotePoint().Address;
+            packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.NewUserIdentity);
+            //packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.HandshakeRequest);
             packet.WriteGuid(client.UID);
-
             client.Network.Send(packet);
         }
 
@@ -99,6 +102,33 @@ namespace WelcomeServer.Managers
             });
 
             client.Network.Send(packet);
+        }
+
+        private void CheckAuthToSocket(LobbyNetworkClientModel client, InputPacketBuffer data)
+        {
+            var x = data.ReadGuid();
+            if (!TemporaryCreds.Values.Contains(x))
+            {
+                var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.ErrorHandShake);
+                packet.WriteString32("Handshake failed");
+                client.Network.Send(packet);
+                client.Network.Disconnect();
+            }
+            else
+            {
+                clientMap[x] = client;
+                client.UID = x;
+            }
+            //var packet = OutputPacketBuffer.Create(ClientReceivePacketEnum.GetRoomListResult).WithWaitableAnswer(data);
+
+            //packet.WriteCollection(roomMap, item =>
+            //{
+            //    packet.WriteGuid(item.Value.Id);
+
+            //    packet.WriteString16(item.Value.Name);
+            //});
+
+            //client.Network.Send(packet);
         }
 
         private void CreateRoomRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
@@ -302,6 +332,14 @@ namespace WelcomeServer.Managers
             });
         }
 
+
         #endregion
+
+        public async Task<Guid> RegisterTemporaryKey(string username)
+        {
+            TemporaryCreds[username] = Guid.NewGuid();
+            return TemporaryCreds[username];
+        }
+
     }
 }

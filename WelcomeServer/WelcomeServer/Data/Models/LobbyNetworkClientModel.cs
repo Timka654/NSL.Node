@@ -7,6 +7,7 @@ namespace WelcomeServer.Data.Models
         private LobbyRoomInfoModel currentRoom;
 
         public Guid UID { get; set; }
+        public string Username { get; set; }
 
         public Guid CurrentRoomId { get; set; }
 

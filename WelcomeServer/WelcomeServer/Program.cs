@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using WelcomeServer.Data;
 using WelcomeServer.Data.Models;
 using WelcomeServer.Data.Repositories;
+using WelcomeServer.Data.Repositories.Interfaces;
 using WelcomeServer.Managers;
 using WelcomeServer.Managers.Interfaces;
 
@@ -16,8 +18,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("default")));
 
 builder.Services.AddSingleton<LobbyManager>();
-builder.Services.AddScoped<IUserManager, UserManager>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+SetDependencies();
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -56,3 +59,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+void SetDependencies()
+{
+    builder.Services.AddScoped<IUserManager, UserManager>();
+    builder.Services.AddScoped<IUserRepository, UserRepository>();
+    builder.Services.AddScoped<ICredentialsRepository, CredentialRepository>();
+}

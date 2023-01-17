@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WelcomeServer.Data.Models;
+using WelcomeServer.Data.Repositories.Interfaces;
 
 namespace WelcomeServer.Data.Repositories
 {
@@ -21,8 +22,12 @@ namespace WelcomeServer.Data.Repositories
 
         public async Task<User> GetUserAsync(Guid id)
         {
-            var result = await _dbContext.Users.FirstOrDefaultAsync(u => u.ID == id);
-            return result;
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.ID == id);
+        }
+
+        public async Task<User> GetUserAsyncByName(string username)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
     }
 }

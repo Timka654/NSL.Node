@@ -20,6 +20,7 @@ namespace WelcomeServer.Enums
         NewUserIdentity,
         RoomStartedMessage,
         RoomRemoveMessage,
-        GetRoomListResult
+        GetRoomListResult,
+        ErrorHandShake
     }
 }

@@ -14,6 +14,7 @@ namespace WelcomeServer.Enums
         SendChatMessage,
         StartRoom,
         RemoveRoom,
-        GetRoomList
+        GetRoomList,
+        Handshake
     }
 }
