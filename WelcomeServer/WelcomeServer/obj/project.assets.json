@@ -3938,6 +3938,16 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
+      },
+      "SimpleGame/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/SimpleGame.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SimpleGame.dll": {}
+        }
       }
     }
   },
@@ -10934,6 +10944,11 @@
         "system.xml.xdocument.4.3.0.nupkg.sha512",
         "system.xml.xdocument.nuspec"
       ]
+    },
+    "SimpleGame/1.0.0": {
+      "type": "project",
+      "path": "../SimpleGame/SimpleGame.csproj",
+      "msbuildProject": "../SimpleGame/SimpleGame.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -10946,23 +10961,24 @@
       "NSL.BuilderExtensions.TCPServer >= 2023.1.6.2250",
       "NSL.BuilderExtensions.WebSocketsServer.AspNet >= 2023.1.6.2250",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 7.0.1",
+      "SimpleGame >= 1.0.0",
       "Swashbuckle.AspNetCore >= 6.2.3"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Bohdan\\.nuget\\packages\\": {}
+    "C:\\Users\\yasin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\WelcomeServer\\WelcomeServer.csproj",
+      "projectUniqueName": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\WelcomeServer\\WelcomeServer.csproj",
       "projectName": "WelcomeServer",
-      "projectPath": "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\WelcomeServer\\WelcomeServer.csproj",
-      "packagesPath": "C:\\Users\\Bohdan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Bohdan\\Desktop\\Server\\WelcomeServer\\WelcomeServer\\obj\\",
+      "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\WelcomeServer\\WelcomeServer.csproj",
+      "packagesPath": "C:\\Users\\yasin\\.nuget\\packages\\",
+      "outputPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\WelcomeServer\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Bohdan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\yasin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -10976,7 +10992,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj": {
+              "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -11049,7 +11069,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
       }
     }
   },

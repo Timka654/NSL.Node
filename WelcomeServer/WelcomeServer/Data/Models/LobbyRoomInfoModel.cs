@@ -24,7 +24,8 @@ namespace WelcomeServer.Data.Models
         {
             var member = new LobbyRoomMemberModel()
             {
-                Client = client
+                Client = client,
+                Username= client.Username,
             };
 
             if (members.ContainsKey(member.Client.UID)) // already exists
@@ -173,6 +174,7 @@ namespace WelcomeServer.Data.Models
     public class LobbyRoomMemberModel
     {
         public LobbyNetworkClientModel Client { get; set; }
+        public string Username { get; set; }
     }
 
     public enum LobbyRoomState

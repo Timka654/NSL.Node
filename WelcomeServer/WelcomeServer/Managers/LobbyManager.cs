@@ -3,6 +3,7 @@ using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Server;
+using SimpleGame;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ namespace WelcomeServer.Managers
             builder.AddPacketHandle(ServerReceivePacketEnum.RemoveRoom, RemoveRoomRequestHandle);
             builder.AddPacketHandle(ServerReceivePacketEnum.GetRoomList, GetRoomListRequestHandle);
             builder.AddPacketHandle(ServerReceivePacketEnum.Handshake, CheckAuthToSocket);
+            //builder.AddPacketHandle(ServerReceivePacketEnum.PerformGameMove, UpdateGame);
         }
 
         public LobbyManager(IConfiguration configuration)
@@ -200,8 +202,18 @@ namespace WelcomeServer.Managers
                     processingRoomMap.TryAdd(room.Id, room);
 
                     BroadcastRemoveLobbyRoom(room);
+
+                    StartGame(room);
                 }
             }
+        }
+
+        private void StartGame(LobbyRoomInfoModel room)
+        {
+            var playersCount = room.MemberCount();
+            var gameModel = new GameModel(playersCount);
+
+            var gameInfoForPlayers = gameModel.GetMaskedInfo();
         }
 
         private void SendChatMessageRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)

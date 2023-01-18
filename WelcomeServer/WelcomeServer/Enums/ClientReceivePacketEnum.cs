@@ -21,6 +21,9 @@ namespace WelcomeServer.Enums
         RoomStartedMessage,
         RoomRemoveMessage,
         GetRoomListResult,
-        ErrorHandShake
+        ErrorHandShake,
+        OnGameStarted,
+        GameUpdate,
+        GameFinished
     }
 }

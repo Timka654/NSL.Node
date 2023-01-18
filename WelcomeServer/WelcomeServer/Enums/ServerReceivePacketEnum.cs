@@ -15,6 +15,7 @@ namespace WelcomeServer.Enums
         StartRoom,
         RemoveRoom,
         GetRoomList,
-        Handshake
+        Handshake,
+        PerformGameMove
     }
 }
