@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\NSL.Node.BridgeLobbyClient.AspNetCore_Debug.props" />
-</Project>
