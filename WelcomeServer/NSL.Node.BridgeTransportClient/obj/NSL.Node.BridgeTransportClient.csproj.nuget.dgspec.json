@@ -18,7 +18,7 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0"
+          "net7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -26,11 +26,11 @@
           "https://nuget.twicepricegroup.com/api/Package/fdc0f390-ac03-4981-9208-a4241196ea2c-1aa7e63b-7a53-4e6c-8b47-99bcc56a1a1b-ff706b44-7248-45d9-8de5-736437532bbd/v3/index.json": {}
         },
         "frameworks": {
-          "net6.0": {
-            "targetAlias": "net6.0",
+          "net7.0": {
+            "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeServer.Shared\\NSL.Node.BridgeServer.Shared.csproj": {
-                "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeServer.Shared\\NSL.Node.BridgeServer.Shared.csproj"
+              "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj": {
+                "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj"
               }
             }
           }
@@ -42,8 +42,8 @@
         }
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "dependencies": {
             "NSL.BuilderExtensions.SocketCore": {
               "target": "Package",
@@ -56,8 +56,80 @@
             "NSL.BuilderExtensions.WebSocketsServer": {
               "target": "Package",
               "version": "[2023.1.6.2250, )"
+            },
+            "NSL.ConfigurationEngine": {
+              "target": "Package",
+              "version": "[2023.1.18.1421, )"
+            },
+            "NSL.ConfigurationEngine.Providers.Json": {
+              "target": "Package",
+              "version": "[2023.1.18.1421, )"
+            },
+            "NSL.Logger": {
+              "target": "Package",
+              "version": "[2023.1.18.1421, )"
+            },
+            "NSL.UDP.Client": {
+              "target": "Package",
+              "version": "[2023.1.18.1421, )"
             }
           },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj",
+        "projectName": "SimpleGame",
+        "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj",
+        "packagesPath": "C:\\Users\\yasin\\.nuget\\packages\\",
+        "outputPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\yasin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://nuget.twicepricegroup.com/api/Package/fdc0f390-ac03-4981-9208-a4241196ea2c-1aa7e63b-7a53-4e6c-8b47-99bcc56a1a1b-ff706b44-7248-45d9-8de5-736437532bbd/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
           "imports": [
             "net461",
             "net462",

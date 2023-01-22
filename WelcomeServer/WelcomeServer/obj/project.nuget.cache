@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "XCMKZqskI4Pnbet4FL9TcRbg08GKnL2MB1A3TNYkDLb0jWhK867HLSzOLtSUvWPMtGbndQOLY0YzKDBVpAqllw==",
+  "dgSpecHash": "24McZ5WxEXlOJ68SJj96kdp7+UovSwzBCnnzvRghWg5DyXlQeLe8fkNoJLWi3bkUZ+BeE+ozkVYe028NLInH5g==",
   "success": true,
   "projectFilePath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\WelcomeServer\\WelcomeServer.csproj",
   "expectedPackageFiles": [
@@ -80,9 +80,12 @@
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.tcp\\2023.1.6.2250\\nsl.builderextensions.tcp.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.tcpserver\\2023.1.6.2250\\nsl.builderextensions.tcpserver.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.websockets\\2023.1.6.2250\\nsl.builderextensions.websockets.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.websocketsclient\\2023.1.6.2250\\nsl.builderextensions.websocketsclient.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.websocketsserver\\2023.1.6.2250\\nsl.builderextensions.websocketsserver.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.websocketsserver.aspnet\\2023.1.6.2250\\nsl.builderextensions.websocketsserver.aspnet.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.endpointbuilder\\2023.1.6.2250\\nsl.endpointbuilder.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.logger\\2023.1.6.2250\\nsl.logger.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.logger.aspnetcore\\2023.1.6.2250\\nsl.logger.aspnetcore.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketclient\\2023.1.6.2250\\nsl.socketclient.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketcore\\2023.1.6.2250\\nsl.socketcore.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketcore.extensions.buffer\\2023.1.6.2250\\nsl.socketcore.extensions.buffer.2023.1.6.2250.nupkg.sha512",
@@ -92,6 +95,7 @@
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.tcp.server\\2023.1.6.2250\\nsl.tcp.server.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.utils\\2023.1.6.2250\\nsl.utils.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.websockets\\2023.1.6.2250\\nsl.websockets.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.websockets.client\\2023.1.6.2250\\nsl.websockets.client.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.websockets.server\\2023.1.6.2250\\nsl.websockets.server.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nsl.websockets.server.aspnetpoint\\2023.1.6.2250\\nsl.websockets.server.aspnetpoint.2023.1.6.2250.nupkg.sha512",
     "C:\\Users\\yasin\\.nuget\\packages\\nuget.common\\6.3.1\\nuget.common.6.3.1.nupkg.sha512",

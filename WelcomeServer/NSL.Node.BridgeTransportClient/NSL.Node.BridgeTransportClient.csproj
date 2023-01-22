@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<Configurations>Debug;Release;UnityDebug;Unity</Configurations>
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
+		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -36,7 +37,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
+	  <PackageReference Include="NSL.ConfigurationEngine" Version="2023.1.18.1421" />
+	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.1.18.1421" />
+	  <PackageReference Include="NSL.Logger" Version="2023.1.18.1421" />
+	  <PackageReference Include="NSL.UDP.Client" Version="2023.1.18.1421" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SimpleGame\SimpleGame.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,11 +1,23 @@
 {
   "Version": 1,
-  "Hash": "l5mN/fJS9UE7NUT1QymyAnol4zwvP+Mfwbbwha29BiM=",
+  "Hash": "J556LTEMGcQXzkgedrtDKuawd6XLxfY79Qr2VsESip4=",
   "Source": "WelcomeServer",
   "BasePath": "_content/WelcomeServer",
   "Mode": "Default",
   "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeLobbyClient.AspNetCore\\NSL.Node.BridgeLobbyClient.AspNetCore.csproj",
+      "Version": 2,
+      "Source": "NSL.Node.BridgeLobbyClient.AspNetCore_Debug",
+      "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
+    }
+  ],
   "DiscoveryPatterns": [],
   "Assets": []
 }

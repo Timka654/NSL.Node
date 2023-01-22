@@ -1,16 +1,20 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketCore.Utils.Buffer;
+using SimpleGame;
+using SimpleGame.Game;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace NSL.Node.BridgeTransportClient.Transport.Data
 {
     public class RoomInfo
     {
+        private GameModel gameModel;
+
+
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
         private Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>> commands = new Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>>();
@@ -25,6 +29,11 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
         public RoomInfo(Guid roomId)
         {
             this.RoomId = roomId;
+            //gameModel = new GameModel(2);
+            commands.Add(1, (client, packet) =>
+            {
+                Console.WriteLine("Command Works");
+            });
         }
 
         public void AddClient(TransportNetworkClient node)
@@ -110,12 +119,30 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
             else
                 packet.Dispose();
         }
+        public void StartGame()
+        {
+            gameModel = new GameModel(nodes.Count);
+            gameModel.StartNewTurn();
+            var packet = OutputPacketBuffer.Create(NodeTransportPacketEnum.Transport);
+            packet.WriteInt16((Int16)GameCommandsEnum.GameStart);
 
+            var playersIds = nodes.Keys.ToList();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                packet.WriteInt32(i);
+                nodes[playersIds[i]].Network.Send(packet);
+            }
+        }
         public void Execute(TransportNetworkClient client, InputPacketBuffer packet)
         {
             var body = packet.GetBuffer();
 
             var to = packet.ReadGuid();
+
+            if (commands.TryGetValue(packet.ReadUInt16(), out var command))
+            {
+                command(client, packet);
+            }
 
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(NodeTransportPacketEnum.Transport);
 
@@ -125,10 +152,7 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
             pbuf.Write(body[23..]);
 
             SendTo(to, pbuf);
-            if (commands.TryGetValue(packet.ReadUInt16(), out var command))
-            {
-                command(client, packet);
-            }
+
         }
 
         public void SendTo(TransportNetworkClient node, OutputPacketBuffer packet, bool disposeOnSend = true)

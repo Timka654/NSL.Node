@@ -13,6 +13,7 @@ using WelcomeServer.Managers.Interfaces;
 
 namespace WelcomeServer.Controllers
 {
+    [Route("[controller]")]
     [Controller]
     public class UsersController : Controller
     {

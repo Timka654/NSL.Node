@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NSL.Node.BridgeLobbyClient.AspNetCore\NSL.Node.BridgeLobbyClient.AspNetCore.csproj" />
     <ProjectReference Include="..\SimpleGame\SimpleGame.csproj" />
   </ItemGroup>
 

@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {
+    "net7.0": {
       "Newtonsoft.Json/13.0.1": {
         "type": "package",
         "compile": {
@@ -69,10 +69,36 @@
           "lib/net6.0/NSL.BuilderExtensions.WebSocketsServer.dll": {}
         }
       },
-      "NSL.EndPointBuilder/2023.1.6.2250": {
+      "NSL.ConfigurationEngine/2023.1.18.1421": {
         "type": "package",
         "dependencies": {
-          "NSL.SocketCore": "2023.1.6.2250"
+          "NSL.SocketCore": "2023.1.18.1421",
+          "NSL.Utils": "2023.1.18.1421"
+        },
+        "compile": {
+          "lib/net7.0/NSL.ConfigurationEngine.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/NSL.ConfigurationEngine.dll": {}
+        }
+      },
+      "NSL.ConfigurationEngine.Providers.Json/2023.1.18.1421": {
+        "type": "package",
+        "dependencies": {
+          "NSL.ConfigurationEngine": "2023.1.18.1421",
+          "NSL.Utils": "2023.1.18.1421"
+        },
+        "compile": {
+          "lib/net7.0/NSL.ConfigurationEngine.Providers.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/NSL.ConfigurationEngine.Providers.Json.dll": {}
+        }
+      },
+      "NSL.EndPointBuilder/2023.1.18.1421": {
+        "type": "package",
+        "dependencies": {
+          "NSL.SocketCore": "2023.1.18.1421"
         },
         "compile": {
           "lib/netstandard2.0/NSL.EndPointBuilder.dll": {}
@@ -81,11 +107,24 @@
           "lib/netstandard2.0/NSL.EndPointBuilder.dll": {}
         }
       },
-      "NSL.SocketClient/2023.1.6.2250": {
+      "NSL.Logger/2023.1.18.1421": {
         "type": "package",
         "dependencies": {
-          "NSL.EndPointBuilder": "2023.1.6.2250",
-          "NSL.SocketCore": "2023.1.6.2250"
+          "NSL.SocketCore": "2023.1.18.1421",
+          "NSL.Utils": "2023.1.18.1421"
+        },
+        "compile": {
+          "lib/net7.0/NSL.Logger.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/NSL.Logger.dll": {}
+        }
+      },
+      "NSL.SocketClient/2023.1.18.1421": {
+        "type": "package",
+        "dependencies": {
+          "NSL.EndPointBuilder": "2023.1.18.1421",
+          "NSL.SocketCore": "2023.1.18.1421"
         },
         "compile": {
           "lib/netstandard2.0/NSL.SocketClient.dll": {}
@@ -94,7 +133,7 @@
           "lib/netstandard2.0/NSL.SocketClient.dll": {}
         }
       },
-      "NSL.SocketCore/2023.1.6.2250": {
+      "NSL.SocketCore/2023.1.18.1421": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/NSL.SocketCore.dll": {}
@@ -128,11 +167,11 @@
           "lib/netstandard2.0/NSL.SocketCore.Extensions.Packet.dll": {}
         }
       },
-      "NSL.SocketServer/2023.1.6.2250": {
+      "NSL.SocketServer/2023.1.18.1421": {
         "type": "package",
         "dependencies": {
-          "NSL.EndPointBuilder": "2023.1.6.2250",
-          "NSL.SocketCore": "2023.1.6.2250"
+          "NSL.EndPointBuilder": "2023.1.18.1421",
+          "NSL.SocketCore": "2023.1.18.1421"
         },
         "compile": {
           "lib/netstandard2.0/NSL.SocketServer.dll": {}
@@ -141,7 +180,34 @@
           "lib/netstandard2.0/NSL.SocketServer.dll": {}
         }
       },
-      "NSL.Utils/2023.1.6.2250": {
+      "NSL.UDP/2023.1.18.1421": {
+        "type": "package",
+        "dependencies": {
+          "NSL.SocketCore": "2023.1.18.1421"
+        },
+        "compile": {
+          "lib/net7.0/NSL.UDP.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/NSL.UDP.dll": {}
+        }
+      },
+      "NSL.UDP.Client/2023.1.18.1421": {
+        "type": "package",
+        "dependencies": {
+          "NSL.SocketClient": "2023.1.18.1421",
+          "NSL.SocketServer": "2023.1.18.1421",
+          "NSL.UDP": "2023.1.18.1421",
+          "STUN": "0.5.0"
+        },
+        "compile": {
+          "lib/net7.0/NSL.UDP.Client.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/NSL.UDP.Client.dll": {}
+        }
+      },
+      "NSL.Utils/2023.1.18.1421": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.Json": "(13.0.0, )"
@@ -190,6 +256,25 @@
         },
         "runtime": {
           "lib/net6.0/NSL.WebSockets.Server.dll": {}
+        }
+      },
+      "STUN/0.5.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/STUN.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/STUN.dll": {}
+        }
+      },
+      "SimpleGame/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/SimpleGame.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SimpleGame.dll": {}
         }
       }
     }
@@ -266,36 +351,69 @@
         "nsl.builderextensions.websocketsserver.nuspec"
       ]
     },
-    "NSL.EndPointBuilder/2023.1.6.2250": {
-      "sha512": "vsV+cNlEbLSpWzVSlrqn1cpzKaWZwCLcL/IscmoCKp0sZGB0IUmxcZuvaoo6myPi+WtWCaPMzlFpZogdda0eMQ==",
+    "NSL.ConfigurationEngine/2023.1.18.1421": {
+      "sha512": "6ac6X4eWNiaryGAGi6FPAseD28glwGRWKe5kKw2pqFQPLw8tvnVMY+Hql6LOwlVQc1txcAdIQgzwarc8lX2jtQ==",
       "type": "package",
-      "path": "nsl.endpointbuilder/2023.1.6.2250",
+      "path": "nsl.configurationengine/2023.1.18.1421",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net7.0/NSL.ConfigurationEngine.dll",
+        "nsl.configurationengine.2023.1.18.1421.nupkg.sha512",
+        "nsl.configurationengine.nuspec"
+      ]
+    },
+    "NSL.ConfigurationEngine.Providers.Json/2023.1.18.1421": {
+      "sha512": "pSd4Yh58Zktq4BHFv7LiWvE7OoNkJizhk5juHeEWI7TespysTdPjXxIQC8wEuF8Gq5CyoZQ444xrLIOUfh52KA==",
+      "type": "package",
+      "path": "nsl.configurationengine.providers.json/2023.1.18.1421",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net7.0/NSL.ConfigurationEngine.Providers.Json.dll",
+        "nsl.configurationengine.providers.json.2023.1.18.1421.nupkg.sha512",
+        "nsl.configurationengine.providers.json.nuspec"
+      ]
+    },
+    "NSL.EndPointBuilder/2023.1.18.1421": {
+      "sha512": "dGPL1l8AOomqCg+6T/yvELbis1Cj/p7UOygSuiA87/0bIMdnLHCMkq+E9csdu8CObVC8EWS81vW/LVD3d+v1lg==",
+      "type": "package",
+      "path": "nsl.endpointbuilder/2023.1.18.1421",
       "files": [
         ".nupkg.metadata",
         "lib/netstandard2.0/NSL.EndPointBuilder.dll",
-        "nsl.endpointbuilder.2023.1.6.2250.nupkg.sha512",
+        "nsl.endpointbuilder.2023.1.18.1421.nupkg.sha512",
         "nsl.endpointbuilder.nuspec"
       ]
     },
-    "NSL.SocketClient/2023.1.6.2250": {
-      "sha512": "Xxphha+3oK2m0PMmSVL1rWgVL/ha4PsO2FROvk1CGl1X5Q56qCtW5fcJeVR8S5gHW20BgDxP3vOa0cVXsZTzng==",
+    "NSL.Logger/2023.1.18.1421": {
+      "sha512": "F15H+gZ5Trf122nGNT99dlRdvDz69wymYjGWNqLmt9YgAn9KR5q/onhPRESw8ouHCE3ltg9LMVFrEV8MZgb5IA==",
       "type": "package",
-      "path": "nsl.socketclient/2023.1.6.2250",
+      "path": "nsl.logger/2023.1.18.1421",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net7.0/NSL.Logger.dll",
+        "nsl.logger.2023.1.18.1421.nupkg.sha512",
+        "nsl.logger.nuspec"
+      ]
+    },
+    "NSL.SocketClient/2023.1.18.1421": {
+      "sha512": "HfRZSVSHyi1c9ADyi+/sy3cBAGBXK7+JhFW3yyW0Bo6bJpCOyF5TqfZYtAWYbswlAMGVpdic2Bt5tQiPydVv8A==",
+      "type": "package",
+      "path": "nsl.socketclient/2023.1.18.1421",
       "files": [
         ".nupkg.metadata",
         "lib/netstandard2.0/NSL.SocketClient.dll",
-        "nsl.socketclient.2023.1.6.2250.nupkg.sha512",
+        "nsl.socketclient.2023.1.18.1421.nupkg.sha512",
         "nsl.socketclient.nuspec"
       ]
     },
-    "NSL.SocketCore/2023.1.6.2250": {
-      "sha512": "VhG16uZm4YTLtPzFYfzTWiCpLKUn2sn+UElRX5RZSv0npFLXGv3fxqc0y7dtWYydbBf6V0P8CUrqEKu783lmzA==",
+    "NSL.SocketCore/2023.1.18.1421": {
+      "sha512": "ZRheu0u58+asO4U0bDbfT8h2pXADoMGB7FPH29EH66bGT7zQhRnMVxOMpVKWkw+FwRB5uGPlOJmze79bYeq9fg==",
       "type": "package",
-      "path": "nsl.socketcore/2023.1.6.2250",
+      "path": "nsl.socketcore/2023.1.18.1421",
       "files": [
         ".nupkg.metadata",
         "lib/netstandard2.0/NSL.SocketCore.dll",
-        "nsl.socketcore.2023.1.6.2250.nupkg.sha512",
+        "nsl.socketcore.2023.1.18.1421.nupkg.sha512",
         "nsl.socketcore.nuspec"
       ]
     },
@@ -321,25 +439,47 @@
         "nsl.socketcore.extensions.packet.nuspec"
       ]
     },
-    "NSL.SocketServer/2023.1.6.2250": {
-      "sha512": "4eNrEyUhaaZqmUsAPctytx1vtjyHjRPSTIEKLPoxldMrbbVdkQJkRUNVJMhvg4gka4Tah1TZCYhntiIW2cS/ig==",
+    "NSL.SocketServer/2023.1.18.1421": {
+      "sha512": "2prgwhtwQkveF1dQdyNmd1qBY8j3uWzDtSxTpp2b9vV07INx1ge3ORbs9qdmvHvUaJDaw6lKRrCM/h6uqR6S7A==",
       "type": "package",
-      "path": "nsl.socketserver/2023.1.6.2250",
+      "path": "nsl.socketserver/2023.1.18.1421",
       "files": [
         ".nupkg.metadata",
         "lib/netstandard2.0/NSL.SocketServer.dll",
-        "nsl.socketserver.2023.1.6.2250.nupkg.sha512",
+        "nsl.socketserver.2023.1.18.1421.nupkg.sha512",
         "nsl.socketserver.nuspec"
       ]
     },
-    "NSL.Utils/2023.1.6.2250": {
-      "sha512": "jgmt1JpX1qEIKnqptQMTb0nROscgARhkhD/cinUMeI48unc/nCwmuBUFTfNk7Y1tLN17q10fHizmesoINQdBvQ==",
+    "NSL.UDP/2023.1.18.1421": {
+      "sha512": "zFW7yVMjLbT8gcyLe7+ld9o+RWkgLszgBBOEKtYKiXBWOO5zfMkOcTzqrUs+30N550kHHT+SAXk0Zfl1e1MzFA==",
       "type": "package",
-      "path": "nsl.utils/2023.1.6.2250",
+      "path": "nsl.udp/2023.1.18.1421",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net7.0/NSL.UDP.dll",
+        "nsl.udp.2023.1.18.1421.nupkg.sha512",
+        "nsl.udp.nuspec"
+      ]
+    },
+    "NSL.UDP.Client/2023.1.18.1421": {
+      "sha512": "QHCUtATh2t7BEaNMw0xTMt81GrjOQBWXBqWVasr6Rrn9DMRDAO5zMADvw8aHw8YDXuqAUY6fke2YjFuvo1InIg==",
+      "type": "package",
+      "path": "nsl.udp.client/2023.1.18.1421",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net7.0/NSL.UDP.Client.dll",
+        "nsl.udp.client.2023.1.18.1421.nupkg.sha512",
+        "nsl.udp.client.nuspec"
+      ]
+    },
+    "NSL.Utils/2023.1.18.1421": {
+      "sha512": "T95jxLJUeFFDqrVLpIescRQlzgzSE97/xU0PmZrwXXDwVvZXwO/H85LnzqIwLW2YtfuEpefh8uzB26fZ3Y3gbw==",
+      "type": "package",
+      "path": "nsl.utils/2023.1.18.1421",
       "files": [
         ".nupkg.metadata",
         "lib/netstandard2.0/NSL.Utils.dll",
-        "nsl.utils.2023.1.6.2250.nupkg.sha512",
+        "nsl.utils.2023.1.18.1421.nupkg.sha512",
         "nsl.utils.nuspec"
       ]
     },
@@ -375,14 +515,37 @@
         "nsl.websockets.server.2023.1.6.2250.nupkg.sha512",
         "nsl.websockets.server.nuspec"
       ]
+    },
+    "STUN/0.5.0": {
+      "sha512": "xycAOIaCT2bdndchrCMCqhCK+KnGSWgJZWOe2YPDuDDK0eqHO+20utU66tKgqH9trJnZ/XyZk5bdDdZQHSIKig==",
+      "type": "package",
+      "path": "stun/0.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net45/STUN.dll",
+        "lib/netstandard1.3/STUN.dll",
+        "lib/netstandard2.0/STUN.dll",
+        "stun.0.5.0.nupkg.sha512",
+        "stun.nuspec"
+      ]
+    },
+    "SimpleGame/1.0.0": {
+      "type": "project",
+      "path": "../SimpleGame/SimpleGame.csproj",
+      "msbuildProject": "../SimpleGame/SimpleGame.csproj"
     }
   },
   "projectFileDependencyGroups": {
-    "net6.0": [
-      "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeServer.Shared\\NSL.Node.BridgeServer.Shared.csproj",
+    "net7.0": [
       "NSL.BuilderExtensions.SocketCore >= 2023.1.6.2250",
       "NSL.BuilderExtensions.WebSocketsClient >= 2023.1.6.2250",
-      "NSL.BuilderExtensions.WebSocketsServer >= 2023.1.6.2250"
+      "NSL.BuilderExtensions.WebSocketsServer >= 2023.1.6.2250",
+      "NSL.ConfigurationEngine >= 2023.1.18.1421",
+      "NSL.ConfigurationEngine.Providers.Json >= 2023.1.18.1421",
+      "NSL.Logger >= 2023.1.18.1421",
+      "NSL.UDP.Client >= 2023.1.18.1421",
+      "SimpleGame >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -402,7 +565,7 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net6.0"
+        "net7.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -410,11 +573,11 @@
         "https://nuget.twicepricegroup.com/api/Package/fdc0f390-ac03-4981-9208-a4241196ea2c-1aa7e63b-7a53-4e6c-8b47-99bcc56a1a1b-ff706b44-7248-45d9-8de5-736437532bbd/v3/index.json": {}
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "projectReferences": {
-            "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeServer.Shared\\NSL.Node.BridgeServer.Shared.csproj": {
-              "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeServer.Shared\\NSL.Node.BridgeServer.Shared.csproj"
+            "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj": {
+              "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj"
             }
           }
         }
@@ -426,8 +589,8 @@
       }
     },
     "frameworks": {
-      "net6.0": {
-        "targetAlias": "net6.0",
+      "net7.0": {
+        "targetAlias": "net7.0",
         "dependencies": {
           "NSL.BuilderExtensions.SocketCore": {
             "target": "Package",
@@ -440,6 +603,22 @@
           "NSL.BuilderExtensions.WebSocketsServer": {
             "target": "Package",
             "version": "[2023.1.6.2250, )"
+          },
+          "NSL.ConfigurationEngine": {
+            "target": "Package",
+            "version": "[2023.1.18.1421, )"
+          },
+          "NSL.ConfigurationEngine.Providers.Json": {
+            "target": "Package",
+            "version": "[2023.1.18.1421, )"
+          },
+          "NSL.Logger": {
+            "target": "Package",
+            "version": "[2023.1.18.1421, )"
+          },
+          "NSL.UDP.Client": {
+            "target": "Package",
+            "version": "[2023.1.18.1421, )"
           }
         },
         "imports": [
@@ -467,19 +646,20 @@
       "code": "NU1602",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "NSL.Utils 2023.1.6.2250 does not provide an inclusive lower bound for dependency Newtonsoft.Json (> 13.0.0). An approximate best match of Newtonsoft.Json 13.0.1 was resolved.",
+      "message": "NSL.Utils 2023.1.18.1421 does not provide an inclusive lower bound for dependency Newtonsoft.Json (> 13.0.0). An approximate best match of Newtonsoft.Json 13.0.1 was resolved.",
       "libraryId": "Newtonsoft.Json",
       "targetGraphs": [
-        "net6.0"
+        "net7.0"
       ]
     },
     {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project 'D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeServer.Shared\\NSL.Node.BridgeServer.Shared.csproj'. Check that the project reference is valid and that the project file exists.",
-      "libraryId": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeServer.Shared\\NSL.Node.BridgeServer.Shared.csproj",
+      "code": "NU1602",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "NSL.Utils 2023.1.6.2250 does not provide an inclusive lower bound for dependency Newtonsoft.Json (> 13.0.0). An approximate best match of Newtonsoft.Json 13.0.1 was resolved.",
+      "libraryId": "Newtonsoft.Json",
       "targetGraphs": [
-        "net6.0"
+        "net7.0"
       ]
     }
   ]

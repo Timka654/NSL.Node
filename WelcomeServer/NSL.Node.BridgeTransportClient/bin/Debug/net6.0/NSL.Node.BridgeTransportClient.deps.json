@@ -11,7 +11,7 @@
           "NSL.BuilderExtensions.SocketCore": "2023.1.6.2250",
           "NSL.BuilderExtensions.WebSocketsClient": "2023.1.6.2250",
           "NSL.BuilderExtensions.WebSocketsServer": "2023.1.6.2250",
-          "NSL.Node.BridgeServer.Shared_Debug": "1.0.0"
+          "SimpleGame": "1.0.0"
         },
         "runtime": {
           "NSL.Node.BridgeTransportClient.dll": {}
@@ -188,9 +188,9 @@
           }
         }
       },
-      "NSL.Node.BridgeServer.Shared_Debug/1.0.0": {
+      "SimpleGame/1.0.0": {
         "runtime": {
-          "NSL.Node.BridgeServer.Shared.dll": {}
+          "SimpleGame.dll": {}
         }
       }
     }
@@ -306,7 +306,7 @@
       "path": "nsl.websockets.server/2023.1.6.2250",
       "hashPath": "nsl.websockets.server.2023.1.6.2250.nupkg.sha512"
     },
-    "NSL.Node.BridgeServer.Shared_Debug/1.0.0": {
+    "SimpleGame/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

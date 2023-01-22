@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "dgSpecHash": "UV/Oo5bUcBKYc3WMmRI9rFaOqTCzzG84O408hLS3utkWTYwD6W/n9xqJ0aGhGv9gW9ItA3pRE/v/2z3cg1NjRg==",
+  "success": true,
+  "projectFilePath": "D:\\Arrible\\unity\\NSL.Node\\NSL.Node.BridgeServer\\NSL.Node.BridgeServer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\yasin\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.socketcore\\2023.1.6.2250\\nsl.builderextensions.socketcore.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.websockets\\2023.1.6.2250\\nsl.builderextensions.websockets.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.builderextensions.websocketsserver\\2023.1.6.2250\\nsl.builderextensions.websocketsserver.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.configurationengine\\2023.1.6.2250\\nsl.configurationengine.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.configurationengine.providers.json\\2023.1.6.2250\\nsl.configurationengine.providers.json.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.endpointbuilder\\2023.1.6.2250\\nsl.endpointbuilder.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.logger\\2023.1.6.2250\\nsl.logger.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketclient\\2023.1.6.2250\\nsl.socketclient.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketcore\\2023.1.6.2250\\nsl.socketcore.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketcore.extensions.buffer\\2023.1.6.2250\\nsl.socketcore.extensions.buffer.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketcore.extensions.packet\\2023.1.6.2250\\nsl.socketcore.extensions.packet.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.socketserver\\2023.1.6.2250\\nsl.socketserver.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.utils\\2023.1.6.2250\\nsl.utils.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.websockets\\2023.1.6.2250\\nsl.websockets.2023.1.6.2250.nupkg.sha512",
+    "C:\\Users\\yasin\\.nuget\\packages\\nsl.websockets.server\\2023.1.6.2250\\nsl.websockets.server.2023.1.6.2250.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1602",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "NSL.Utils 2023.1.6.2250 does not provide an inclusive lower bound for dependency Newtonsoft.Json (> 13.0.0). An approximate best match of Newtonsoft.Json 13.0.1 was resolved.",
+      "libraryId": "Newtonsoft.Json",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
+}

@@ -604,3 +604,16 @@ D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\obj\Debug\net6.0
 D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\obj\Debug\net6.0\WelcomeServer.pdb
 D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\obj\Debug\net6.0\WelcomeServer.genruntimeconfig.cache
 D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\obj\Debug\net6.0\ref\WelcomeServer.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\SimpleGame.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\SimpleGame.pdb
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.BuilderExtensions.WebSocketsClient.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Logger.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Logger.AspNetCore.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.WebSockets.Client.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Node.BridgeLobbyClient.AspNetCore.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Node.BridgeLobbyClient.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Node.BridgeServer.Shared.dll
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Node.BridgeLobbyClient.AspNetCore.pdb
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Node.BridgeLobbyClient.AspNetCore.dll.config
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Node.BridgeLobbyClient.pdb
+D:\Arrible\unity\ws_websocketserver\WelcomeServer\WelcomeServer\bin\Debug\net6.0\NSL.Node.BridgeServer.Shared.pdb

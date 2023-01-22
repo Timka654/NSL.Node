@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using NSL.Node.BridgeLobbyClient.AspNetCore;
 using WelcomeServer.Data;
 using WelcomeServer.Data.Models;
 using WelcomeServer.Data.Repositories;
@@ -17,6 +18,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("default")));
 
+builder.Services.AddBridgeLobbyClient(
+           builder.Configuration.GetValue<string>("bridge:server:url"),
+           builder.Configuration.GetValue<string>("bridge:server:identity"),
+           builder.Configuration.GetValue<string>("bridge:server:key"),
+           (services, builder) => {
+
+           });
 builder.Services.AddSingleton<LobbyManager>();
 SetDependencies();
 
@@ -52,6 +60,7 @@ app.MapWebSocketsPoint<LobbyNetworkClientModel>("/lobby_ws", builder =>
 });
 app.UseRouting();
 
+app.RunBridgeLobbyClient(app.Services.GetRequiredService<LobbyManager>().BridgeValidateSessionAsync);
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

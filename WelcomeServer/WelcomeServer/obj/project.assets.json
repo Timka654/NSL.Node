@@ -1835,6 +1835,21 @@
           "lib/net6.0/NSL.BuilderExtensions.WebSockets.dll": {}
         }
       },
+      "NSL.BuilderExtensions.WebSocketsClient/2023.1.6.2250": {
+        "type": "package",
+        "dependencies": {
+          "NSL.BuilderExtensions.WebSockets": "2023.1.6.2250",
+          "NSL.EndPointBuilder": "2023.1.6.2250",
+          "NSL.SocketClient": "2023.1.6.2250",
+          "NSL.WebSockets.Client": "2023.1.6.2250"
+        },
+        "compile": {
+          "lib/net6.0/NSL.BuilderExtensions.WebSocketsClient.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/NSL.BuilderExtensions.WebSocketsClient.dll": {}
+        }
+      },
       "NSL.BuilderExtensions.WebSocketsServer/2023.1.6.2250": {
         "type": "package",
         "dependencies": {
@@ -1878,6 +1893,34 @@
         "runtime": {
           "lib/netstandard2.0/NSL.EndPointBuilder.dll": {}
         }
+      },
+      "NSL.Logger/2023.1.6.2250": {
+        "type": "package",
+        "dependencies": {
+          "NSL.SocketCore": "2023.1.6.2250",
+          "NSL.Utils": "2023.1.6.2250"
+        },
+        "compile": {
+          "lib/net6.0/NSL.Logger.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/NSL.Logger.dll": {}
+        }
+      },
+      "NSL.Logger.AspNetCore/2023.1.6.2250": {
+        "type": "package",
+        "dependencies": {
+          "NSL.Logger": "2023.1.6.2250"
+        },
+        "compile": {
+          "lib/net6.0/NSL.Logger.AspNetCore.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/NSL.Logger.AspNetCore.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       },
       "NSL.SocketClient/2023.1.6.2250": {
         "type": "package",
@@ -1986,6 +2029,20 @@
         },
         "runtime": {
           "lib/net6.0/NSL.WebSockets.dll": {}
+        }
+      },
+      "NSL.WebSockets.Client/2023.1.6.2250": {
+        "type": "package",
+        "dependencies": {
+          "NSL.SocketClient": "2023.1.6.2250",
+          "NSL.SocketCore": "2023.1.6.2250",
+          "NSL.WebSockets": "2023.1.6.2250"
+        },
+        "compile": {
+          "lib/net6.0/NSL.WebSockets.Client.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/NSL.WebSockets.Client.dll": {}
         }
       },
       "NSL.WebSockets.Server/2023.1.6.2250": {
@@ -3937,6 +3994,48 @@
         },
         "runtime": {
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
+        }
+      },
+      "NSL.Node.BridgeLobbyClient.AspNetCore_Debug/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "NSL.Logger.AspNetCore": "2023.1.6.2250",
+          "NSL.Node.BridgeLobbyClient_Debug": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/NSL.Node.BridgeLobbyClient.AspNetCore_Debug.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NSL.Node.BridgeLobbyClient.AspNetCore_Debug.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
+      "NSL.Node.BridgeLobbyClient_Debug/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "NSL.BuilderExtensions.SocketCore": "2023.1.6.2250",
+          "NSL.BuilderExtensions.WebSocketsClient": "2023.1.6.2250",
+          "NSL.Node.BridgeServer.Shared_Debug": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/NSL.Node.BridgeLobbyClient_Debug.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NSL.Node.BridgeLobbyClient_Debug.dll": {}
+        }
+      },
+      "NSL.Node.BridgeServer.Shared_Debug/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/NSL.Node.BridgeServer.Shared_Debug.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NSL.Node.BridgeServer.Shared_Debug.dll": {}
         }
       },
       "SimpleGame/1.0.0": {
@@ -6469,6 +6568,17 @@
         "nsl.builderextensions.websockets.nuspec"
       ]
     },
+    "NSL.BuilderExtensions.WebSocketsClient/2023.1.6.2250": {
+      "sha512": "xdgiDBjM9cC5tA6TytaqqsuJit8GnadANXDfdO2HDUos32yHteUvOUNuzZu4P2wuxwylIlkHvukqRcPTgjNxHw==",
+      "type": "package",
+      "path": "nsl.builderextensions.websocketsclient/2023.1.6.2250",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net6.0/NSL.BuilderExtensions.WebSocketsClient.dll",
+        "nsl.builderextensions.websocketsclient.2023.1.6.2250.nupkg.sha512",
+        "nsl.builderextensions.websocketsclient.nuspec"
+      ]
+    },
     "NSL.BuilderExtensions.WebSocketsServer/2023.1.6.2250": {
       "sha512": "qNxM1ggfs/s6egd9fVBPWFYM52BzyZOdQTZACNo34sQirah8hdHPSqBEmZrnSfMUrAmJK9LpvQXAt1HHgtMVXg==",
       "type": "package",
@@ -6500,6 +6610,28 @@
         "lib/netstandard2.0/NSL.EndPointBuilder.dll",
         "nsl.endpointbuilder.2023.1.6.2250.nupkg.sha512",
         "nsl.endpointbuilder.nuspec"
+      ]
+    },
+    "NSL.Logger/2023.1.6.2250": {
+      "sha512": "M2qyxAWdMdGg9yWds3wTvoImd79y5PJxKl2UhcJslu8AJQkw+dHznja73JypUFUTJ00BYFr1cbaurrdylP4iqg==",
+      "type": "package",
+      "path": "nsl.logger/2023.1.6.2250",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net6.0/NSL.Logger.dll",
+        "nsl.logger.2023.1.6.2250.nupkg.sha512",
+        "nsl.logger.nuspec"
+      ]
+    },
+    "NSL.Logger.AspNetCore/2023.1.6.2250": {
+      "sha512": "uTWJnBGeC0z2AZCMX6NzimuL6BVk0j/a6VL6CXpRTR+6y66T3zZLUOOb/mTwWmT5mfJF7Q3Ce1150ywGScErBQ==",
+      "type": "package",
+      "path": "nsl.logger.aspnetcore/2023.1.6.2250",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net6.0/NSL.Logger.AspNetCore.dll",
+        "nsl.logger.aspnetcore.2023.1.6.2250.nupkg.sha512",
+        "nsl.logger.aspnetcore.nuspec"
       ]
     },
     "NSL.SocketClient/2023.1.6.2250": {
@@ -6599,6 +6731,17 @@
         "lib/net6.0/NSL.WebSockets.dll",
         "nsl.websockets.2023.1.6.2250.nupkg.sha512",
         "nsl.websockets.nuspec"
+      ]
+    },
+    "NSL.WebSockets.Client/2023.1.6.2250": {
+      "sha512": "Nou/2kVx+ZT9Sg/aLPdIdBLwGJWBx6657TfFdlymuhIslW+Clb23sf7uXyZTPsHGO8AXNhLv7c9vBifySofWMQ==",
+      "type": "package",
+      "path": "nsl.websockets.client/2023.1.6.2250",
+      "files": [
+        ".nupkg.metadata",
+        "lib/net6.0/NSL.WebSockets.Client.dll",
+        "nsl.websockets.client.2023.1.6.2250.nupkg.sha512",
+        "nsl.websockets.client.nuspec"
       ]
     },
     "NSL.WebSockets.Server/2023.1.6.2250": {
@@ -10945,6 +11088,21 @@
         "system.xml.xdocument.nuspec"
       ]
     },
+    "NSL.Node.BridgeLobbyClient.AspNetCore_Debug/1.0.0": {
+      "type": "project",
+      "path": "../NSL.Node.BridgeLobbyClient.AspNetCore/NSL.Node.BridgeLobbyClient.AspNetCore.csproj",
+      "msbuildProject": "../NSL.Node.BridgeLobbyClient.AspNetCore/NSL.Node.BridgeLobbyClient.AspNetCore.csproj"
+    },
+    "NSL.Node.BridgeLobbyClient_Debug/1.0.0": {
+      "type": "project",
+      "path": "../NSL.Node.BridgeLobbyClient/NSL.Node.BridgeLobbyClient.csproj",
+      "msbuildProject": "../NSL.Node.BridgeLobbyClient/NSL.Node.BridgeLobbyClient.csproj"
+    },
+    "NSL.Node.BridgeServer.Shared_Debug/1.0.0": {
+      "type": "project",
+      "path": "../NSL.Node.BridgeServer.Shared/NSL.Node.BridgeServer.Shared.csproj",
+      "msbuildProject": "../NSL.Node.BridgeServer.Shared/NSL.Node.BridgeServer.Shared.csproj"
+    },
     "SimpleGame/1.0.0": {
       "type": "project",
       "path": "../SimpleGame/SimpleGame.csproj",
@@ -10960,6 +11118,7 @@
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 6.0.11",
       "NSL.BuilderExtensions.TCPServer >= 2023.1.6.2250",
       "NSL.BuilderExtensions.WebSocketsServer.AspNet >= 2023.1.6.2250",
+      "NSL.Node.BridgeLobbyClient.AspNetCore_Debug >= 1.0.0",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 7.0.1",
       "SimpleGame >= 1.0.0",
       "Swashbuckle.AspNetCore >= 6.2.3"
@@ -10993,6 +11152,9 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
+            "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeLobbyClient.AspNetCore\\NSL.Node.BridgeLobbyClient.AspNetCore.csproj": {
+              "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\NSL.Node.BridgeLobbyClient.AspNetCore\\NSL.Node.BridgeLobbyClient.AspNetCore.csproj"
+            },
             "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj": {
               "projectPath": "D:\\Arrible\\unity\\ws_websocketserver\\WelcomeServer\\SimpleGame\\SimpleGame.csproj"
             }

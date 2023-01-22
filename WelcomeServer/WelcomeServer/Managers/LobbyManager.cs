@@ -203,18 +203,11 @@ namespace WelcomeServer.Managers
 
                     BroadcastRemoveLobbyRoom(room);
 
-                    StartGame(room);
+                    room.StartRoom(configuration);
                 }
             }
         }
 
-        private void StartGame(LobbyRoomInfoModel room)
-        {
-            var playersCount = room.MemberCount();
-            var gameModel = new GameModel(playersCount);
-
-            var gameInfoForPlayers = gameModel.GetMaskedInfo();
-        }
 
         private void SendChatMessageRequestHandle(LobbyNetworkClientModel client, InputPacketBuffer data)
         {
