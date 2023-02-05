@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<Configurations>Debug;Release;UnityDebug;Unity</Configurations>
 		
 		<Version>$(VersionSuffix)</Version>
@@ -24,8 +24,8 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
-	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.1.6.2250" />
-	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.1.6.2250" />
+	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.5.1332" />
+	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.2.5.1332" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">

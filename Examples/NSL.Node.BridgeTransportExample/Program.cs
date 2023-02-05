@@ -39,8 +39,10 @@ namespace NSL.Node.BridgeTransportExample
         internal static ConfigurationManager Configuration { get; } = new ConfigurationManager();
 
         internal static int BindingPort => Configuration.GetValue("transport.binding.port", 5920);
+
         internal static string PublicPoint => Configuration.GetValue("transport.public.endpoint", default(string));
 
+        internal static bool StunDetect => Configuration.GetValue("transport.stun.detect", default(bool));
 
         public static void Main(string[] args)
         {
@@ -48,6 +50,9 @@ namespace NSL.Node.BridgeTransportExample
 
             if (publicPoint == default)
             {
+                if (!StunDetect)
+                    throw new Exception($"must be set transport.public.endpoint or transport.stun.detect(true value) for start");
+
                 STUNQueryResult stunResult = default;
 
                 STUNClient.ReceiveTimeout = 700;
@@ -67,7 +72,7 @@ namespace NSL.Node.BridgeTransportExample
 
                 publicPoint = stunResult.PublicEndPoint.Address.ToString();
 
-                publicPoint = $"http://{publicPoint}:{BindingPort}/";
+                publicPoint = $"ws://{publicPoint}:{BindingPort}/";
             }
 
             BridgeNetwork = new BridgeTransportNetwork(new Uri($"ws://localhost:6998"), "AABBCC", c =>

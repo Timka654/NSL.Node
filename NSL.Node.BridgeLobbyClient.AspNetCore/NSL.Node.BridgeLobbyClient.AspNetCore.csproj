@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<Configurations>Debug;Release;</Configurations>
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -21,7 +21,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.Logger.AspNetCore" Version="2023.1.6.2250" />
+	  <PackageReference Include="NSL.Logger.AspNetCore" Version="2023.2.5.1332" />
 	</ItemGroup>
 
 	<ItemGroup>

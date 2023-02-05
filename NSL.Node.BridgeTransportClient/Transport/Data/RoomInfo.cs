@@ -11,7 +11,9 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
 {
     public class RoomInfo
     {
-        private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
+        private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>(); 
+        
+        private Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>> commands = new Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>>();
 
         public Guid RoomId { get; }
 
@@ -115,6 +117,30 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
             node.Network.Send(packet, disposeOnSend);
         }
 
+        public void Execute(TransportNetworkClient client, InputPacketBuffer packet)
+        {
+            if (commands.TryGetValue(packet.ReadUInt16(), out var command))
+            {
+                command(client, packet);
+            }
+        }
 
+        public void Transport(TransportNetworkClient client, InputPacketBuffer packet)
+        {
+            var body = packet.GetBuffer();
+
+            var to = packet.ReadGuid();
+
+            Execute(client, packet);
+
+            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(NodeTransportPacketEnum.Transport);
+
+            pbuf.WriteGuid(client.Id);
+
+            pbuf.Write(body[0..7]);
+            pbuf.Write(body[23..]);
+
+            SendTo(to, pbuf);
+        }
     }
 }

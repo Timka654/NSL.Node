@@ -11,9 +11,9 @@ namespace NSL.Node.BridgeTransportClient.Transport
 {
     public partial class TransportNetwork
     {
-        private void TransportPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+        private void ExecutePacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
-            client.Room?.Transport(client, buffer);
+            client.Room?.Execute(client, buffer);
         }
     }
 }

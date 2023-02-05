@@ -17,7 +17,7 @@ namespace NSL.Node.BridgeTransportClient.Transport
         {
             var result = data
                 .CreateWaitBufferResponse()
-                .WithPid(NodeTransportPacketEnum.ReadyNodeResultPID);
+                .WithPid(NodeTransportPacketEnum.ReadyNodeResult);
 
             result.WriteBool(client.Room != default && client.Room.ValidateNodeReady(client, data.ReadInt32(), data.ReadCollection(p => p.ReadGuid())));
 

@@ -47,7 +47,9 @@ namespace NSL.Node.BridgeTransportClient.Transport
                     builder.AddPacketHandle(
                         NodeTransportPacketEnum.Broadcast, BroadcastPacketHandle);
                     builder.AddPacketHandle(
-                        NodeTransportPacketEnum.ReadyNodePID, ReadyPacketHandle);
+                        NodeTransportPacketEnum.ReadyNode, ReadyPacketHandle);
+                    builder.AddPacketHandle(
+                        NodeTransportPacketEnum.Execute, ExecutePacketHandle);
 
                     if (onBuild != null)
                         onBuild(builder);

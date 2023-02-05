@@ -13,8 +13,9 @@ namespace NSL.Node.BridgeServer.Shared.Enums
         ChangeNodeList,
         Transport,
         Broadcast,
-        ReadyNodePID,
-        ReadyNodeResultPID = ReadyNodePID,
-        ReadyRoom
+        ReadyNode,
+        ReadyNodeResult = ReadyNode,
+        ReadyRoom,
+        Execute
     }
 }
