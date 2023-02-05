@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Configurations>Debug;Release;UnityDebug;Unity</Configurations>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Unity'">
+		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
+		<TargetFramework>netstandard2.1</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.1.6.2250" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.1.6.2250" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.1.6.2250" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
+		<PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2022.12.2.526" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2022.12.2.526" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsServer" Version="2022.12.2.526" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="NSL.ConfigurationEngine" Version="2023.1.18.1421" />
+	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.1.18.1421" />
+	  <PackageReference Include="NSL.Logger" Version="2023.1.18.1421" />
+	  <PackageReference Include="NSL.UDP.Client" Version="2023.1.18.1421" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SimpleGame\SimpleGame.csproj" />
+	</ItemGroup>
+
+</Project>
