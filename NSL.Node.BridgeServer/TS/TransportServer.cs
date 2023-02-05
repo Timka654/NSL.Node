@@ -16,21 +16,33 @@ using NSL.Node.BridgeServer.CS;
 
 namespace NSL.Node.BridgeServer.TS
 {
-    internal class TransportServer
+    public class TransportServer
     {
-        private static BaseConfigurationManager Configuration => Program.Configuration;
+        protected BaseConfigurationManager Configuration => Entry.Configuration;
 
-        public static int BindingPort => Configuration.GetValue("transport.server.port", 6998);
+        public virtual int BindingPort => Configuration.GetValue("transport.server.port", 6998);
 
-        public static string IdentityKey => Configuration.GetValue<string>("transport.server.identityKey", "AABBCC");
+        public virtual string IdentityKey => Configuration.GetValue<string>("transport.server.identityKey", "AABBCC");
 
-        private static int TransportServerCountPerRoom => Configuration.GetValue("transport.server.count.perRoom", 1);
+        public virtual int TransportServerCountPerRoom => Configuration.GetValue("transport.server.count.perRoom", 1);
 
-        public static NetworkListener Listener { get; private set; }
+        protected NetworkListener Listener { get; private set; }
 
-        public static ILogger Logger { get; } = new PrefixableLoggerProxy(Program.Logger, "[TransportServer]");
+        protected ILogger Logger { get; }
 
-        public static void Run()
+        protected BridgeServerEntry Entry { get; }
+
+        public static TransportServer Create(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
+            => new TransportServer(entry, logPrefix);
+
+        public TransportServer(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
+        {
+            Entry = entry;
+
+            Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
+        }
+
+        public TransportServer Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
@@ -48,9 +60,11 @@ namespace NSL.Node.BridgeServer.TS
                 .Build();
 
             Listener.Start();
+
+            return this;
         }
 
-        private static void SignServerReceiveHandle(NetworkClient client, InputPacketBuffer data)
+        private void SignServerReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             var response = data.CreateWaitBufferResponse()
                 .WithPid(NodeBridgeTransportPacketEnum.SignServerResultPID);
@@ -112,7 +126,7 @@ namespace NSL.Node.BridgeServer.TS
             client.Send(response);
         }
 
-        private static void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
+        private void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             var packet = data.CreateWaitBufferResponse()
                 .WithPid(NodeBridgeTransportPacketEnum.SignSessionResultPID);
@@ -136,7 +150,7 @@ namespace NSL.Node.BridgeServer.TS
             client.Send(packet);
         }
 
-        internal static List<CreateSignResult> CreateSignSession(string identityKey, Guid roomId)
+        internal List<CreateSignResult> CreateSignSession(string identityKey, Guid roomId)
         {
             List<CreateSignResult> result = new List<CreateSignResult>();
 
@@ -190,7 +204,7 @@ namespace NSL.Node.BridgeServer.TS
             //return result;
         }
 
-        private static ConcurrentDictionary<Guid, NetworkClient> serverMap = new ConcurrentDictionary<Guid, NetworkClient>();
+        private ConcurrentDictionary<Guid, NetworkClient> serverMap = new ConcurrentDictionary<Guid, NetworkClient>();
 
         public record CreateSignResult(string endPoint, Guid id);
     }

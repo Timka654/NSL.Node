@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace NSL.Node.BridgeServer.TS
 {
-    internal class TransportServerNetworkClient : IServerNetworkClient
+    public class TransportServerNetworkClient : IServerNetworkClient
     {
         public Guid Id { get; set; }
 
@@ -12,7 +12,7 @@ namespace NSL.Node.BridgeServer.TS
         public ConcurrentDictionary<Guid, TransportSession> SessionMap { get; } = new ConcurrentDictionary<Guid, TransportSession>();
     }
 
-    internal class TransportSession
+    public class TransportSession
     {
         public TransportSession(string identityKey, Guid roomId)
         {

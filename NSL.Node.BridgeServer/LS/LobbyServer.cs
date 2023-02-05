@@ -14,19 +14,31 @@ using NSL.ConfigurationEngine;
 
 namespace NSL.Node.BridgeServer.LS
 {
-    internal class LobbyServer
+    public class LobbyServer
     {
-        private static BaseConfigurationManager Configuration => Program.Configuration;
+        protected BaseConfigurationManager Configuration => Entry.Configuration;
 
-        public static int BindingPort => Configuration.GetValue("lobby.server.port", 6999);
+        public virtual int BindingPort => Configuration.GetValue("lobby.server.port", 6999);
 
-        public static string IdentityKey => Configuration.GetValue("lobby.server.identityKey", "AABBCC");
+        public virtual string IdentityKey => Configuration.GetValue("lobby.server.identityKey", "AABBCC");
 
-        public static NetworkListener Listener { get; private set; }
+        protected NetworkListener Listener { get; private set; }
 
-        public static ILogger Logger { get; } = new PrefixableLoggerProxy(Program.Logger, "[LobbyServer]");
+        protected ILogger Logger { get; }
 
-        public static void Run()
+        protected BridgeServerEntry Entry { get; }
+
+        public static LobbyServer Create(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
+            => new LobbyServer(entry, logPrefix);
+
+        public LobbyServer(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
+        {
+            Entry = entry;
+
+            Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
+        }
+
+        public LobbyServer Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
@@ -40,16 +52,18 @@ namespace NSL.Node.BridgeServer.LS
                     builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignServerReceiveHandle);
 
                     builder.AddReceivePacketHandle(
-                        NodeBridgeLobbyPacketEnum.ValidateSessionResultPID, 
+                        NodeBridgeLobbyPacketEnum.ValidateSessionResultPID,
                         client => client.ValidateRequestBuffer);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}/")
                 .Build();
 
             Listener.Start();
+
+            return this;
         }
 
-        private static void SignServerReceiveHandle(NetworkClient client, InputPacketBuffer data)
+        private void SignServerReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             var packet = data.CreateWaitBufferResponse()
                 .WithPid(NodeBridgeLobbyPacketEnum.SignServerResultPID);
@@ -73,7 +87,7 @@ namespace NSL.Node.BridgeServer.LS
             client.Network.Send(packet);
         }
 
-        public static async Task<bool> ValidateSession(string serverIdentity, Guid roomId, string session)
+        public async Task<bool> ValidateSession(string serverIdentity, Guid roomId, string session)
         {
             if (!connectedServers.TryGetValue(serverIdentity, out var server))
                 return false;
@@ -96,6 +110,6 @@ namespace NSL.Node.BridgeServer.LS
             return result;
         }
 
-        private static ConcurrentDictionary<string, NetworkClient> connectedServers = new ConcurrentDictionary<string, NetworkClient>();
+        private ConcurrentDictionary<string, NetworkClient> connectedServers = new ConcurrentDictionary<string, NetworkClient>();
     }
 }

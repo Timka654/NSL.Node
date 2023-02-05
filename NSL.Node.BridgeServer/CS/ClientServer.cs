@@ -11,18 +11,38 @@ using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.Node.BridgeServer.TS;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.ConfigurationEngine;
 
 namespace NSL.Node.BridgeServer.CS
 {
-    internal class ClientServer
+    public class ClientServer
     {
-        public static int BindingPort => Program.Configuration.GetValue("client.server.port", 7000);
+        protected LobbyServer LobbyServer { get; }
 
-        public static NetworkListener Listener { get; private set; }
+        protected TransportServer TransportServer { get; }
 
-        public static ILogger Logger { get; } = new PrefixableLoggerProxy(Program.Logger, "[ClientServer]");
+        protected BaseConfigurationManager Configuration => Entry.Configuration;
 
-        public static void Run()
+        public virtual int BindingPort => Configuration.GetValue("client.server.port", 7000);
+
+        protected NetworkListener Listener { get; private set; }
+
+        protected ILogger Logger { get; }
+
+        protected BridgeServerEntry Entry { get; }
+
+        public static ClientServer Create(BridgeServerEntry entry, LobbyServer lobbyServer, TransportServer transportServer, string logPrefix = "[ClientServer]")
+            => new ClientServer(entry, lobbyServer, transportServer, logPrefix);
+
+        public ClientServer(BridgeServerEntry entry, LobbyServer lobbyServer, TransportServer transportServer, string logPrefix = "[ClientServer]")
+        {
+            Entry = entry;
+            LobbyServer = lobbyServer;
+            TransportServer = transportServer;
+            Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
+        }
+
+        public ClientServer Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
@@ -39,12 +59,14 @@ namespace NSL.Node.BridgeServer.CS
                 .Build();
 
             Listener.Start();
+
+            return this;
         }
 
         #region Handles
 
 
-        private static async void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
+        private async void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             client.ServerIdentity = data.ReadString16();
             client.RoomId = data.ReadGuid();

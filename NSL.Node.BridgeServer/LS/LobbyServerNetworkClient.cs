@@ -5,10 +5,9 @@ using System.Collections.Concurrent;
 
 namespace NSL.Node.BridgeServer.LS
 {
-    internal class LobbyServerNetworkClient : IServerNetworkClient
+    public class LobbyServerNetworkClient : IServerNetworkClient
     {
         public string Identity { get; set; }
-
 
         public PacketWaitBuffer ValidateRequestBuffer { get; set; }
 
