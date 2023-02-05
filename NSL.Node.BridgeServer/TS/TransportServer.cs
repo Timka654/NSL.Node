@@ -39,7 +39,8 @@ namespace NSL.Node.BridgeServer.TS
         {
             Entry = entry;
 
-            Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
+            if (Entry.Logger != null)
+                Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
         public TransportServer Run()
