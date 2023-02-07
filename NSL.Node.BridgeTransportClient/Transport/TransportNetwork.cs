@@ -20,23 +20,24 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeTransportClient.Transport
 {
-    public partial class TransportNetwork
+    public partial class TransportNetwork<TRoomInfo>
+        where TRoomInfo : RoomInfo, new()
     {
         public string BindingAddress { get; }
 
-        protected WSServerListener<TransportNetworkClient> network { get; private set; }
+        protected WSServerListener<TransportNetworkClient<TRoomInfo>> network { get; private set; }
 
         public TransportNetwork(
             BridgeTransportNetwork bridgeNetwork,
             string bindingAddress,
-            Action<WebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>> onBuild = null)
+            Action<WebSocketsServerEndPointBuilder<TransportNetworkClient<TRoomInfo>, WSServerOptions<TransportNetworkClient<TRoomInfo>>>> onBuild = null)
         {
             this.bridgeNetwork = bridgeNetwork;
             this.BindingAddress = bindingAddress;
 
             network = WebSocketsServerEndPointBuilder.Create()
-                .WithClientProcessor<TransportNetworkClient>()
-                .WithOptions<WSServerOptions<TransportNetworkClient>>()
+                .WithClientProcessor<TransportNetworkClient<TRoomInfo>>()
+                .WithOptions<WSServerOptions<TransportNetworkClient<TRoomInfo>>>()
                 .WithBindingPoint(bindingAddress)
                 .WithCode(builder =>
                 {
@@ -61,6 +62,6 @@ namespace NSL.Node.BridgeTransportClient.Transport
 
         private readonly BridgeTransportNetwork bridgeNetwork;
 
-        private ConcurrentDictionary<Guid, RoomInfo> roomMap = new ConcurrentDictionary<Guid, RoomInfo>();
+        private ConcurrentDictionary<Guid, TRoomInfo> roomMap = new ConcurrentDictionary<Guid, TRoomInfo>();
     }
 }

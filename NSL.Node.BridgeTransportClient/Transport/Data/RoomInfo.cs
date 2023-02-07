@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeTransportClient.Transport.Data
 {
-    public class RoomInfo
+    public abstract class RoomInfo
     {
-        private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>(); 
-        
+        private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
+
         private Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>> commands = new Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>>();
 
-        public Guid RoomId { get; }
+        public Guid RoomId { get; private set; }
 
         public int ConnectedNodesCount => nodes.Count;
 
@@ -23,20 +23,23 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
 
         public DateTime CreateTime { get; } = DateTime.UtcNow;
 
-        public RoomInfo(Guid roomId)
-        {
-            this.RoomId = roomId;
-        }
+        public RoomInfo() { }
 
-        public void AddClient(TransportNetworkClient node)
+        internal void WithId(Guid roomId) => this.RoomId = roomId;
+
+        public bool AddClient(TransportNetworkClient node)
         {
             if (nodes.TryAdd(node.Id, node))
             {
-                node.Room = this;
+                if (node.Network != null)
+                    broadcastDelegate += node.Network.Send;
 
-                broadcastDelegate += node.Network.Send;
                 BroadcastChangeNodeList();
+
+                return true;
             }
+
+            return false;
         }
 
         public bool ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
@@ -72,7 +75,7 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
             return true;
         }
 
-        private OutputPacketBuffer CreateReadyRoomPacket()
+        protected OutputPacketBuffer CreateReadyRoomPacket()
         {
             var p = OutputPacketBuffer.Create(NodeTransportPacketEnum.ReadyRoom);
 
@@ -114,7 +117,7 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
 
         public void SendTo(TransportNetworkClient node, OutputPacketBuffer packet, bool disposeOnSend = true)
         {
-            node.Network.Send(packet, disposeOnSend);
+            node.Network?.Send(packet, disposeOnSend);
         }
 
         public void Execute(TransportNetworkClient client, InputPacketBuffer packet)

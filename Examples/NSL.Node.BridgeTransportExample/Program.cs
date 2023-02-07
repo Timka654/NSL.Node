@@ -23,7 +23,7 @@ namespace NSL.Node.BridgeTransportExample
     {
         static BridgeTransportNetwork BridgeNetwork;
 
-        static TransportNetwork TransportNetwork;
+        static TransportNetwork<SampleRoomInfo> TransportNetwork;
 
         static StunServerInfo[] stunServers = new[]
         {
@@ -84,11 +84,11 @@ namespace NSL.Node.BridgeTransportExample
 
             BridgeNetwork.OnStateChanged += BridgeNetwork_OnStateChanged;
 
-            TransportNetwork = new TransportNetwork(BridgeNetwork, $"http://*:{BindingPort}/", c =>
+            TransportNetwork = new TransportNetwork<SampleRoomInfo>(BridgeNetwork, $"http://*:{BindingPort}/", c =>
             {
                 c.SetLogger(Logger);
 
-                c.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>, TransportNetworkClient>("[Transport]", DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                c.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<TransportNetworkClient<SampleRoomInfo>, WSServerOptions<TransportNetworkClient<SampleRoomInfo>>>, TransportNetworkClient<SampleRoomInfo>>("[Transport]", DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
             });
 
             BridgeNetwork.Initialize(publicPoint);

@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\NSL.Node.BridgeTransportClient.Shared\NSL.Node.BridgeTransportClient.Shared.csproj" />
 		<ProjectReference Include="..\..\NSL.Node.BridgeTransportClient\NSL.Node.BridgeTransportClient.csproj" />
 	</ItemGroup>
 

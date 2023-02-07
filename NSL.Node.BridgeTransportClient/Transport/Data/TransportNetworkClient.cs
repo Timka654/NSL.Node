@@ -16,10 +16,14 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
 
         public Guid RoomId { get; set; }
 
-        public RoomInfo Room { get; set; }
-
         public string EndPoint { get; set; }
 
         public bool Ready { get; set; }
+    }
+
+    public class TransportNetworkClient<TRoomInfo> : TransportNetworkClient
+        where TRoomInfo : RoomInfo
+    {
+        public TRoomInfo Room { get; set; }
     }
 }
