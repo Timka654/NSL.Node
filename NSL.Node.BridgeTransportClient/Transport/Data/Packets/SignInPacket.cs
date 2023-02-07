@@ -10,10 +10,9 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeTransportClient.Transport
 {
-    public partial class TransportNetwork<TRoomInfo>
-        where TRoomInfo : RoomInfo, new()
+    public partial class TransportNetwork
     {
-        private async void SignInPacketHandle(TransportNetworkClient<TRoomInfo> client, InputPacketBuffer buffer)
+        private async void SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
             var response = OutputPacketBuffer.Create(NodeTransportPacketEnum.SignSessionResult);
 
@@ -30,8 +29,7 @@ namespace NSL.Node.BridgeTransportClient.Transport
             if (result)
             {
                 client.Room = roomMap.GetOrAdd(client.RoomId, id => {
-                    var room = new TRoomInfo();
-                    room.WithId(id);
+                    var room = new RoomInfo(id);
 
                     return room;
                 });

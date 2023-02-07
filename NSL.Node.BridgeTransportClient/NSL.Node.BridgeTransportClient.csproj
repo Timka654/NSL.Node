@@ -37,6 +37,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Node.BridgeTransportClient.Shared\NSL.Node.BridgeTransportClient.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

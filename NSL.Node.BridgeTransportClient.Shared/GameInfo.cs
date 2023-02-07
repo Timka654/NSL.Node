@@ -1,4 +1,4 @@
-﻿using NSL.Node.BridgeTransportClient.Transport.Data;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeTransportClient.Shared
 {
-    internal class SampleRoomInfo : RoomInfo
+    public class GameInfo
     {
+        public IRoomInfo RoomInfo { get; }
+
+        public GameInfo(IRoomInfo roomInfo)
+        {
+            RoomInfo = roomInfo;
+        }
     }
 }

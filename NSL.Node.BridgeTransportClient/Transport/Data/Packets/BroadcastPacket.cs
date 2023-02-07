@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeTransportClient.Transport
 {
-    public partial class TransportNetwork<TRoomInfo>
-        where TRoomInfo : RoomInfo, new()
+    public partial class TransportNetwork
     {
-        private void BroadcastPacketHandle(TransportNetworkClient<TRoomInfo> client, InputPacketBuffer buffer)
+        private void BroadcastPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
             var body = buffer.GetBuffer();
 

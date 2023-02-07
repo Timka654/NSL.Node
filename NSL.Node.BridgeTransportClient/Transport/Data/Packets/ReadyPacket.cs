@@ -11,10 +11,9 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeTransportClient.Transport
 {
-    public partial class TransportNetwork<TRoomInfo>
-        where TRoomInfo : RoomInfo, new()
+    public partial class TransportNetwork
     {
-        private static void ReadyPacketHandle(TransportNetworkClient<TRoomInfo> client, InputPacketBuffer data)
+        private static void ReadyPacketHandle(TransportNetworkClient client, InputPacketBuffer data)
         {
             var result = data
                 .CreateWaitBufferResponse()

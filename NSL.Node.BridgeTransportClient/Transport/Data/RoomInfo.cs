@@ -1,4 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.BridgeTransportClient.Shared;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Concurrent;
@@ -9,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeTransportClient.Transport.Data
 {
-    public abstract class RoomInfo
+    public class RoomInfo : IRoomInfo
     {
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
         private Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>> commands = new Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>>();
 
-        public Guid RoomId { get; private set; }
+        public Guid RoomId { get; }
 
         public int ConnectedNodesCount => nodes.Count;
 
@@ -23,9 +24,9 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
 
         public DateTime CreateTime { get; } = DateTime.UtcNow;
 
-        public RoomInfo() { }
+        private GameInfo Game;
 
-        internal void WithId(Guid roomId) => this.RoomId = roomId;
+        public RoomInfo(Guid roomId) { this.RoomId = roomId; Game = new GameInfo(this); }
 
         public bool AddClient(TransportNetworkClient node)
         {
@@ -33,6 +34,8 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
             {
                 if (node.Network != null)
                     broadcastDelegate += node.Network.Send;
+
+                node.Player = new PlayerInfo() { Network = node, Id = node.Id };
 
                 BroadcastChangeNodeList();
 
@@ -144,6 +147,11 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
             pbuf.Write(body[23..]);
 
             SendTo(to, pbuf);
+        }
+
+        public void SendTo(PlayerInfo player, OutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            SendTo(player.Network as TransportNetworkClient, packet, disposeOnSend);
         }
     }
 }

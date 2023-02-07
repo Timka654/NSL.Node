@@ -1,4 +1,5 @@
-﻿using NSL.SocketClient;
+﻿using NSL.Node.BridgeTransportClient.Shared;
+using NSL.SocketClient;
 using NSL.SocketServer.Utils;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,9 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
         public string EndPoint { get; set; }
 
         public bool Ready { get; set; }
-    }
 
-    public class TransportNetworkClient<TRoomInfo> : TransportNetworkClient
-        where TRoomInfo : RoomInfo
-    {
-        public TRoomInfo Room { get; set; }
+        public RoomInfo Room { get; set; }
+
+        public PlayerInfo Player { get; set; }
     }
 }

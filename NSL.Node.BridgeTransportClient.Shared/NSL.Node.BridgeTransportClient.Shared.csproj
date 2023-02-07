@@ -4,5 +4,11 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+	<ItemGroup>
+		<Compile Include="..\..\..\Game\Logic\**\*.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="NSL.SocketCore" Version="2023.2.5.1332" />
+	</ItemGroup>
 
 </Project>
