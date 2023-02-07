@@ -5,6 +5,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,7 +16,8 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
     {
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
-        private Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>> commands = new Dictionary<ushort, Action<TransportNetworkClient, InputPacketBuffer>>();
+        private Dictionary<ushort,
+            ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
 
         public Guid RoomId { get; }
 
@@ -125,9 +128,9 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
 
         public void Execute(TransportNetworkClient client, InputPacketBuffer packet)
         {
-            if (commands.TryGetValue(packet.ReadUInt16(), out var command))
+            if (handles.TryGetValue(packet.ReadUInt16(), out var command))
             {
-                command(client, packet);
+                command(client.Player, packet);
             }
         }
 
@@ -137,7 +140,7 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
 
             var to = packet.ReadGuid();
 
-            Execute(client, packet);
+            //Execute(client, packet);
 
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(NodeTransportPacketEnum.Transport);
 
@@ -152,6 +155,30 @@ namespace NSL.Node.BridgeTransportClient.Transport.Data
         public void SendTo(PlayerInfo player, OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             SendTo(player.Network as TransportNetworkClient, packet, disposeOnSend);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RegisterHandle(ushort code, ReciveHandleDelegate handle)
+        {
+            if (!handles.TryAdd(code, handle))
+                throw new Exception($"code {code} already contains in {nameof(handles)}");
+        }
+
+
+        public PlayerInfo GetPlayer(Guid id)
+        {
+            if (nodes.TryGetValue(id, out var node))
+                return node.Player;
+
+            return default;
+        }
+
+        public void Execute(ushort command, Action<OutputPacketBuffer> build)
+        {
+        }
+
+        public void SendToGameServer(OutputPacketBuffer packet)
+        {
         }
     }
 }

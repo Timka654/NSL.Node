@@ -1,14 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Nullable>enable</Nullable>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
-		<Compile Include="..\..\..\Game\Logic\**\*.cs" />
+		<Compile Include="..\..\Scripts\Game\Logic\**\*.cs" />
 	</ItemGroup>
+
 	<ItemGroup>
-	  <PackageReference Include="NSL.SocketCore" Version="2023.2.5.1332" />
+		<PackageReference Include="NSL.SocketCore" Version="2023.2.5.1332" />
 	</ItemGroup>
 
 </Project>
