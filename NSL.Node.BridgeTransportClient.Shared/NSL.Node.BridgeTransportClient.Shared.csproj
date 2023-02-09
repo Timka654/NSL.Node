@@ -17,11 +17,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\..\Scripts\Game\Logic\**\*.cs" />
+		<Compile Include="..\..\Scripts\Game\Logic\**\*.cs" /> 
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="NSL.SocketCore" Version="2023.2.5.1332" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 	</ItemGroup>
 
 </Project>
