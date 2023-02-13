@@ -1,5 +1,6 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.Node.RoomServer.Shared;
+using NSL.Node.RoomServer.Shared.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Concurrent;
@@ -83,7 +84,7 @@ namespace NSL.Node.RoomServer.Transport.Data
 
         protected OutputPacketBuffer CreateReadyRoomPacket()
         {
-            var p = OutputPacketBuffer.Create(NodeTransportPacketEnum.ReadyRoom);
+            var p = OutputPacketBuffer.Create(RoomPacketEnum.ReadyRoom);
 
             p.WriteDateTime(CreateTime);
 
@@ -92,7 +93,7 @@ namespace NSL.Node.RoomServer.Transport.Data
 
         private void BroadcastChangeNodeList()
         {
-            var buffer = OutputPacketBuffer.Create(NodeTransportPacketEnum.ChangeNodeList);
+            var buffer = OutputPacketBuffer.Create(RoomPacketEnum.ChangeNodeList);
 
             buffer.WriteCollection(Nodes, b =>
             {
@@ -142,7 +143,7 @@ namespace NSL.Node.RoomServer.Transport.Data
 
             //Execute(client, packet);
 
-            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(NodeTransportPacketEnum.Transport);
+            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);
 
             pbuf.WriteGuid(client.Id);
 

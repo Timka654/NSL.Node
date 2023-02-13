@@ -1,5 +1,6 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.Node.RoomServer.Shared;
+using NSL.Node.RoomServer.Shared.Enums;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer.Utils;
@@ -50,7 +51,7 @@ namespace NSL.Node.RoomServer.Transport.Data
 
             build(packet);
 
-            packet.WithPid(NodeTransportPacketEnum.Transport);
+            packet.WithPid(RoomPacketEnum.Transport);
 
             Send(packet, false);
 

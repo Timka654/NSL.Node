@@ -1,4 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.RoomServer.Shared.Enums;
 using NSL.Node.RoomServer.Transport.Data;
 using NSL.SocketCore.Utils.Buffer;
 using System;
@@ -15,7 +16,7 @@ namespace NSL.Node.RoomServer.Transport
         {
             var body = buffer.GetBuffer();
 
-            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(NodeTransportPacketEnum.Transport);
+            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);
 
             pbuf.WriteGuid(client.Id);
 

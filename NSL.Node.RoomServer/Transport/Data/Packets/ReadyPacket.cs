@@ -1,4 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.RoomServer.Shared.Enums;
 using NSL.Node.RoomServer.Transport.Data;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
@@ -17,7 +18,7 @@ namespace NSL.Node.RoomServer.Transport
         {
             var result = data
                 .CreateWaitBufferResponse()
-                .WithPid(NodeTransportPacketEnum.ReadyNodeResult);
+                .WithPid(RoomPacketEnum.ReadyNodeResult);
 
             result.WriteBool(client.Room != default && client.Room.ValidateNodeReady(client, data.ReadInt32(), data.ReadCollection(p => p.ReadGuid())));
 

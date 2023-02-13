@@ -1,4 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.RoomServer.Shared.Enums;
 using NSL.Node.RoomServer.Transport.Data;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
@@ -14,7 +15,7 @@ namespace NSL.Node.RoomServer.Transport
     {
         private async void SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
-            var response = OutputPacketBuffer.Create(NodeTransportPacketEnum.SignSessionResult);
+            var response = OutputPacketBuffer.Create(RoomPacketEnum.SignSessionResult);
 
             client.Token = buffer.ReadString16();
 

@@ -19,6 +19,7 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using NSL.Node.RoomServer.Shared.Enums;
 
 namespace NSL.Node.RoomServer.Transport
 {
@@ -62,15 +63,15 @@ namespace NSL.Node.RoomServer.Transport
                     builder.SetLogger(Logger);
 
                     builder.AddPacketHandle(
-                        NodeTransportPacketEnum.SignSession, SignInPacketHandle);
+                        RoomPacketEnum.SignSession, SignInPacketHandle);
                     builder.AddPacketHandle(
-                        NodeTransportPacketEnum.Transport, TransportPacketHandle);
+                        RoomPacketEnum.Transport, TransportPacketHandle);
                     builder.AddPacketHandle(
-                        NodeTransportPacketEnum.Broadcast, BroadcastPacketHandle);
+                        RoomPacketEnum.Broadcast, BroadcastPacketHandle);
                     builder.AddPacketHandle(
-                        NodeTransportPacketEnum.ReadyNode, ReadyPacketHandle);
+                        RoomPacketEnum.ReadyNode, ReadyPacketHandle);
                     builder.AddPacketHandle(
-                        NodeTransportPacketEnum.Execute, ExecutePacketHandle);
+                        RoomPacketEnum.Execute, ExecutePacketHandle);
 
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>, TransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
                 })
