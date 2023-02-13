@@ -1,9 +1,9 @@
 ﻿using NSL.SocketServer.Utils;
 using System.Collections.Concurrent;
 
-namespace NSL.Node.BridgeServer.TS
+namespace NSL.Node.BridgeServer.RS
 {
-    public class TransportServerNetworkClient : IServerNetworkClient
+    public class RoomServerNetworkClient : IServerNetworkClient
     {
         public Guid Id { get; set; }
 

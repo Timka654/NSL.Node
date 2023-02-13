@@ -1,10 +1,12 @@
-﻿namespace NSL.Node.BridgeServerExample
+﻿using NSL.Node.BridgeServer;
+
+namespace NSL.Node.BridgeServerExample
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            new Bridge().Run();
+            BridgeServerEntry.CreateDefault().RunEntry();
 
             Thread.Sleep(Timeout.InfiniteTimeSpan);
         }

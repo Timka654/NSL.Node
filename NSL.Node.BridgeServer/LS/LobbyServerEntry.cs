@@ -14,7 +14,7 @@ using NSL.ConfigurationEngine;
 
 namespace NSL.Node.BridgeServer.LS
 {
-    public class LobbyServer
+    public class LobbyServerEntry
     {
         protected BaseConfigurationManager Configuration => Entry.Configuration;
 
@@ -28,10 +28,10 @@ namespace NSL.Node.BridgeServer.LS
 
         protected BridgeServerEntry Entry { get; }
 
-        public static LobbyServer Create(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
-            => new LobbyServer(entry, logPrefix);
+        public static LobbyServerEntry Create(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
+            => new LobbyServerEntry(entry, logPrefix);
 
-        public LobbyServer(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
+        public LobbyServerEntry(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
         {
             Entry = entry;
 
@@ -39,7 +39,7 @@ namespace NSL.Node.BridgeServer.LS
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
-        public LobbyServer Run()
+        public LobbyServerEntry Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()

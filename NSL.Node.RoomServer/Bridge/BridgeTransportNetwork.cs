@@ -7,35 +7,50 @@ using NSL.BuilderExtensions.SocketCore;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore;
 using System.Net;
-using NSL.Node.BridgeTransportClient.Transport.Data;
+using NSL.Node.RoomServer.Transport.Data;
+using NSL.Logger;
+using NSL.Logger.Interface;
+using System.ComponentModel.DataAnnotations;
 
-namespace NSL.Node.BridgeTransportClient.Bridge
+namespace NSL.Node.RoomServer.Bridge
 {
     public delegate Task<bool> ValidateSessionDelegate(string sessionIdentity);
 
     public class BridgeTransportNetwork
     {
-        public Uri WsUrl { get; }
-
         public Guid ServerIdentity { get; private set; } = Guid.Empty;
 
-        public string IdentityKey { get; }
+        public string IdentityKey => Entry.BridgeIdentityKey;
+
+        public string BridgeAddress => Entry.BridgeAddress; 
 
         protected WSNetworkClient<BridgeTransportNetworkClient, WSClientOptions<BridgeTransportNetworkClient>> network { get; private set; }
 
-        public BridgeTransportNetwork(
-            Uri wsUrl,
-            string identityKey,
-            Action<WebSocketsClientEndPointBuilder<BridgeTransportNetworkClient, WSClientOptions<BridgeTransportNetworkClient>>> onBuild = null)
+        protected RoomServerEntry Entry { get; }
+
+        protected ILogger Logger { get; }
+
+        public static BridgeTransportNetwork Create(RoomServerEntry entry, string logPrefix = "[BridgeClient]")
+            => new BridgeTransportNetwork(entry, logPrefix);
+
+        public BridgeTransportNetwork(RoomServerEntry entry, string logPrefix = "[BridgeClient]")
         {
-            WsUrl = wsUrl;
-            IdentityKey = identityKey;
+            Entry = entry;
+
+            if (Entry.Logger != null)
+                Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
+        }
+
+        public BridgeTransportNetwork Run()
+        {
             network = WebSocketsClientEndPointBuilder.Create()
                 .WithClientProcessor<BridgeTransportNetworkClient>()
                 .WithOptions<WSClientOptions<BridgeTransportNetworkClient>>()
-                .WithUrl(wsUrl)
+                .WithUrl(new Uri(BridgeAddress))
                 .WithCode(builder =>
                 {
+                    builder.SetLogger(Logger);
+
                     builder.AddReceivePacketHandle(
                         BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignServerResultPID,
                         c => c.PacketWaitBuffer);
@@ -71,10 +86,11 @@ namespace NSL.Node.BridgeTransportClient.Bridge
                         OnStateChanged(State);
                     });
 
-                    if (onBuild != null)
-                        onBuild(builder);
+                    builder.AddDefaultEventHandlers<WebSocketsClientEndPointBuilder<BridgeTransportNetworkClient, WSClientOptions<BridgeTransportNetworkClient>>, BridgeTransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
                 })
                 .Build();
+
+            return this;
         }
 
         bool _signResult = false;
@@ -82,16 +98,16 @@ namespace NSL.Node.BridgeTransportClient.Bridge
         bool signResult { get => _signResult; set { _signResult = value; OnStateChanged(State); } }
 
 
-        bool initialized = false;
+        bool authorized = false;
 
         string transportEndPoint;
 
-        public async void Initialize(string transportEndPoint)
+        public async void Authorize(string transportEndPoint)
         {
-            if (initialized)
+            if (authorized)
                 return;
 
-            initialized = true;
+            authorized = true;
 
             this.transportEndPoint = transportEndPoint;
 

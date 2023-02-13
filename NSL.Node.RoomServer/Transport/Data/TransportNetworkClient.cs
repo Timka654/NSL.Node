@@ -1,5 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.BridgeTransportClient.Shared;
+using NSL.Node.RoomServer.Shared;
 using NSL.SocketClient;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer.Utils;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Node.BridgeTransportClient.Transport.Data
+namespace NSL.Node.RoomServer.Transport.Data
 {
     public class TransportNetworkClient : IServerNetworkClient, IPlayerNetwork
     {

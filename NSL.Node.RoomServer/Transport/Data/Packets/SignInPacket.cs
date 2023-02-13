@@ -1,5 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.BridgeTransportClient.Transport.Data;
+using NSL.Node.RoomServer.Transport.Data;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
 using System;
@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Node.BridgeTransportClient.Transport
+namespace NSL.Node.RoomServer.Transport
 {
-    public partial class TransportNetwork
+    public partial class ClientServerEntry
     {
         private async void SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {

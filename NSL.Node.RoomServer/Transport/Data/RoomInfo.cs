@@ -1,5 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.BridgeTransportClient.Shared;
+using NSL.Node.RoomServer.Shared;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Concurrent;
@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Node.BridgeTransportClient.Transport.Data
+namespace NSL.Node.RoomServer.Transport.Data
 {
     public class RoomInfo : IRoomInfo
     {

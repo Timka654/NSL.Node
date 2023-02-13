@@ -9,17 +9,16 @@ using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServ
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.CS.ClientServerNetworkClient>;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.BridgeServer.TS;
-using NSL.SocketCore.Extensions.Buffer;
 using NSL.ConfigurationEngine;
+using NSL.Node.BridgeServer.RS;
 
 namespace NSL.Node.BridgeServer.CS
 {
-    public class ClientServer
+    public class ClientServerEntry
     {
-        protected LobbyServer LobbyServer { get; }
+        protected LobbyServerEntry LobbyServer { get; }
 
-        protected TransportServer TransportServer { get; }
+        protected RoomServerEntry TransportServer { get; }
 
         protected BaseConfigurationManager Configuration => Entry.Configuration;
 
@@ -31,10 +30,10 @@ namespace NSL.Node.BridgeServer.CS
 
         protected BridgeServerEntry Entry { get; }
 
-        public static ClientServer Create(BridgeServerEntry entry, LobbyServer lobbyServer, TransportServer transportServer, string logPrefix = "[ClientServer]")
-            => new ClientServer(entry, lobbyServer, transportServer, logPrefix);
+        public static ClientServerEntry Create(BridgeServerEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
+            => new ClientServerEntry(entry, lobbyServer, transportServer, logPrefix);
 
-        public ClientServer(BridgeServerEntry entry, LobbyServer lobbyServer, TransportServer transportServer, string logPrefix = "[ClientServer]")
+        public ClientServerEntry(BridgeServerEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
         {
             Entry = entry;
             LobbyServer = lobbyServer;
@@ -44,7 +43,7 @@ namespace NSL.Node.BridgeServer.CS
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
-        public ClientServer Run()
+        public ClientServerEntry Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()

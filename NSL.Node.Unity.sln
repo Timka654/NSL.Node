@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.LobbyServerExample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeLobbyClient", "NSL.Node.BridgeLobbyClient\NSL.Node.BridgeLobbyClient.csproj", "{00B0802A-1B83-483E-8200-F599C06B3E63}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeTransportClient", "NSL.Node.BridgeTransportClient\NSL.Node.BridgeTransportClient.csproj", "{881A9B06-FAE5-467C-BADB-6EAD8BB1BEAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer", "NSL.Node.RoomServer\NSL.Node.BridgeTransportClient.csproj", "{881A9B06-FAE5-467C-BADB-6EAD8BB1BEAF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeServer.Shared", "NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj", "{01F5BEB1-8A4C-4D11-816F-48699603D52E}"
 EndProject

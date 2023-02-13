@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Node.BridgeTransportClient.Bridge
+namespace NSL.Node.RoomServer.Bridge
 {
     public class BridgeTransportNetworkClient : BaseSocketNetworkClient
     {

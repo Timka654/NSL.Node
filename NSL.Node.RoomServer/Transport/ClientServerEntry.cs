@@ -1,9 +1,11 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.BuilderExtensions.WebSocketsServer;
+using NSL.Logger.Interface;
+using NSL.Logger;
 using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.BridgeTransportClient.Bridge;
-using NSL.Node.BridgeTransportClient.Transport.Data;
+using NSL.Node.RoomServer.Bridge;
+using NSL.Node.RoomServer.Transport.Data;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils;
 using NSL.SocketCore.Utils.Buffer;
@@ -18,28 +20,47 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSL.Node.BridgeTransportClient.Transport
+namespace NSL.Node.RoomServer.Transport
 {
-    public partial class TransportNetwork
+    public partial class ClientServerEntry
     {
         public string BindingAddress { get; }
 
         protected WSServerListener<TransportNetworkClient> network { get; private set; }
 
-        public TransportNetwork(
-            BridgeTransportNetwork bridgeNetwork,
-            string bindingAddress,
-            Action<WebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>> onBuild = null)
-        {
-            this.bridgeNetwork = bridgeNetwork;
-            this.BindingAddress = bindingAddress;
+        public int ClientBindingPort => Entry.ClientBindingPort;
 
+        protected RoomServerEntry Entry { get; }
+
+        protected ILogger Logger { get; }
+
+        public static ClientServerEntry Create(
+            RoomServerEntry entry, 
+            BridgeTransportNetwork bridgeNetwork,
+            
+            string logPrefix = "[ClientServer]")
+            => new ClientServerEntry(entry, bridgeNetwork, logPrefix);
+
+        public ClientServerEntry(RoomServerEntry entry, BridgeTransportNetwork bridgeNetwork, string logPrefix = "[ClientServer]")
+        {
+            Entry = entry;
+
+            this.bridgeNetwork = bridgeNetwork;
+
+            if (Entry.Logger != null)
+                Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
+        }
+
+        public ClientServerEntry Run()
+        {
             network = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<TransportNetworkClient>()
                 .WithOptions<WSServerOptions<TransportNetworkClient>>()
-                .WithBindingPoint(bindingAddress)
+                .WithBindingPoint($"http://*:{ClientBindingPort}/")
                 .WithCode(builder =>
                 {
+                    builder.SetLogger(Logger);
+
                     builder.AddPacketHandle(
                         NodeTransportPacketEnum.SignSession, SignInPacketHandle);
                     builder.AddPacketHandle(
@@ -51,12 +72,13 @@ namespace NSL.Node.BridgeTransportClient.Transport
                     builder.AddPacketHandle(
                         NodeTransportPacketEnum.Execute, ExecutePacketHandle);
 
-                    if (onBuild != null)
-                        onBuild(builder);
+                    builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>, TransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
                 })
                 .Build();
 
             network.Start();
+
+            return this;
         }
 
         private readonly BridgeTransportNetwork bridgeNetwork;

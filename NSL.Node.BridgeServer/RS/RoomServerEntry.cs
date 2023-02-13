@@ -4,9 +4,9 @@ using NSL.Logger;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.BuilderExtensions.SocketCore;
 
-using NetworkClient = NSL.Node.BridgeServer.TS.TransportServerNetworkClient;
-using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.TS.TransportServerNetworkClient>;
-using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.TS.TransportServerNetworkClient>;
+using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
+using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.RS.RoomServerNetworkClient>;
+using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.RS.RoomServerNetworkClient>;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.ConfigurationEngine;
 using System.Collections.Concurrent;
@@ -14,9 +14,9 @@ using NSL.SocketCore.Extensions.Buffer;
 using System.Collections.Generic;
 using NSL.Node.BridgeServer.CS;
 
-namespace NSL.Node.BridgeServer.TS
+namespace NSL.Node.BridgeServer.RS
 {
-    public class TransportServer
+    public class RoomServerEntry
     {
         protected BaseConfigurationManager Configuration => Entry.Configuration;
 
@@ -32,10 +32,10 @@ namespace NSL.Node.BridgeServer.TS
 
         protected BridgeServerEntry Entry { get; }
 
-        public static TransportServer Create(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
-            => new TransportServer(entry, logPrefix);
+        public static RoomServerEntry Create(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
+            => new RoomServerEntry(entry, logPrefix);
 
-        public TransportServer(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
+        public RoomServerEntry(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
         {
             Entry = entry;
 
@@ -43,7 +43,7 @@ namespace NSL.Node.BridgeServer.TS
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
-        public TransportServer Run()
+        public RoomServerEntry Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()

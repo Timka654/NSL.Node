@@ -1,0 +1,5 @@
+﻿{
+  "client": {
+    "public.endpoint": "ws://localhost:5920"
+  }
+}
