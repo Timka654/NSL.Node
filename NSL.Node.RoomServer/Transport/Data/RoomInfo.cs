@@ -141,8 +141,6 @@ namespace NSL.Node.RoomServer.Transport.Data
 
             var to = packet.ReadGuid();
 
-            //Execute(client, packet);
-
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);
 
             pbuf.WriteGuid(client.Id);
