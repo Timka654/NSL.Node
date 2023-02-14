@@ -1,29 +1,26 @@
 ﻿using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.RoomServer.Bridge;
-using NSL.Node.RoomServer.Transport;
+using NSL.Node.RoomServer.Client;
 using NSL.UDP.Client.Info;
 using STUN;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer
 {
-    public abstract class RoomServerEntry<TTHIS> : RoomServerEntry
-        where TTHIS : RoomServerEntry
+    public abstract class RoomServerStartupEntry<TTHIS> : RoomServerStartupEntry
+        where TTHIS : RoomServerStartupEntry
     {
         /// <summary>
         /// Call Run and return this
         /// </summary>
         /// <returns></returns>
-        public RoomServerEntry<TTHIS> RunEntry() { Run(); return this; }
+        public RoomServerStartupEntry<TTHIS> RunEntry() { Run(); return this; }
     }
 
-    public abstract class RoomServerEntry
+    public abstract class RoomServerStartupEntry
     {
         public abstract RoomConfigurationManager Configuration { get; }
 
@@ -88,7 +85,7 @@ namespace NSL.Node.RoomServer
                 .Create(this, bridgeClient)
                 .Run();
 
-        public static DefaultRoomServerEntry CreateDefault()
-            => new DefaultRoomServerEntry();
+        public static DefaultRoomServerStartupEntry CreateDefault()
+            => new DefaultRoomServerStartupEntry();
     }
 }

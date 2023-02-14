@@ -1,28 +1,22 @@
-﻿using NSL.ConfigurationEngine;
-using NSL.Logger;
+﻿using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.BridgeServer.CS;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.RS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeServer
 {
-    public abstract class BridgeServerEntry<TTHIS> : BridgeServerEntry
-        where TTHIS : BridgeServerEntry
+    public abstract class BridgeServerStartupEntry<TTHIS> : BridgeServerStartupEntry
+        where TTHIS : BridgeServerStartupEntry
     {
         /// <summary>
         /// Call Run and return this
         /// </summary>
         /// <returns></returns>
-        public BridgeServerEntry<TTHIS> RunEntry() { Run(); return this; }
+        public BridgeServerStartupEntry<TTHIS> RunEntry() { Run(); return this; }
     }
 
-    public abstract class BridgeServerEntry
+    public abstract class BridgeServerStartupEntry
     {
         public abstract BridgeConfigurationManager Configuration { get; }
 
@@ -58,7 +52,7 @@ namespace NSL.Node.BridgeServer
                 .Create(this, LobbyServer, TransportServer)
                 .Run();
 
-        public static DefaultBridgeServerEntry CreateDefault()
-            => new DefaultBridgeServerEntry();
+        public static DefaultBridgeServerStartupEntry CreateDefault()
+            => new DefaultBridgeServerStartupEntry();
     }
 }

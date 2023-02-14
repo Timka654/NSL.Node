@@ -18,6 +18,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\NSL.Node.BridgeLobbyClient.AspNetCore\NSL.Node.BridgeLobbyClient.AspNetCore.csproj" />
 		<ProjectReference Include="..\..\NSL.Node.BridgeLobbyClient\NSL.Node.BridgeLobbyClient.csproj" />
+		<ProjectReference Include="..\..\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj" />
+		<ProjectReference Include="..\..\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
 		<ProjectReference Include="..\NSL.Node.LobbyServerExample.Shared\NSL.Node.LobbyServerExample.Shared.csproj" />
 	</ItemGroup>
 

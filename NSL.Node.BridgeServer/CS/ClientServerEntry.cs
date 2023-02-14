@@ -28,12 +28,12 @@ namespace NSL.Node.BridgeServer.CS
 
         protected ILogger Logger { get; }
 
-        protected BridgeServerEntry Entry { get; }
+        protected BridgeServerStartupEntry Entry { get; }
 
-        public static ClientServerEntry Create(BridgeServerEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
+        public static ClientServerEntry Create(BridgeServerStartupEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
             => new ClientServerEntry(entry, lobbyServer, transportServer, logPrefix);
 
-        public ClientServerEntry(BridgeServerEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
+        public ClientServerEntry(BridgeServerStartupEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
         {
             Entry = entry;
             LobbyServer = lobbyServer;

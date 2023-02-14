@@ -31,7 +31,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
+	<ItemGroup Condition="'$(Configuration)'!='UnityDebug' and '$(Configuration)'!='Unity'">
 	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.5.1332" />
 	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.2.5.1332" />
 	</ItemGroup>

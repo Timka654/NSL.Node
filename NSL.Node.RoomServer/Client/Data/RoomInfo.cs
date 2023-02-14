@@ -1,17 +1,14 @@
-﻿using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.RoomServer.Shared;
-using NSL.Node.RoomServer.Shared.Enums;
+﻿using NSL.Node.RoomServer.Shared;
+using NSL.Node.RoomServer.Shared.Client.Core;
+using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace NSL.Node.RoomServer.Transport.Data
+namespace NSL.Node.RoomServer.Client.Data
 {
     public class RoomInfo : IRoomInfo
     {
@@ -28,9 +25,9 @@ namespace NSL.Node.RoomServer.Transport.Data
 
         public DateTime CreateTime { get; } = DateTime.UtcNow;
 
-        private GameInfo Game;
+        private SGameInfo Game;
 
-        public RoomInfo(Guid roomId) { this.RoomId = roomId; Game = new GameInfo(this); }
+        public RoomInfo(Guid roomId) { this.RoomId = roomId; Game = new SGameInfo(this); }
 
         public bool AddClient(TransportNetworkClient node)
         {

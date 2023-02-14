@@ -6,7 +6,7 @@ namespace NSL.Node.BridgeServerExample
     {
         static void Main(string[] args)
         {
-            BridgeServerEntry.CreateDefault().RunEntry();
+            BridgeServerStartupEntry.CreateDefault().RunEntry();
 
             Thread.Sleep(Timeout.InfiniteTimeSpan);
         }

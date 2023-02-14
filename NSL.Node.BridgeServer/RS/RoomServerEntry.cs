@@ -11,8 +11,6 @@ using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.ConfigurationEngine;
 using System.Collections.Concurrent;
 using NSL.SocketCore.Extensions.Buffer;
-using System.Collections.Generic;
-using NSL.Node.BridgeServer.CS;
 
 namespace NSL.Node.BridgeServer.RS
 {
@@ -30,12 +28,12 @@ namespace NSL.Node.BridgeServer.RS
 
         protected ILogger Logger { get; }
 
-        protected BridgeServerEntry Entry { get; }
+        protected BridgeServerStartupEntry Entry { get; }
 
-        public static RoomServerEntry Create(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
+        public static RoomServerEntry Create(BridgeServerStartupEntry entry, string logPrefix = "[TransportServer]")
             => new RoomServerEntry(entry, logPrefix);
 
-        public RoomServerEntry(BridgeServerEntry entry, string logPrefix = "[TransportServer]")
+        public RoomServerEntry(BridgeServerStartupEntry entry, string logPrefix = "[TransportServer]")
         {
             Entry = entry;
 

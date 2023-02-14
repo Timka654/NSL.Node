@@ -1,16 +1,12 @@
 ﻿using NSL.Logger.Interface;
 using NSL.UDP.Client.Info;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer
 {
-    public class DefaultRoomServerEntry : RoomServerEntry<DefaultRoomServerEntry>
+    public class DefaultRoomServerStartupEntry : RoomServerStartupEntry<DefaultRoomServerStartupEntry>
     {
-        internal DefaultRoomServerEntry() { }
+        internal DefaultRoomServerStartupEntry() { }
         private RoomConfigurationManager configuration;
         private ILogger logger;
 

@@ -1,16 +1,10 @@
-﻿using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.RoomServer.Shared;
-using NSL.Node.RoomServer.Shared.Enums;
-using NSL.SocketClient;
-using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketServer.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NSL.Node.RoomServer.Shared.Client.Core;
+using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 
-namespace NSL.Node.RoomServer.Transport.Data
+namespace NSL.Node.RoomServer.Client.Data
 {
     public class TransportNetworkClient : IServerNetworkClient, IPlayerNetwork
     {

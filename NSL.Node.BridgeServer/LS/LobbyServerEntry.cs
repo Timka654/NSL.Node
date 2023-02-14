@@ -26,12 +26,12 @@ namespace NSL.Node.BridgeServer.LS
 
         protected ILogger Logger { get; }
 
-        protected BridgeServerEntry Entry { get; }
+        protected BridgeServerStartupEntry Entry { get; }
 
-        public static LobbyServerEntry Create(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
+        public static LobbyServerEntry Create(BridgeServerStartupEntry entry, string logPrefix = "[LobbyServer]")
             => new LobbyServerEntry(entry, logPrefix);
 
-        public LobbyServerEntry(BridgeServerEntry entry, string logPrefix = "[LobbyServer]")
+        public LobbyServerEntry(BridgeServerStartupEntry entry, string logPrefix = "[LobbyServer]")
         {
             Entry = entry;
 

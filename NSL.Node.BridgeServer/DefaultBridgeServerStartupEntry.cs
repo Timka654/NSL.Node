@@ -1,15 +1,10 @@
 ﻿using NSL.Logger.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeServer
 {
-    public class DefaultBridgeServerEntry : BridgeServerEntry<DefaultBridgeServerEntry>
+    public class DefaultBridgeServerStartupEntry : BridgeServerStartupEntry<DefaultBridgeServerStartupEntry>
     {
-        internal DefaultBridgeServerEntry() { }
+        internal DefaultBridgeServerStartupEntry() { }
         private BridgeConfigurationManager configuration;
         private ILogger logger;
 

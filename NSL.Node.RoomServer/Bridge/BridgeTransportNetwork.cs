@@ -4,13 +4,9 @@ using NSL.WebSockets.Client;
 using System.Threading.Tasks;
 using System;
 using NSL.BuilderExtensions.SocketCore;
-using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketCore;
-using System.Net;
-using NSL.Node.RoomServer.Transport.Data;
+using NSL.Node.RoomServer.Client.Data;
 using NSL.Logger;
 using NSL.Logger.Interface;
-using System.ComponentModel.DataAnnotations;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -26,14 +22,14 @@ namespace NSL.Node.RoomServer.Bridge
 
         protected WSNetworkClient<BridgeTransportNetworkClient, WSClientOptions<BridgeTransportNetworkClient>> network { get; private set; }
 
-        protected RoomServerEntry Entry { get; }
+        protected RoomServerStartupEntry Entry { get; }
 
         protected ILogger Logger { get; }
 
-        public static BridgeTransportNetwork Create(RoomServerEntry entry, string logPrefix = "[BridgeClient]")
+        public static BridgeTransportNetwork Create(RoomServerStartupEntry entry, string logPrefix = "[BridgeClient]")
             => new BridgeTransportNetwork(entry, logPrefix);
 
-        public BridgeTransportNetwork(RoomServerEntry entry, string logPrefix = "[BridgeClient]")
+        public BridgeTransportNetwork(RoomServerStartupEntry entry, string logPrefix = "[BridgeClient]")
         {
             Entry = entry;
 

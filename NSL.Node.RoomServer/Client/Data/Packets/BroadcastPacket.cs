@@ -1,14 +1,8 @@
-﻿using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.RoomServer.Shared.Enums;
-using NSL.Node.RoomServer.Transport.Data;
+﻿using NSL.Node.RoomServer.Client.Data;
 using NSL.SocketCore.Utils.Buffer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 
-namespace NSL.Node.RoomServer.Transport
+namespace NSL.Node.RoomServer.Client
 {
     public partial class ClientServerEntry
     {

@@ -1,27 +1,15 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
-using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.BuilderExtensions.WebSocketsServer;
 using NSL.Logger.Interface;
 using NSL.Logger;
-using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.Node.RoomServer.Bridge;
-using NSL.Node.RoomServer.Transport.Data;
-using NSL.SocketCore.Extensions.Buffer;
-using NSL.SocketCore.Utils;
-using NSL.SocketCore.Utils.Buffer;
-using NSL.WebSockets.Client;
+using NSL.Node.RoomServer.Client.Data;
 using NSL.WebSockets.Server;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using NSL.Node.RoomServer.Shared.Enums;
+using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 
-namespace NSL.Node.RoomServer.Transport
+namespace NSL.Node.RoomServer.Client
 {
     public partial class ClientServerEntry
     {
@@ -31,18 +19,18 @@ namespace NSL.Node.RoomServer.Transport
 
         public int ClientBindingPort => Entry.ClientBindingPort;
 
-        protected RoomServerEntry Entry { get; }
+        protected RoomServerStartupEntry Entry { get; }
 
         protected ILogger Logger { get; }
 
         public static ClientServerEntry Create(
-            RoomServerEntry entry, 
+            RoomServerStartupEntry entry, 
             BridgeTransportNetwork bridgeNetwork,
             
             string logPrefix = "[ClientServer]")
             => new ClientServerEntry(entry, bridgeNetwork, logPrefix);
 
-        public ClientServerEntry(RoomServerEntry entry, BridgeTransportNetwork bridgeNetwork, string logPrefix = "[ClientServer]")
+        public ClientServerEntry(RoomServerStartupEntry entry, BridgeTransportNetwork bridgeNetwork, string logPrefix = "[ClientServer]")
         {
             Entry = entry;
 
