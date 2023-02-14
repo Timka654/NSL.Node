@@ -18,7 +18,7 @@
 
 	<!--this link to files-->
 	<ItemGroup>
-		<Compile Include="..\..\Scripts\Game\Logic\**\*.cs" /> 
+		<Compile Include="..\..\Assets\Scripts\Network\**\*.cs" /> 
 	</ItemGroup>
 
 	<ItemGroup>
