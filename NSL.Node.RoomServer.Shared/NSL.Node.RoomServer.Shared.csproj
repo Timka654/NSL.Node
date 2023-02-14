@@ -34,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Assets\Scripts\Network\NSL.Node.RoomServer.Shared.Client.csproj" />
+	  <ProjectReference Include="..\..\Assets\Scripts\Network\Node\NSL.Node.RoomServer.Shared.Client.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServerExample", "Examples\NSL.Node.RoomServerExample\NSL.Node.RoomServerExample.csproj", "{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared.Client", "..\Assets\Scripts\Network\NSL.Node.RoomServer.Shared.Client.csproj", "{A8388655-AF33-437C-95A4-8C8392969259}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared.Client", "..\Assets\Scripts\Network\Node\NSL.Node.RoomServer.Shared.Client.csproj", "{A8388655-AF33-437C-95A4-8C8392969259}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
