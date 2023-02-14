@@ -8,6 +8,7 @@
 
 	  <Version>$(VersionSuffix)</Version>
 	  <Authors>Relife87</Authors>
+	  <Configurations>Debug;Release;DebugExamples;ReleaseRoomServer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

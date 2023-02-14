@@ -9,11 +9,14 @@ $patternHere  = 'UnityEngine'
 
 $directoryInfo = [System.IO.DirectoryInfo]::new($buildPath)
 
-foreach($item in ($directoryInfo.GetFiles("*", 1)))
+if($directoryInfo.Exists)
 {
-    if($item.Name.Contains($patternHere))
+    foreach($item in ($directoryInfo.GetFiles("*", 1)))
     {
-        Write-Output "Remove file $($item.FullName)"
-        $item.Delete()
+        if($item.Name.Contains($patternHere))
+        {
+            Write-Output "Remove file $($item.FullName)"
+            $item.Delete()
+        }
     }
 }

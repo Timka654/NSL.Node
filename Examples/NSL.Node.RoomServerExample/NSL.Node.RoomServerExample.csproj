@@ -11,6 +11,8 @@
 		<Authors>Relife87</Authors>
 
 		<IsPackable>false</IsPackable>
+
+		<Configurations>Debug;Release;DebugExamples;ReleaseRoomServer</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>

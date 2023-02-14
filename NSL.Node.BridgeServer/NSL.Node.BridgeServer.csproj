@@ -8,6 +8,7 @@
 		<IsPackable>false</IsPackable>
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
+		<Configurations>Debug;Release;DebugExamples;ReleaseRoomServer;DebugRoomServer</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>

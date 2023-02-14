@@ -12,5 +12,5 @@ namespace NSL.Node.BridgeServer.Shared.Enums
         SignServerResultPID = SignServerPID,
         SignSessionPID,
         SignSessionResultPID = SignSessionPID
-}
+    }
 }
