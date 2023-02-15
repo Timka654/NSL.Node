@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
-		<Configurations>Debug;Release;UnityDebug;Unity;DebugExamples;ReleaseRoomServer;DebugRoomServer</Configurations>
-		
+		<Configurations>Debug;Release;UnityDebug;Unity;DebugExamples</Configurations>
+
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -13,11 +13,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='DebugRoomServer'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
@@ -32,17 +28,17 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='UnityDebug' and '$(Configuration)'!='Unity'">
-	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.5.1332" />
-	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.2.5.1332" />
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.5.1332" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.2.5.1332" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
-	  <PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2022.10.30.1407" />
-	  <PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2022.10.30.1407" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2022.10.30.1407" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2022.10.30.1407" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

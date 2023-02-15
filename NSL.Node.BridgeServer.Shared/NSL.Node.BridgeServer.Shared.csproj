@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<Configurations>Debug;Release;UnityDebug;Unity;DebugExamples;ReleaseRoomServer;DebugRoomServer</Configurations>
-		
+		<Configurations>Debug;Release;UnityDebug;Unity;DebugExamples</Configurations>
+
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
@@ -13,11 +13,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='DebugRoomServer'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">

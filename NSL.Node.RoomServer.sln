@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{BC3466B4-8239-425D-BB35-7F65AD1D6001}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeServer.Shared", "NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj", "{DC3E1E60-0ED5-45B1-A14A-97110890B9A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer", "NSL.Node.RoomServer\NSL.Node.RoomServer.csproj", "{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared", "NSL.Node.RoomServer.Shared\NSL.Node.RoomServer.Shared.csproj", "{392EB482-64F9-48F2-940C-2654724572F5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServerExample", "Examples\NSL.Node.RoomServerExample\NSL.Node.RoomServerExample.csproj", "{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared.Client", "..\Assets\Scripts\Network\Node\NSL.Node.RoomServer.Shared.Client.csproj", "{A8388655-AF33-437C-95A4-8C8392969259}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC3E1E60-0ED5-45B1-A14A-97110890B9A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC3E1E60-0ED5-45B1-A14A-97110890B9A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC3E1E60-0ED5-45B1-A14A-97110890B9A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC3E1E60-0ED5-45B1-A14A-97110890B9A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{392EB482-64F9-48F2-940C-2654724572F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{392EB482-64F9-48F2-940C-2654724572F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{392EB482-64F9-48F2-940C-2654724572F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{392EB482-64F9-48F2-940C-2654724572F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8388655-AF33-437C-95A4-8C8392969259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8388655-AF33-437C-95A4-8C8392969259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8388655-AF33-437C-95A4-8C8392969259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8388655-AF33-437C-95A4-8C8392969259}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374} = {BC3466B4-8239-425D-BB35-7F65AD1D6001}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FAC0C61D-775D-4347-9BD3-3A114A731C7C}
+	EndGlobalSection
+EndGlobal
