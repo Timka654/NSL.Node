@@ -11,11 +11,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.15.2226" />
-	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.2.15.2226" />
-	  <PackageReference Include="NSL.ConfigurationEngine" Version="2023.2.15.2226" />
-	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.2.15.2226" />
-	  <PackageReference Include="NSL.Logger" Version="2023.2.15.2226" />
+	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.16.49" />
+	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.2.16.49" />
+	  <PackageReference Include="NSL.ConfigurationEngine" Version="2023.2.16.49" />
+	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.2.16.49" />
+	  <PackageReference Include="NSL.Logger" Version="2023.2.16.49" />
 	</ItemGroup>
 
 	<ItemGroup>
