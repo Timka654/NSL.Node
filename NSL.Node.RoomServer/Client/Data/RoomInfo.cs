@@ -1,4 +1,5 @@
-﻿using NSL.Node.RoomServer.Shared;
+﻿#define REQUIRE_ALL_CONNECTED_NODES
+using NSL.Node.RoomServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
@@ -7,11 +8,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
     public class RoomInfo : IRoomInfo
     {
+        private AutoResetEvent ar = new AutoResetEvent(true);
+
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
         private Dictionary<ushort,
@@ -48,22 +52,25 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
         {
+            ar.WaitOne();
             if (!nodes.ContainsKey(node.Id))
             {
                 if (node.RoomId != RoomId)
                 {
                     node.Network.Disconnect();
+                    ar.Set();
                     return false;
                 }
                 //else // m.b write change room logic or not...
                 //    AddClient(node);
-
+                ar.Set();
                 return false;
             }
             if (ConnectedNodesCount != nodeIds.Count() /*totalNodeCount*/)
             {
                 BroadcastChangeNodeList();
 #if REQUIRE_ALL_CONNECTED_NODES
+                ar.Set();
                 return false;
 #endif
             }
@@ -71,11 +78,11 @@ namespace NSL.Node.RoomServer.Client.Data
             node.Ready = true;
 #if REQUIRE_ALL_CONNECTED_NODES
             if (Nodes.All(x => x.Ready))
-                Broadcast(CreateReadyRoomPacket())
+                Broadcast(CreateReadyRoomPacket());
 #else
             SendTo(node, CreateReadyRoomPacket());
 #endif
-
+            ar.Set();
             return true;
         }
 
