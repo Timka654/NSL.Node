@@ -48,13 +48,19 @@ namespace NSL.Node.BridgeServer.LS
                 {
                     builder.SetLogger(Logger);
 
+                    builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
+
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
                     builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignServerReceiveHandle);
 
                     builder.AddReceivePacketHandle(
                         NodeBridgeLobbyPacketEnum.ValidateSessionResultPID,
-                        client => client.ValidateRequestBuffer);
+                        client => client.RequestBuffer);
+
+                    builder.AddReceivePacketHandle(
+                        NodeBridgeLobbyPacketEnum.RoomStartupInfoResultPID,
+                        client => client.RequestBuffer);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}/")
                 .Build();
@@ -69,48 +75,13 @@ namespace NSL.Node.BridgeServer.LS
             var packet = data.CreateWaitBufferResponse()
                 .WithPid(NodeBridgeLobbyPacketEnum.SignServerResultPID);
 
-            var serverIdentity = client.Identity = data.ReadString16();
+            client.Identity = data.ReadString16();
 
-            var identityKey = data.ReadString16();
-
-            //todo:check identity key
-            bool result = true;
-
-            if (result)
-            {
-                connectedServers.Remove(serverIdentity, out _);
-
-                connectedServers.TryAdd(serverIdentity, client);
-            }
+            bool result = Entry.LobbyManager.TryLobbyServerConnect(client, data.ReadString16());
 
             packet.WriteBool(result);
 
             client.Network.Send(packet);
         }
-
-        public async Task<bool> ValidateSession(string serverIdentity, Guid roomId, string session)
-        {
-            if (!connectedServers.TryGetValue(serverIdentity, out var server))
-                return false;
-
-            bool result = default;
-
-            var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.ValidateSessionPID);
-
-            packet.WriteGuid(roomId);
-            packet.WriteString16(session);
-
-            await server.ValidateRequestBuffer.SendWaitRequest(packet, data =>
-            {
-                if (data != default)
-                    result = data.ReadBool();
-
-                return Task.CompletedTask;
-            });
-
-            return result;
-        }
-
-        private ConcurrentDictionary<string, NetworkClient> connectedServers = new ConcurrentDictionary<string, NetworkClient>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
+using NSL.Node.BridgeServer.Shared;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.WebSockets.Client;
@@ -9,6 +10,8 @@ using System.Threading.Tasks;
 namespace NSL.Node.BridgeLobbyClient
 {
     public delegate Task<bool> ValidateSessionDelegate(Guid roomId, string sessionIdentity);
+    public delegate Task<bool> RoomStartupInfoDelegate(Guid roomId, NodeRoomStartupInfo startupInfo);
+    public delegate Task RoomFinishDelegate(Guid roomId, byte[] data);
 
     public class BridgeLobbyNetwork
     {
@@ -54,6 +57,48 @@ namespace NSL.Node.BridgeLobbyClient
                              result = await ValidateSession(roomId, sessionId);
 
                          packet.WriteBool(result);
+
+                         c.Network.Send(packet);
+                     });
+
+                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.FinishRoom, async (c, d) =>
+                     {
+                         var roomId = d.ReadGuid();
+
+                         var dataLen = d.DataLength - d.DataPosition;
+
+                         byte[] buffer = default;
+
+                         if (dataLen > 0)
+                             buffer = d.Read(dataLen);
+                         else
+                             buffer = new byte[0];
+
+                         await RoomFinish(roomId, buffer);
+                     });
+
+                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.RoomStartupInfoPID, async (c, d) =>
+                     {
+                         var packet = d.CreateWaitBufferResponse();
+
+                         packet.WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.RoomStartupInfoResultPID);
+
+                         var roomId = d.ReadGuid();
+                         bool result = default;
+
+                         NodeRoomStartupInfo startupInfo = new NodeRoomStartupInfo();
+
+                         if (RoomStartupInfo != null)
+                             result = await RoomStartupInfo(roomId, startupInfo);
+
+                         packet.WriteBool(result);
+
+                         if (result)
+                             packet.WriteCollection(startupInfo.GetCollection(), item =>
+                             {
+                                 packet.WriteString16(item.Key);
+                                 packet.WriteString16(item.Value);
+                             });
 
                          c.Network.Send(packet);
                      });
@@ -154,5 +199,9 @@ namespace NSL.Node.BridgeLobbyClient
         public bool IdentityFailed { get; private set; }
 
         public ValidateSessionDelegate ValidateSession { set; private get; }
+
+        public RoomStartupInfoDelegate RoomStartupInfo { set; private get; }
+
+        public RoomFinishDelegate RoomFinish { set; private get; }
     }
 }

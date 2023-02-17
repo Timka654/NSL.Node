@@ -16,10 +16,6 @@ namespace NSL.Node.BridgeServer.CS
 {
     public class ClientServerEntry
     {
-        protected LobbyServerEntry LobbyServer { get; }
-
-        protected RoomServerEntry TransportServer { get; }
-
         protected BaseConfigurationManager Configuration => Entry.Configuration;
 
         public virtual int BindingPort => Configuration.GetValue("client.server.port", 7000);
@@ -30,14 +26,12 @@ namespace NSL.Node.BridgeServer.CS
 
         protected BridgeServerStartupEntry Entry { get; }
 
-        public static ClientServerEntry Create(BridgeServerStartupEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
-            => new ClientServerEntry(entry, lobbyServer, transportServer, logPrefix);
+        public static ClientServerEntry Create(BridgeServerStartupEntry entry, string logPrefix = "[ClientServer]")
+            => new ClientServerEntry(entry, logPrefix);
 
-        public ClientServerEntry(BridgeServerStartupEntry entry, LobbyServerEntry lobbyServer, RoomServerEntry transportServer, string logPrefix = "[ClientServer]")
+        public ClientServerEntry(BridgeServerStartupEntry entry, string logPrefix = "[ClientServer]")
         {
             Entry = entry;
-            LobbyServer = lobbyServer;
-            TransportServer = transportServer;
 
             if (Entry.Logger != null)
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
@@ -66,22 +60,23 @@ namespace NSL.Node.BridgeServer.CS
 
         #region Handles
 
-
         private async void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            client.ServerIdentity = data.ReadString16();
+            client.LobbyServerIdentity = data.ReadString16();
             client.RoomId = data.ReadGuid();
             client.SessionIdentity = data.ReadString16();
 
-            var result = await LobbyServer.ValidateSession(client.ServerIdentity, client.RoomId, client.SessionIdentity);
+            client.Signed = await Entry.LobbyManager.ValidateClientSession(client);
 
             var packet = OutputPacketBuffer.Create(NodeBridgeClientPacketEnum.SignSessionResultPID);
 
-            packet.WriteBool(result);
+            packet.WriteBool(client.Signed);
 
-            if (result)
+            if (client.Signed)
             {
-                var sessions = TransportServer.CreateSignSession(client.SessionIdentity, client.RoomId);
+                Entry.RoomManager.CreateRoom(client);
+
+                var sessions = Entry.RoomManager.CreateSignSession(client);
 
                 packet.WriteCollection(sessions, i =>
                 {

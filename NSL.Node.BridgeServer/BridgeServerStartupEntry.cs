@@ -2,6 +2,7 @@
 using NSL.Logger.Interface;
 using NSL.Node.BridgeServer.CS;
 using NSL.Node.BridgeServer.LS;
+using NSL.Node.BridgeServer.Managers;
 using NSL.Node.BridgeServer.RS;
 
 namespace NSL.Node.BridgeServer
@@ -28,6 +29,16 @@ namespace NSL.Node.BridgeServer
 
         public ClientServerEntry ClientServer { get; protected set; }
 
+        internal RoomManager RoomManager { get; }
+
+        internal LobbyManager LobbyManager { get; }
+
+        public BridgeServerStartupEntry()
+        {
+            RoomManager = new RoomManager(this);
+            LobbyManager = new LobbyManager(this);
+        }
+
 
         public abstract void Run();
 
@@ -49,7 +60,7 @@ namespace NSL.Node.BridgeServer
 
         protected virtual ClientServerEntry CreateDefaultClientServerNetwork()
             => ClientServer = ClientServerEntry
-                .Create(this, LobbyServer, TransportServer)
+                .Create(this)
                 .Run();
 
         public static DefaultBridgeServerStartupEntry CreateDefault()

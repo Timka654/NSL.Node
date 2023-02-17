@@ -22,8 +22,6 @@ namespace NSL.Node.BridgeServer.RS
 
         public virtual string IdentityKey => Configuration.GetValue<string>("transport.server.identityKey", "AABBCC");
 
-        public virtual int TransportServerCountPerRoom => Configuration.GetValue("transport.server.count.perRoom", 1);
-
         protected NetworkListener Listener { get; private set; }
 
         protected ILogger Logger { get; }
@@ -50,10 +48,14 @@ namespace NSL.Node.BridgeServer.RS
                 {
                     builder.SetLogger(Logger);
 
+                    builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
+
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
                     builder.AddPacketHandle(NodeBridgeTransportPacketEnum.SignServerPID, SignServerReceiveHandle);
                     builder.AddPacketHandle(NodeBridgeTransportPacketEnum.SignSessionPID, SignSessionReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeTransportPacketEnum.RoomStartupInfoPID, RoomStartupInfoReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeTransportPacketEnum.FinishRoom, RoomFinishRoomReceiveHandle);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}/")
                 .Build();
@@ -84,43 +86,12 @@ namespace NSL.Node.BridgeServer.RS
                 return;
             }
 
-            if (!Guid.Empty.Equals(client.Id))
-            {
-                if (serverMap.TryGetValue(client.Id, out var server))
-                {
-                    if (server.GetState())
-                    {
-                        response.WriteBool(false);
+            bool result = Entry.RoomManager.TryRoomServerConnect(client);
 
-                        client.Send(response);
+            response.WriteBool(result);
 
-                        return;
-                    }
-
-                    serverMap[client.Id] = client;
-
-                    server.ChangeOwner(client);
-
-                    response.WriteBool(true);
-
-                    response.WriteGuid(client.Id);
-
-                    client.Send(response);
-
-                    return;
-                }
-            }
-            else
-                client.Id = Guid.NewGuid();
-
-            while (!serverMap.TryAdd(client.Id, client))
-            {
-                client.Id = Guid.NewGuid();
-            }
-
-            response.WriteBool(true);
-
-            response.WriteGuid(client.Id);
+            if (result)
+                response.WriteGuid(client.Id);
 
             client.Send(response);
         }
@@ -133,7 +104,9 @@ namespace NSL.Node.BridgeServer.RS
             var identityKey = data.ReadString16();
             var id = data.ReadGuid();
 
-            if (!client.SessionMap.TryGetValue(id, out var session) || !session.IdentityKey.Equals(identityKey))
+            var session = client.GetSession(id);
+
+            if (session == null || !session.Client.SessionIdentity.Equals(identityKey))
             {
                 packet.WriteBool(false);
 
@@ -144,66 +117,47 @@ namespace NSL.Node.BridgeServer.RS
 
             packet.WriteBool(true);
 
-            packet.WriteGuid(session.RoomId);
+            packet.WriteString16(session.Client.LobbyServerIdentity);
+            packet.WriteGuid(session.Client.RoomId);
 
             client.Send(packet);
         }
 
-        internal List<CreateSignResult> CreateSignSession(string identityKey, Guid roomId)
+        private void RoomFinishRoomReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            List<CreateSignResult> result = new List<CreateSignResult>();
+            var lobbyServerIdentity = data.ReadString16();
 
-            var serverArray = serverMap.Values.ToArray();
+            byte[] dataBuffer = data.Read(data.DataLength - data.DataPosition);
 
-            var offset = roomId.GetHashCode() % serverArray.Length;
+            var lobby = Entry.LobbyManager.GetLobbyById(lobbyServerIdentity);
 
-            // single server for now - maybe change to multiple later
+            if (lobby == null)
+                return; // todo
 
-            var selectedServers = serverArray.Skip(offset).Take(TransportServerCountPerRoom).SingleOrDefault();
+            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoom);
 
+            packet.Write(dataBuffer);
 
-            var tsession = new TransportSession(identityKey, roomId);
+            lobby.Network.Send(packet);
 
-            Guid newId;
-
-            do
-            {
-                newId = Guid.NewGuid();
-            } while (!selectedServers.SessionMap.TryAdd(newId, tsession));
-
-            tsession.TransportIdentity = newId;
-
-            result.Add(new CreateSignResult(selectedServers.ConnectionEndPoint, newId));
-
-            return result;
-
-
-            //if (selectedServers.Count() < TransportServerCountPerRoom)
-            //{
-            //    offset = 0;
-
-            //    serverArray = selectedServers.Concat(serverArray.Skip(offset).Take(TransportServerCountPerRoom - selectedServers.Count())).ToArray();
-            //}
-
-
-            //foreach (var item in serverArray)
-            //{
-            //    Guid newid = default;
-
-            //    var tsession = new TransportSession() { IdentityKey = identityKey };
-
-            //    do
-            //    {
-            //        newid = Guid.NewGuid();
-            //    } while (!item.SessionMap.TryAdd(newid, tsession));
-
-            //    result.Add(new CreateSignResult(item.ConnectionEndPoint, newid));
-            //}
-
-            //return result;
         }
+        private async void RoomStartupInfoReceiveHandle(NetworkClient client, InputPacketBuffer data)
+        {
+            var packet = data.CreateWaitBufferResponse()
+                .WithPid(NodeBridgeTransportPacketEnum.RoomStartupInfoResultPID);
 
-        private ConcurrentDictionary<Guid, NetworkClient> serverMap = new ConcurrentDictionary<Guid, NetworkClient>();
+            var lobbyServerIdentity = data.ReadString16();
+            var roomId = data.ReadGuid();
+
+            var result = await Entry.LobbyManager.GetRoomStartupInfo(lobbyServerIdentity, roomId);
+
+            packet.WriteBool(result.Item1);
+
+            if (result.Item1)
+                packet.Write(result.Item2);
+
+            client.Send(packet);
+        }
 
         public record CreateSignResult(string endPoint, Guid id);
     }

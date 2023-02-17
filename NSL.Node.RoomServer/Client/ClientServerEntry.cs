@@ -72,6 +72,6 @@ namespace NSL.Node.RoomServer.Client
 
         private readonly BridgeTransportNetwork bridgeNetwork;
 
-        private ConcurrentDictionary<Guid, RoomInfo> roomMap = new ConcurrentDictionary<Guid, RoomInfo>();
+        private ConcurrentDictionary<(string lobbyServerIdentity, Guid roomId), RoomInfo> roomMap = new ();
     }
 }

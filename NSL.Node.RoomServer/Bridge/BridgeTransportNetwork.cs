@@ -7,6 +7,8 @@ using NSL.BuilderExtensions.SocketCore;
 using NSL.Node.RoomServer.Client.Data;
 using NSL.Logger;
 using NSL.Logger.Interface;
+using NSL.Node.BridgeServer.Shared;
+using System.Collections.Generic;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -18,7 +20,7 @@ namespace NSL.Node.RoomServer.Bridge
 
         public string IdentityKey => Entry.BridgeIdentityKey;
 
-        public string BridgeAddress => Entry.BridgeAddress; 
+        public string BridgeAddress => Entry.BridgeAddress;
 
         protected WSNetworkClient<BridgeTransportNetworkClient, WSClientOptions<BridgeTransportNetworkClient>> network { get; private set; }
 
@@ -52,6 +54,9 @@ namespace NSL.Node.RoomServer.Bridge
                         c => c.PacketWaitBuffer);
                     builder.AddReceivePacketHandle(
                         BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignSessionResultPID,
+                        c => c.PacketWaitBuffer);
+                    builder.AddReceivePacketHandle(
+                        BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.RoomStartupInfoResultPID,
                         c => c.PacketWaitBuffer);
 
                     builder.AddDisconnectHandle(async client =>
@@ -170,12 +175,59 @@ namespace NSL.Node.RoomServer.Bridge
                 signResult = data.ReadBool();
 
                 if (signResult)
+                {
+                    client.LobbyServerIdentity = data.ReadString16();
                     client.RoomId = data.ReadGuid();
-
+                }
                 return Task.CompletedTask;
             });
 
             return signResult;
+        }
+
+        internal async Task<(bool, NodeRoomStartupInfo)> GetRoomStartupInfo(RoomInfo room)
+        {
+            var bridgeClient = network.Data;
+
+            bool signResult = false;
+
+            NodeRoomStartupInfo startupInfo = default;
+
+            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.RoomStartupInfoPID);
+
+            output.WriteString16(room.LobbyServerIdentity);
+
+            output.WriteGuid(room.RoomId);
+
+            await bridgeClient.PacketWaitBuffer.SendWaitRequest(output, data =>
+            {
+                signResult = data.ReadBool();
+
+                if (signResult)
+                {
+                    startupInfo = new NodeRoomStartupInfo(data.ReadCollection(p => new KeyValuePair<string, string>(p.ReadString16(), p.ReadString16())));
+                }
+                return Task.CompletedTask;
+            });
+
+            return (signResult, startupInfo);
+        }
+
+        internal async void FinishRoom(RoomInfo room, byte[] data)
+        {
+            var bridgeClient = network.Data;
+
+            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.FinishRoom);
+
+            output.WriteString16(room.LobbyServerIdentity);
+
+            output.WriteGuid(room.RoomId);
+
+            if (data != null)
+                output.Write(data);
+
+            bridgeClient.Send(output);
+
         }
 
         public event Action<bool> OnStateChanged = (state) => { };

@@ -1,4 +1,4 @@
-﻿#define REQUIRE_ALL_CONNECTED_NODES
+﻿using NSL.Node.BridgeServer.Shared;
 using NSL.Node.RoomServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
@@ -9,19 +9,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public class RoomInfo : IRoomInfo
+    public class RoomInfo : IRoomInfo, IDisposable
     {
-        private AutoResetEvent ar = new AutoResetEvent(true);
+        private AutoResetEvent ar = new AutoResetEvent(false);
 
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
 
+        public RoomServerStartupEntry Entry { get; }
         public Guid RoomId { get; }
+        public string LobbyServerIdentity { get; }
 
         public int ConnectedNodesCount => nodes.Count;
 
@@ -31,7 +34,13 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private SGameInfo Game;
 
-        public RoomInfo(Guid roomId) { this.RoomId = roomId; Game = new SGameInfo(this); }
+        public RoomInfo(RoomServerStartupEntry entry, Guid roomId, string lobbyServerIdentity)
+        {
+            Entry = entry;
+            RoomId = roomId;
+            LobbyServerIdentity = lobbyServerIdentity;
+            Game = new SGameInfo(this);
+        }
 
         public bool AddClient(TransportNetworkClient node)
         {
@@ -50,6 +59,43 @@ namespace NSL.Node.RoomServer.Client.Data
             return false;
         }
 
+        internal void SetStartupInfo(NodeRoomStartupInfo startupInfo)
+        {
+            this.StartupInfo = startupInfo;
+
+            RoomWaitAllReady = startupInfo.GetRoomWaitReady();
+
+            RoomPlayerCount = startupInfo.GetRoomPlayerCount();
+
+            StartupTimeout = startupInfo.GetRoomStartupTimeout();
+
+            ShutdownOnMissedReady = startupInfo.GetRoomShutdownOnMissed();
+
+            if (ShutdownOnMissedReady)
+                RunDestroyOnMissedTimer();
+            ar.Set();
+        }
+
+        private async void RunDestroyOnMissedTimer()
+        {
+            await Task.Delay(StartupTimeout);
+
+            if (ConnectedNodesCount == RoomPlayerCount)
+                return;
+
+            Dispose();
+        }
+
+        public NodeRoomStartupInfo StartupInfo { get; private set; }
+
+        public int RoomPlayerCount { get; private set; }
+
+        public bool RoomWaitAllReady { get; private set; }
+
+        public int StartupTimeout { get; private set; }
+
+        public bool ShutdownOnMissedReady { get; private set; }
+
         public bool ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
         {
             ar.WaitOne();
@@ -66,22 +112,31 @@ namespace NSL.Node.RoomServer.Client.Data
                 ar.Set();
                 return false;
             }
-            if (ConnectedNodesCount != nodeIds.Count() /*totalNodeCount*/)
+            if (ConnectedNodesCount != nodeIds.Count())
             {
                 BroadcastChangeNodeList();
-#if REQUIRE_ALL_CONNECTED_NODES
-                ar.Set();
                 return false;
-#endif
+            }
+
+            if(nodeIds.Count() != ConnectedNodesCount)
+            { 
+                if (RoomWaitAllReady)
+                {
+                    ar.Set();
+                    return false;
+                }
             }
 
             node.Ready = true;
-#if REQUIRE_ALL_CONNECTED_NODES
-            if (Nodes.All(x => x.Ready))
-                Broadcast(CreateReadyRoomPacket());
-#else
-            SendTo(node, CreateReadyRoomPacket());
-#endif
+
+            if (RoomWaitAllReady)
+            {
+                if (Nodes.All(x => x.Ready))
+                    Broadcast(CreateReadyRoomPacket());
+            }
+            else
+                SendTo(node, CreateReadyRoomPacket());
+
             ar.Set();
             return true;
         }
@@ -167,7 +222,6 @@ namespace NSL.Node.RoomServer.Client.Data
                 throw new Exception($"code {code} already contains in {nameof(handles)}");
         }
 
-
         public PlayerInfo GetPlayer(Guid id)
         {
             if (nodes.TryGetValue(id, out var node))
@@ -182,6 +236,11 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void SendToGameServer(OutputPacketBuffer packet)
         {
+        }
+
+        public void Dispose()
+        {
+            Entry.BridgeClient.FinishRoom(this, null);
         }
     }
 }

@@ -39,15 +39,17 @@ namespace NSL.Node.BridgeLobbyClient.AspNetCore
             return services;
         }
 
-        public static void RunBridgeLobbyClient(this IHost host, ValidateSessionDelegate validateSession)
-            => RunBridgeLobbyClient<BridgeLobbyNetwork>(host, validateSession);
+        public static void RunBridgeLobbyClient(this IHost host, ValidateSessionDelegate validateSession, RoomStartupInfoDelegate roomStartupInfo, RoomFinishDelegate roomFinish)
+            => RunBridgeLobbyClient<BridgeLobbyNetwork>(host, validateSession, roomStartupInfo, roomFinish);
 
-        public static void RunBridgeLobbyClient<TNetwork>(this IHost host, ValidateSessionDelegate validateSession)
+        public static void RunBridgeLobbyClient<TNetwork>(this IHost host, ValidateSessionDelegate validateSession, RoomStartupInfoDelegate roomStartupInfo, RoomFinishDelegate roomFinish)
             where TNetwork : BridgeLobbyNetwork
         {
             var network = host.Services.GetRequiredService<TNetwork>();
 
             network.ValidateSession = validateSession;
+            network.RoomStartupInfo = roomStartupInfo;
+            network.RoomFinish = roomFinish;
 
             network.Initialize();
         }

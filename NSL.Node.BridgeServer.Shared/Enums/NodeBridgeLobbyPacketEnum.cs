@@ -5,6 +5,9 @@
         SignServerPID = 1,
         SignServerResultPID = SignServerPID,
         ValidateSessionPID = 2,
-        ValidateSessionResultPID = ValidateSessionPID
+        ValidateSessionResultPID = ValidateSessionPID,
+        RoomStartupInfoPID = 3,
+        RoomStartupInfoResultPID = RoomStartupInfoPID,
+        FinishRoom = 4
     }
 }
