@@ -30,11 +30,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.SocketCore" Version="2023.2.16.49" />
+		<PackageReference Include="NSL.SocketCore" Version="2023.2.15.2226" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\Assets\Game\Networking\Node\NSL.Node.RoomServer.Shared.Client.csproj" />
+	  <ProjectReference Include="..\..\Assets\Scripts\Network\Node\NSL.Node.RoomServer.Shared.Client.csproj" />
 	</ItemGroup>
 
 </Project>
