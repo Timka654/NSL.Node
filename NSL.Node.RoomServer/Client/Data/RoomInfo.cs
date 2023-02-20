@@ -23,7 +23,9 @@ namespace NSL.Node.RoomServer.Client.Data
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
 
         public RoomServerStartupEntry Entry { get; }
+
         public Guid RoomId { get; }
+
         public string LobbyServerIdentity { get; }
 
         public int ConnectedNodesCount => nodes.Count;
@@ -118,8 +120,8 @@ namespace NSL.Node.RoomServer.Client.Data
                 return false;
             }
 
-            if(nodeIds.Count() != ConnectedNodesCount)
-            { 
+            if (nodeIds.Count() != ConnectedNodesCount)
+            {
                 if (RoomWaitAllReady)
                 {
                     ar.Set();
@@ -234,13 +236,33 @@ namespace NSL.Node.RoomServer.Client.Data
         {
         }
 
-        public void SendToGameServer(OutputPacketBuffer packet)
+        public void SendToRoomServer(OutputPacketBuffer packet)
         {
         }
 
         public void Dispose()
         {
             Entry.BridgeClient.FinishRoom(this, null);
+        }
+
+        public bool Broadcast(Action<OutputPacketBuffer> builder, ushort code)
+        {
+            return Broadcast(packet =>
+            {
+                packet.WriteUInt16(code);
+                builder(packet);
+            });
+        }
+
+        public bool Broadcast(Action<OutputPacketBuffer> builder)
+        {
+            var packet = OutputPacketBuffer.Create(RoomPacketEnum.Execute);
+
+            builder(packet);
+
+            Broadcast(packet);
+
+            return true;
         }
     }
 }
