@@ -7,7 +7,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
 {
     internal class SignServerPacket
     {
-        public static string GetIdentityKey(NetworkClient client) => client.Entry.Configuration.GetValue<string>("transport.server.identityKey", "AABBCC");
+        public static string GetIdentityKey(NetworkClient client) => client.Entry.Configuration.GetValue<string>("transport_server_identityKey", "AABBCC");
 
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {

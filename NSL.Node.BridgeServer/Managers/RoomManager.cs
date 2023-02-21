@@ -13,7 +13,7 @@ namespace NSL.Node.BridgeServer.Managers
 
         private BridgeConfigurationManager Configuration => entry.Configuration;
 
-        public virtual int TransportServerCountPerRoom => Configuration.GetValue("transport.server.count.perRoom", 1);
+        public virtual int TransportServerCountPerRoom => Configuration.GetValue("transport_server_count_perRoom", 1);
 
         public RoomManager(BridgeServerStartupEntry entry)
         {

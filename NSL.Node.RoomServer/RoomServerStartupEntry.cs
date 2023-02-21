@@ -30,17 +30,17 @@ namespace NSL.Node.RoomServer
 
         public ClientServerEntry RoomServer { get; protected set; }
 
-        public string BridgeIdentityKey => Configuration.GetValue<string>("bridge.identity.key", "AABBCC");
+        public string BridgeIdentityKey => Configuration.GetValue<string>("bridge_identity_key", "AABBCC");
 
-        public string BridgeAddress => Configuration.GetValue<string>("bridge.address", "ws://localhost:6998");
-
-
-        public int ClientBindingPort => Configuration.GetValue<int>("client.binding.port", 5920);
-
-        public string ClientPublicPoint => Configuration.GetValue<string>("client.public.endpoint", default(string));
+        public string BridgeAddress => Configuration.GetValue<string>("bridge_address", "ws://localhost:6998");
 
 
-        public bool StunAutoDetect => Configuration.GetValue<bool>("client.stun.detect", default(bool));
+        public int ClientBindingPort => Configuration.GetValue<int>("client_binding_port", 5920);
+
+        public string ClientPublicPoint => Configuration.GetValue<string>("client_public_endpoint", default(string));
+
+
+        public bool StunAutoDetect => Configuration.GetValue<bool>("client_stun_detect", default(bool));
 
         protected string GetStunAddress(StunServerInfo[] stunServers)
         {
