@@ -1,16 +1,23 @@
 ﻿using NSL.BuilderExtensions.WebSocketsServer;
 using NSL.Logger.Interface;
 using NSL.Logger;
-using NSL.SocketCore.Utils.Buffer;
 using NSL.BuilderExtensions.SocketCore;
 
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.LS.LobbyServerNetworkClient>;
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.LS.LobbyServerNetworkClient>;
-using System.Collections.Concurrent;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.ConfigurationEngine;
+using NSL.Node.BridgeServer.LS.Packets;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using NSL.Node.BridgeServer.CS;
+using System.Threading.Tasks;
+using System;
+using NSL.SocketServer.Utils;
+using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 
 namespace NSL.Node.BridgeServer.LS
 {
@@ -22,7 +29,7 @@ namespace NSL.Node.BridgeServer.LS
 
         public virtual string IdentityKey => Configuration.GetValue("lobby.server.identityKey", "AABBCC");
 
-        protected NetworkListener Listener { get; private set; }
+        protected INetworkListener Listener { get; private set; }
 
         protected ILogger Logger { get; }
 
@@ -39,6 +46,58 @@ namespace NSL.Node.BridgeServer.LS
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
+        public LobbyServerEntry RunAsp(IEndpointRouteBuilder builder, string pattern,
+            Func<HttpContext, Task<bool>> requestHandle = null,
+            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
+        {
+            var server = WebSocketsServerEndPointBuilder.Create()
+                .WithClientProcessor<NetworkClient>()
+                .AspWithOptions<NetworkClient, NetworkOptions>()
+                .WithCode(builder =>
+                {
+                    builder.SetLogger(Logger);
+
+                    builder.AddConnectHandle(client =>
+                    {
+                        if (client != null)
+                            client.Entry = Entry;
+                    });
+
+                    builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
+
+                    builder.AddDefaultEventHandlers<AspNetWebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+
+                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignSessionPacket.ReceiveHandle);
+
+                    builder.AddReceivePacketHandle(
+                        NodeBridgeLobbyPacketEnum.ValidateSessionResultPID,
+                        client => client.RequestBuffer);
+
+                    builder.AddReceivePacketHandle(
+                        NodeBridgeLobbyPacketEnum.RoomStartupInfoResultPID,
+                        client => client.RequestBuffer);
+                }).BuildWithoutRoute();
+
+            var acceptDelegate = server.GetAcceptDelegate();
+
+            var convBuilder = builder.MapGet(pattern, async context =>
+            {
+                if (requestHandle != null)
+                    if (!await requestHandle(context))
+                        return;
+
+                await acceptDelegate(context);
+            });
+
+            if (actionConvertionBuilder != null)
+                actionConvertionBuilder(convBuilder);
+
+
+            Listener = server;
+
+            return this;
+        }
+
         public LobbyServerEntry Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
@@ -48,11 +107,17 @@ namespace NSL.Node.BridgeServer.LS
                 {
                     builder.SetLogger(Logger);
 
+                    builder.AddConnectHandle(client =>
+                    {
+                        if (client != null)
+                            client.Entry = Entry;
+                    });
+
                     builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
 
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
-                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignServerReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignSessionPacket.ReceiveHandle);
 
                     builder.AddReceivePacketHandle(
                         NodeBridgeLobbyPacketEnum.ValidateSessionResultPID,
@@ -68,20 +133,6 @@ namespace NSL.Node.BridgeServer.LS
             Listener.Start();
 
             return this;
-        }
-
-        private void SignServerReceiveHandle(NetworkClient client, InputPacketBuffer data)
-        {
-            var packet = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeLobbyPacketEnum.SignServerResultPID);
-
-            client.Identity = data.ReadString16();
-
-            bool result = Entry.LobbyManager.TryLobbyServerConnect(client, data.ReadString16());
-
-            packet.WriteBool(result);
-
-            client.Network.Send(packet);
         }
     }
 }

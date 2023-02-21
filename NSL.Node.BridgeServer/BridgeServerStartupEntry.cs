@@ -1,9 +1,17 @@
-﻿using NSL.Logger;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using NSL.BuilderExtensions.WebSocketsServer;
+using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.BridgeServer.CS;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Managers;
 using NSL.Node.BridgeServer.RS;
+using NSL.WebSockets.Server;
+using System.Threading.Tasks;
+using System;
 
 namespace NSL.Node.BridgeServer
 {
@@ -25,7 +33,7 @@ namespace NSL.Node.BridgeServer
 
         public LobbyServerEntry LobbyServer { get; protected set; }
 
-        public RoomServerEntry TransportServer { get; protected set; }
+        public RoomServerEntry RoomServer { get; protected set; }
 
         public ClientServerEntry ClientServer { get; protected set; }
 
@@ -43,7 +51,7 @@ namespace NSL.Node.BridgeServer
         public abstract void Run();
 
         protected BridgeConfigurationManager CreateDefaultConfigurationManager()
-            =>  new BridgeConfigurationManager(Logger);
+            => new BridgeConfigurationManager(Logger);
 
         protected ILogger CreateConsoleLogger()
             => ConsoleLogger.Create();
@@ -53,8 +61,8 @@ namespace NSL.Node.BridgeServer
                 .Create(this)
                 .Run();
 
-        protected virtual RoomServerEntry CreateDefaultTransportServerNetwork()
-            => TransportServer = RoomServerEntry
+        protected virtual RoomServerEntry CreateDefaultRoomServerNetwork()
+            => RoomServer = RoomServerEntry
                 .Create(this)
                 .Run();
 
@@ -62,6 +70,28 @@ namespace NSL.Node.BridgeServer
             => ClientServer = ClientServerEntry
                 .Create(this)
                 .Run();
+
+        protected virtual LobbyServerEntry CreateAspLobbyServerNetwork(IEndpointRouteBuilder builder, string pattern,
+            Func<HttpContext, Task<bool>> requestHandle = null,
+            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
+            => LobbyServer = LobbyServerEntry
+                .Create(this)
+                .RunAsp(builder, pattern, requestHandle, actionConvertionBuilder);
+
+        protected virtual RoomServerEntry CreateAspRoomServerNetwork(IEndpointRouteBuilder builder, string pattern,
+            Func<HttpContext, Task<bool>> requestHandle = null,
+            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
+            => RoomServer = RoomServerEntry
+                .Create(this)
+                .RunAsp(builder, pattern, requestHandle, actionConvertionBuilder);
+
+        protected virtual ClientServerEntry CreateAspClientServerNetwork(IEndpointRouteBuilder builder, string pattern,
+            Func<HttpContext, Task<bool>> requestHandle = null,
+            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
+            => ClientServer = ClientServerEntry
+                .Create(this)
+                .RunAsp(builder, pattern, requestHandle, actionConvertionBuilder);
+
 
         public static DefaultBridgeServerStartupEntry CreateDefault()
             => new DefaultBridgeServerStartupEntry();

@@ -1,7 +1,6 @@
 ﻿using NSL.BuilderExtensions.WebSocketsServer;
 using NSL.Logger.Interface;
 using NSL.Logger;
-using NSL.SocketCore.Utils.Buffer;
 using NSL.BuilderExtensions.SocketCore;
 
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
@@ -9,8 +8,15 @@ using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServ
 using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.RS.RoomServerNetworkClient>;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.ConfigurationEngine;
-using System.Collections.Concurrent;
-using NSL.SocketCore.Extensions.Buffer;
+using NSL.Node.BridgeServer.RS.Packets;
+using NSL.SocketServer.Utils;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using NSL.Node.BridgeServer.LS;
+using System.Threading.Tasks;
+using System;
+using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 
 namespace NSL.Node.BridgeServer.RS
 {
@@ -20,9 +26,7 @@ namespace NSL.Node.BridgeServer.RS
 
         public virtual int BindingPort => Configuration.GetValue("transport.server.port", 6998);
 
-        public virtual string IdentityKey => Configuration.GetValue<string>("transport.server.identityKey", "AABBCC");
-
-        protected NetworkListener Listener { get; private set; }
+        protected INetworkListener Listener { get; private set; }
 
         protected ILogger Logger { get; }
 
@@ -39,6 +43,53 @@ namespace NSL.Node.BridgeServer.RS
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
+        public RoomServerEntry RunAsp(IEndpointRouteBuilder builder, string pattern,
+            Func<HttpContext, Task<bool>> requestHandle = null,
+            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
+        {
+            var server = WebSocketsServerEndPointBuilder.Create()
+                .WithClientProcessor<NetworkClient>()
+                .AspWithOptions<NetworkClient, NetworkOptions>()
+                .WithCode(builder =>
+                {
+                    builder.SetLogger(Logger);
+
+                    builder.AddConnectHandle(client =>
+                    {
+                        if (client != null)
+                            client.Entry = Entry;
+                    });
+
+                    builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
+
+                    builder.AddDefaultEventHandlers<AspNetWebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignServerPID, SignServerPacket.ReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPID, SignSessionPacket.ReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoPID, RoomStartupInfoPacket.ReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoom, RoomFinishRoomPacket.ReceiveHandle);
+                }).BuildWithoutRoute();
+
+            var acceptDelegate = server.GetAcceptDelegate();
+
+            var convBuilder = builder.MapGet(pattern, async context =>
+            {
+                if (requestHandle != null)
+                    if (!await requestHandle(context))
+                        return;
+
+                await acceptDelegate(context);
+            });
+
+            if (actionConvertionBuilder != null)
+                actionConvertionBuilder(convBuilder);
+
+
+            Listener = server;
+
+            return this;
+        }
+
         public RoomServerEntry Run()
         {
             Listener = WebSocketsServerEndPointBuilder.Create()
@@ -48,14 +99,20 @@ namespace NSL.Node.BridgeServer.RS
                 {
                     builder.SetLogger(Logger);
 
+                    builder.AddConnectHandle(client =>
+                    {
+                        if (client != null)
+                            client.Entry = Entry;
+                    });
+
                     builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
 
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
 
-                    builder.AddPacketHandle(NodeBridgeTransportPacketEnum.SignServerPID, SignServerReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeTransportPacketEnum.SignSessionPID, SignSessionReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeTransportPacketEnum.RoomStartupInfoPID, RoomStartupInfoReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeTransportPacketEnum.FinishRoom, RoomFinishRoomReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignServerPID, SignServerPacket.ReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPID, SignSessionPacket.ReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoPID, RoomStartupInfoPacket.ReceiveHandle);
+                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoom, RoomFinishRoomPacket.ReceiveHandle);
                 })
                 .WithBindingPoint($"http://*:{BindingPort}/")
                 .Build();
@@ -64,101 +121,5 @@ namespace NSL.Node.BridgeServer.RS
 
             return this;
         }
-
-        private void SignServerReceiveHandle(NetworkClient client, InputPacketBuffer data)
-        {
-            var response = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeTransportPacketEnum.SignServerResultPID);
-
-            client.Id = data.ReadGuid();
-
-            client.ConnectionEndPoint = data.ReadString16();
-
-            var serverIdentityKey = data.ReadString16();
-
-
-            if (!IdentityKey.Equals(serverIdentityKey))
-            {
-                response.WriteBool(false);
-
-                client.Send(response);
-
-                return;
-            }
-
-            bool result = Entry.RoomManager.TryRoomServerConnect(client);
-
-            response.WriteBool(result);
-
-            if (result)
-                response.WriteGuid(client.Id);
-
-            client.Send(response);
-        }
-
-        private void SignSessionReceiveHandle(NetworkClient client, InputPacketBuffer data)
-        {
-            var packet = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeTransportPacketEnum.SignSessionResultPID);
-
-            var identityKey = data.ReadString16();
-            var id = data.ReadGuid();
-
-            var session = client.GetSession(id);
-
-            if (session == null || !session.Client.SessionIdentity.Equals(identityKey))
-            {
-                packet.WriteBool(false);
-
-                client.Send(packet);
-
-                return;
-            }
-
-            packet.WriteBool(true);
-
-            packet.WriteString16(session.Client.LobbyServerIdentity);
-            packet.WriteGuid(session.Client.RoomId);
-
-            client.Send(packet);
-        }
-
-        private void RoomFinishRoomReceiveHandle(NetworkClient client, InputPacketBuffer data)
-        {
-            var lobbyServerIdentity = data.ReadString16();
-
-            byte[] dataBuffer = data.Read(data.DataLength - data.DataPosition);
-
-            var lobby = Entry.LobbyManager.GetLobbyById(lobbyServerIdentity);
-
-            if (lobby == null)
-                return; // todo
-
-            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoom);
-
-            packet.Write(dataBuffer);
-
-            lobby.Network.Send(packet);
-
-        }
-        private async void RoomStartupInfoReceiveHandle(NetworkClient client, InputPacketBuffer data)
-        {
-            var packet = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeTransportPacketEnum.RoomStartupInfoResultPID);
-
-            var lobbyServerIdentity = data.ReadString16();
-            var roomId = data.ReadGuid();
-
-            var result = await Entry.LobbyManager.GetRoomStartupInfo(lobbyServerIdentity, roomId);
-
-            packet.WriteBool(result.Item1);
-
-            if (result.Item1)
-                packet.Write(result.Item2);
-
-            client.Send(packet);
-        }
-
-        public record CreateSignResult(string endPoint, Guid id);
     }
 }

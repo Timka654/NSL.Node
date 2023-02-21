@@ -3,11 +3,11 @@ using NSL.SocketCore.Extensions.Buffer;
 
 namespace NSL.Node.RoomServer.Bridge
 {
-    public class BridgeTransportNetworkClient : BaseSocketNetworkClient
+    public class BridgeRoomNetworkClient : BaseSocketNetworkClient
     {
         public PacketWaitBuffer PacketWaitBuffer { get; }
 
-        public BridgeTransportNetworkClient()
+        public BridgeRoomNetworkClient()
         {
             PacketWaitBuffer = new PacketWaitBuffer(this);
         }
