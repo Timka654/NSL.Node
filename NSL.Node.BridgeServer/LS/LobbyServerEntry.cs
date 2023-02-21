@@ -25,9 +25,9 @@ namespace NSL.Node.BridgeServer.LS
     {
         protected BaseConfigurationManager Configuration => Entry.Configuration;
 
-        public virtual int BindingPort => Configuration.GetValue("lobby.server.port", 6999);
+        public virtual int BindingPort => Configuration.GetValue("lobby_server_port", 6999);
 
-        public virtual string IdentityKey => Configuration.GetValue("lobby.server.identityKey", "AABBCC");
+        public virtual string IdentityKey => Configuration.GetValue("lobby_server_identityKey", "AABBCC");
 
         protected INetworkListener Listener { get; private set; }
 

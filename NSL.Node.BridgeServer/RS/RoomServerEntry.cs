@@ -24,7 +24,7 @@ namespace NSL.Node.BridgeServer.RS
     {
         protected BaseConfigurationManager Configuration => Entry.Configuration;
 
-        public virtual int BindingPort => Configuration.GetValue("transport.server.port", 6998);
+        public virtual int BindingPort => Configuration.GetValue("transport_server_port", 6998);
 
         protected INetworkListener Listener { get; private set; }
 
