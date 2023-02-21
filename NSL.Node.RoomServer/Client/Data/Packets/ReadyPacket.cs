@@ -2,7 +2,7 @@
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
-
+using System;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -13,6 +13,11 @@ namespace NSL.Node.RoomServer.Client
             var result = data
                 .CreateWaitBufferResponse()
                 .WithPid(RoomPacketEnum.ReadyNodeResult);
+
+            if(client.Room == default)
+            {
+                throw new Exception();
+            }
 
             result.WriteBool(client.Room != default && client.Room.ValidateNodeReady(client, data.ReadInt32(), data.ReadCollection(p => p.ReadGuid())));
 

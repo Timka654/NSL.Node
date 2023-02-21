@@ -100,7 +100,11 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
         {
-            ar.WaitOne();
+            if (!ar.WaitOne(5000))
+            {
+                throw new Exception();
+            }
+            //ar.WaitOne();
             if (!nodes.ContainsKey(node.Id))
             {
                 if (node.RoomId != RoomId)
@@ -117,6 +121,7 @@ namespace NSL.Node.RoomServer.Client.Data
             if (ConnectedNodesCount != nodeIds.Count())
             {
                 BroadcastChangeNodeList();
+                ar.Set();
                 return false;
             }
 
