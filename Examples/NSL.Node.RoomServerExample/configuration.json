@@ -1,6 +1,6 @@
 ﻿{
-  "bridge.address": "wss://localhost:7023/room_server",
+  "bridge.address": "wss://localhost:7016/room_server",
   "client": {
-    "public.endpoint": "wss://localhost:7023/room_server"
+    "public.endpoint": "wss://eonrushmetaserver.azurewebsites.net/"
   }
 }
