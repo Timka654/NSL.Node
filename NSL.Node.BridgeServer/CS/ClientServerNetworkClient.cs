@@ -2,10 +2,12 @@
 using NSL.Node.BridgeServer.Models;
 using NSL.Node.BridgeServer.RS;
 using NSL.SocketServer.Utils;
+using NSL.WebSockets.Server.AspNetPoint;
+using System;
 
 namespace NSL.Node.BridgeServer.CS
 {
-    public class ClientServerNetworkClient : IServerNetworkClient
+    public class ClientServerNetworkClient : AspNetWSNetworkServerClient
     {
         public string LobbyServerIdentity { get; set; }
 
@@ -20,5 +22,6 @@ namespace NSL.Node.BridgeServer.CS
         public TransportSession[] TransportSessions { get; set; }
 
         internal LobbyServerNetworkClient LobbyServer { get; set; }
+        public BridgeServerStartupEntry Entry { get; internal set; }
     }
 }

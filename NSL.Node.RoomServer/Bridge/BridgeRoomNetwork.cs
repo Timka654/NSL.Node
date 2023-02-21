@@ -9,12 +9,13 @@ using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.BridgeServer.Shared;
 using System.Collections.Generic;
+using NSL.Node.BridgeServer.Shared.Enums;
 
 namespace NSL.Node.RoomServer.Bridge
 {
     public delegate Task<bool> ValidateSessionDelegate(string sessionIdentity);
 
-    public class BridgeTransportNetwork
+    public class BridgeRoomNetwork
     {
         public Guid ServerIdentity { get; private set; } = Guid.Empty;
 
@@ -22,16 +23,16 @@ namespace NSL.Node.RoomServer.Bridge
 
         public string BridgeAddress => Entry.BridgeAddress;
 
-        protected WSNetworkClient<BridgeTransportNetworkClient, WSClientOptions<BridgeTransportNetworkClient>> network { get; private set; }
+        protected WSNetworkClient<BridgeRoomNetworkClient, WSClientOptions<BridgeRoomNetworkClient>> network { get; private set; }
 
         protected RoomServerStartupEntry Entry { get; }
 
         protected ILogger Logger { get; }
 
-        public static BridgeTransportNetwork Create(RoomServerStartupEntry entry, string logPrefix = "[BridgeClient]")
-            => new BridgeTransportNetwork(entry, logPrefix);
+        public static BridgeRoomNetwork Create(RoomServerStartupEntry entry, string logPrefix = "[BridgeClient]")
+            => new BridgeRoomNetwork(entry, logPrefix);
 
-        public BridgeTransportNetwork(RoomServerStartupEntry entry, string logPrefix = "[BridgeClient]")
+        public BridgeRoomNetwork(RoomServerStartupEntry entry, string logPrefix = "[BridgeClient]")
         {
             Entry = entry;
 
@@ -39,24 +40,24 @@ namespace NSL.Node.RoomServer.Bridge
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
-        public BridgeTransportNetwork Run()
+        public BridgeRoomNetwork Run()
         {
             network = WebSocketsClientEndPointBuilder.Create()
-                .WithClientProcessor<BridgeTransportNetworkClient>()
-                .WithOptions<WSClientOptions<BridgeTransportNetworkClient>>()
+                .WithClientProcessor<BridgeRoomNetworkClient>()
+                .WithOptions<WSClientOptions<BridgeRoomNetworkClient>>()
                 .WithUrl(new Uri(BridgeAddress))
                 .WithCode(builder =>
                 {
                     builder.SetLogger(Logger);
 
                     builder.AddReceivePacketHandle(
-                        BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignServerResultPID,
+                        NodeBridgeRoomPacketEnum.SignServerResultPID,
                         c => c.PacketWaitBuffer);
                     builder.AddReceivePacketHandle(
-                        BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignSessionResultPID,
+                        NodeBridgeRoomPacketEnum.SignSessionResultPID,
                         c => c.PacketWaitBuffer);
                     builder.AddReceivePacketHandle(
-                        BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.RoomStartupInfoResultPID,
+                        NodeBridgeRoomPacketEnum.RoomStartupInfoResultPID,
                         c => c.PacketWaitBuffer);
 
                     builder.AddDisconnectHandle(async client =>
@@ -87,7 +88,7 @@ namespace NSL.Node.RoomServer.Bridge
                         OnStateChanged(State);
                     });
 
-                    builder.AddDefaultEventHandlers<WebSocketsClientEndPointBuilder<BridgeTransportNetworkClient, WSClientOptions<BridgeTransportNetworkClient>>, BridgeTransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                    builder.AddDefaultEventHandlers<WebSocketsClientEndPointBuilder<BridgeRoomNetworkClient, WSClientOptions<BridgeRoomNetworkClient>>, BridgeRoomNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
                 })
                 .Build();
 
@@ -131,7 +132,7 @@ namespace NSL.Node.RoomServer.Bridge
         {
             var client = network.Data;
 
-            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignServerPID);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.SignServerPID);
 
             output.WriteGuid(ServerIdentity);
 
@@ -164,7 +165,7 @@ namespace NSL.Node.RoomServer.Bridge
 
             bool signResult = false;
 
-            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.SignSessionPID);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.SignSessionPID);
 
             output.WriteString16(client.Token);
 
@@ -193,7 +194,7 @@ namespace NSL.Node.RoomServer.Bridge
 
             NodeRoomStartupInfo startupInfo = default;
 
-            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.RoomStartupInfoPID);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomStartupInfoPID);
 
             output.WriteString16(room.LobbyServerIdentity);
 
@@ -217,7 +218,7 @@ namespace NSL.Node.RoomServer.Bridge
         {
             var bridgeClient = network.Data;
 
-            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeTransportPacketEnum.FinishRoom);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.FinishRoom);
 
             output.WriteString16(room.LobbyServerIdentity);
 

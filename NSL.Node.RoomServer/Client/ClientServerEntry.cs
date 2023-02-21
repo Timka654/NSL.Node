@@ -25,12 +25,12 @@ namespace NSL.Node.RoomServer.Client
 
         public static ClientServerEntry Create(
             RoomServerStartupEntry entry, 
-            BridgeTransportNetwork bridgeNetwork,
+            BridgeRoomNetwork bridgeNetwork,
             
             string logPrefix = "[ClientServer]")
             => new ClientServerEntry(entry, bridgeNetwork, logPrefix);
 
-        public ClientServerEntry(RoomServerStartupEntry entry, BridgeTransportNetwork bridgeNetwork, string logPrefix = "[ClientServer]")
+        public ClientServerEntry(RoomServerStartupEntry entry, BridgeRoomNetwork bridgeNetwork, string logPrefix = "[ClientServer]")
         {
             Entry = entry;
 
@@ -70,7 +70,7 @@ namespace NSL.Node.RoomServer.Client
             return this;
         }
 
-        private readonly BridgeTransportNetwork bridgeNetwork;
+        private readonly BridgeRoomNetwork bridgeNetwork;
 
         private ConcurrentDictionary<(string lobbyServerIdentity, Guid roomId), RoomInfo> roomMap = new ();
     }

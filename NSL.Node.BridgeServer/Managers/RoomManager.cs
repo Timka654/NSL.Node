@@ -1,14 +1,9 @@
 ﻿using NSL.Node.BridgeServer.CS;
-using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.RS;
-using NSL.SocketCore.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static NSL.Node.BridgeServer.RS.RoomServerEntry;
 
 namespace NSL.Node.BridgeServer.Managers
 {
@@ -132,4 +127,6 @@ namespace NSL.Node.BridgeServer.Managers
 
         private ConcurrentDictionary<Guid, RoomServerNetworkClient> connectedServers = new ConcurrentDictionary<Guid, RoomServerNetworkClient>();
     }
+
+    public record CreateSignResult(string endPoint, Guid id);
 }

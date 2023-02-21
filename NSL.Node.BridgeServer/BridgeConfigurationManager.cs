@@ -2,6 +2,7 @@
 using NSL.ConfigurationEngine.Providers;
 using NSL.ConfigurationEngine.Providers.Json;
 using NSL.Logger.Interface;
+using System;
 
 namespace NSL.Node.BridgeServer
 {

@@ -32,6 +32,7 @@ namespace NSL.Node.BridgeLobbyClient
             WsUrl = wsUrl;
             ServerIdentity = serverIdentity;
             IdentityKey = identityKey;
+
             network = WebSocketsClientEndPointBuilder.Create()
                 .WithClientProcessor<BridgeLobbyNetworkClient>()
                 .WithOptions<WSClientOptions<BridgeLobbyNetworkClient>>()

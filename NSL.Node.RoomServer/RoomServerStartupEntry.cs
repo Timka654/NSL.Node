@@ -26,7 +26,7 @@ namespace NSL.Node.RoomServer
 
         public abstract ILogger Logger { get; }
 
-        public BridgeTransportNetwork BridgeClient { get; protected set; }
+        public BridgeRoomNetwork BridgeClient { get; protected set; }
 
         public ClientServerEntry RoomServer { get; protected set; }
 
@@ -75,12 +75,12 @@ namespace NSL.Node.RoomServer
         protected ILogger CreateConsoleLogger()
             => ConsoleLogger.Create();
 
-        protected virtual BridgeTransportNetwork CreateBridgeClientNetwork()
-            => BridgeClient = BridgeTransportNetwork
+        protected virtual BridgeRoomNetwork CreateBridgeClientNetwork()
+            => BridgeClient = BridgeRoomNetwork
                 .Create(this)
                 .Run();
 
-        protected virtual ClientServerEntry CreateClientServerNetwork(BridgeTransportNetwork bridgeClient)
+        protected virtual ClientServerEntry CreateClientServerNetwork(BridgeRoomNetwork bridgeClient)
             => RoomServer = ClientServerEntry
                 .Create(this, bridgeClient)
                 .Run();

@@ -1,10 +1,12 @@
 ﻿using NSL.Node.BridgeServer.CS;
 using NSL.SocketServer.Utils;
+using NSL.WebSockets.Server.AspNetPoint;
+using System;
 using System.Collections.Concurrent;
 
 namespace NSL.Node.BridgeServer.RS
 {
-    public class RoomServerNetworkClient : IServerNetworkClient
+    public class RoomServerNetworkClient : AspNetWSNetworkServerClient
     {
         public Guid Id { get; set; }
 
@@ -13,6 +15,7 @@ namespace NSL.Node.BridgeServer.RS
         public string ConnectionEndPoint { get; set; }
 
         private ConcurrentDictionary<Guid, TransportSession> SessionMap { get; } = new ConcurrentDictionary<Guid, TransportSession>();
+        public BridgeServerStartupEntry Entry { get; internal set; }
 
         public bool TryAddSession(TransportSession session)
         {
