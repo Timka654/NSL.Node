@@ -53,6 +53,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
 		<ProjectReference Include="..\NSL.Node.RoomServer.Shared\NSL.Node.RoomServer.Shared.csproj" />
+		
 	</ItemGroup>
 
 </Project>
