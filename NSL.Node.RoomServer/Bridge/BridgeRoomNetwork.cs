@@ -118,7 +118,7 @@ namespace NSL.Node.RoomServer.Bridge
             await TryConnect();
         }
 
-        private async Task<bool> TryConnect(int timeout = 3000)
+        private async Task<bool> TryConnect(int timeout = 9000)
         {
             Logger?.AppendInfo($"Try connect to Bridge({BridgeAddress})");
          
