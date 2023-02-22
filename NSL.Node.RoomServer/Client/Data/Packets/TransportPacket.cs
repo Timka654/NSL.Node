@@ -7,6 +7,9 @@ namespace NSL.Node.RoomServer.Client
     {
         private void TransportPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
+            if (!client.are.WaitOne(5000))
+                Logger.ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Error transportPacketHandle");
+
             client.Room?.Transport(client, buffer);
         }
     }
