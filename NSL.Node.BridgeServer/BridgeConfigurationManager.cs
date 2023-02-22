@@ -13,8 +13,8 @@ namespace NSL.Node.BridgeServer
 
         public BridgeConfigurationManager(ILogger logger, string configurationJsonFilePath) : this(logger, manager =>
         {
-            manager.AddProvider(new EnvironmentVariableConfigurationProvider());
             manager.AddProvider(new JsonConfigurationProvider(configurationJsonFilePath, false, true));
+            manager.AddProvider(new EnvironmentVariableConfigurationProvider());
             manager.AddProvider(new CommandLineArgsConfigurationProvider());
         })
         { }
