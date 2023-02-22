@@ -6,6 +6,11 @@ namespace NSL.Node.AspRoomServerExample
     {
         public static void Main(string[] args)
         {
+            var x = new RoomConfigurationManager(null);
+            foreach (var r in x.GetAllValues())
+            {
+                Console.WriteLine($"{r.Path}  ::  {r.Value}");
+            }
             var builder = WebApplication.CreateBuilder(args);
 
             var app = builder.Build();
