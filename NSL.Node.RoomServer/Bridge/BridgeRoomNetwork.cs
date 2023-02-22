@@ -19,9 +19,9 @@ namespace NSL.Node.RoomServer.Bridge
     {
         public Guid ServerIdentity { get; private set; } = Guid.Empty;
 
-        public string IdentityKey => Entry.BridgeIdentityKey;
+        public string IdentityKey => Entry.Configuration.GetValue<string>("bridge_identity_key", "AABBCC");
 
-        public string BridgeAddress => Entry.BridgeAddress;
+        public string BridgeAddress => Entry.Configuration.GetValue<string>("bridge_address", "ws://localhost:6998");
 
         protected WSNetworkClient<BridgeRoomNetworkClient, WSClientOptions<BridgeRoomNetworkClient>> network { get; private set; }
 
@@ -73,6 +73,8 @@ namespace NSL.Node.RoomServer.Bridge
 
                     builder.AddConnectHandle(async client =>
                     {
+                        IdentityFailed = false;
+
                         client.PingPongEnabled = true;
 
                         if (!await TrySign())

@@ -8,25 +8,32 @@ using NSL.WebSockets.Server;
 using System;
 using System.Collections.Concurrent;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
+using NSL.Utils;
+using NSL.EndPointBuilder;
+using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using System.Threading.Tasks;
+using NSL.SocketServer.Utils;
 
 namespace NSL.Node.RoomServer.Client
 {
     public partial class ClientServerEntry
     {
-        public string BindingAddress { get; }
+        protected INetworkListener Listener { get; private set; }
 
-        protected WSServerListener<TransportNetworkClient> network { get; private set; }
-
-        public int ClientBindingPort => Entry.ClientBindingPort;
+        public int ClientBindingPort => Entry.Configuration.GetValue<int>("client_binding_port", 5920);
 
         protected RoomServerStartupEntry Entry { get; }
 
         protected ILogger Logger { get; }
 
         public static ClientServerEntry Create(
-            RoomServerStartupEntry entry, 
+            RoomServerStartupEntry entry,
             BridgeRoomNetwork bridgeNetwork,
-            
+
             string logPrefix = "[ClientServer]")
             => new ClientServerEntry(entry, bridgeNetwork, logPrefix);
 
@@ -40,38 +47,79 @@ namespace NSL.Node.RoomServer.Client
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
+        public ClientServerEntry RunAsp(IEndpointRouteBuilder builder, string pattern,
+            Func<HttpContext, Task<bool>> requestHandle = null,
+            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
+        {
+            var server = WebSocketsServerEndPointBuilder.Create()
+                .WithClientProcessor<TransportNetworkClient>()
+                .AspWithOptions<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>()
+                .WithCode(builder =>
+                {
+                    Build(builder);
+
+                    builder.AddDefaultEventHandlers<AspNetWebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>, TransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                })
+                .BuildWithoutRoute();
+
+            var acceptDelegate = server.GetAcceptDelegate();
+
+            var convBuilder = builder.MapGet(pattern, async context =>
+            {
+                if (requestHandle != null)
+                    if (!await requestHandle(context))
+                        return;
+
+                await acceptDelegate(context);
+            });
+
+            if (actionConvertionBuilder != null)
+                actionConvertionBuilder(convBuilder);
+
+
+            Listener = server;
+
+            return this;
+        }
+
         public ClientServerEntry Run()
         {
-            network = WebSocketsServerEndPointBuilder.Create()
+            Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<TransportNetworkClient>()
                 .WithOptions<WSServerOptions<TransportNetworkClient>>()
                 .WithBindingPoint($"http://*:{ClientBindingPort}/")
                 .WithCode(builder =>
                 {
-                    builder.SetLogger(Logger);
-
-                    builder.AddPacketHandle(
-                        RoomPacketEnum.SignSession, SignInPacketHandle);
-                    builder.AddPacketHandle(
-                        RoomPacketEnum.Transport, TransportPacketHandle);
-                    builder.AddPacketHandle(
-                        RoomPacketEnum.Broadcast, BroadcastPacketHandle);
-                    builder.AddPacketHandle(
-                        RoomPacketEnum.ReadyNode, ReadyPacketHandle);
-                    builder.AddPacketHandle(
-                        RoomPacketEnum.Execute, ExecutePacketHandle);
+                    Build(builder);
 
                     builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>, TransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
                 })
                 .Build();
 
-            network.Start();
+            Listener.Start();
 
             return this;
         }
 
+        private void Build<TBuilder>(TBuilder builder)
+            where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder
+        {
+            builder.SetLogger(Logger);
+
+            builder.AddPacketHandle(
+                RoomPacketEnum.SignSession, SignInPacketHandle);
+            builder.AddPacketHandle(
+                RoomPacketEnum.Transport, TransportPacketHandle);
+            builder.AddPacketHandle(
+                RoomPacketEnum.Broadcast, BroadcastPacketHandle);
+            builder.AddPacketHandle(
+                RoomPacketEnum.ReadyNode, ReadyPacketHandle);
+            builder.AddPacketHandle(
+                RoomPacketEnum.Execute, ExecutePacketHandle);
+        }
+
         private readonly BridgeRoomNetwork bridgeNetwork;
 
-        private ConcurrentDictionary<(string lobbyServerIdentity, Guid roomId), RoomInfo> roomMap = new ();
+        private ConcurrentDictionary<(string lobbyServerIdentity, Guid roomId), RoomInfo> roomMap = new();
     }
 }
