@@ -3,10 +3,11 @@ using NSL.SocketServer.Utils;
 using System;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
+using NSL.WebSockets.Server.AspNetPoint;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public class TransportNetworkClient : IServerNetworkClient, IPlayerNetwork
+    public class TransportNetworkClient : AspNetWSNetworkServerClient, IPlayerNetwork
     {
         public string Token { get; set; }
 

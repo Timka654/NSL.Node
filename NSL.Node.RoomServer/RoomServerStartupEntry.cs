@@ -1,4 +1,7 @@
-﻿using NSL.Logger;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.RoomServer.Bridge;
 using NSL.Node.RoomServer.Client;
@@ -7,6 +10,7 @@ using STUN;
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer
 {
@@ -30,15 +34,7 @@ namespace NSL.Node.RoomServer
 
         public ClientServerEntry RoomServer { get; protected set; }
 
-        public string BridgeIdentityKey => Configuration.GetValue<string>("bridge_identity_key", "AABBCC");
-
-        public string BridgeAddress => Configuration.GetValue<string>("bridge_address", "ws://localhost:6998");
-
-
-        public int ClientBindingPort => Configuration.GetValue<int>("client_binding_port", 5920);
-
         public string ClientPublicPoint => Configuration.GetValue<string>("client_public_endpoint", default(string));
-
 
         public bool StunAutoDetect => Configuration.GetValue<bool>("client_stun_detect", default(bool));
 
@@ -65,7 +61,7 @@ namespace NSL.Node.RoomServer
         }
 
         protected string BuildClientPublicPoint(string address)
-            => $"ws://{address}:{ClientBindingPort}/";
+            => $"ws://{address}:{RoomServer.ClientBindingPort}/";
 
         public abstract void Run();
 
@@ -84,6 +80,12 @@ namespace NSL.Node.RoomServer
             => RoomServer = ClientServerEntry
                 .Create(this, bridgeClient)
                 .Run();
+        protected virtual ClientServerEntry CreateAspClientServerNetwork(BridgeRoomNetwork bridgeClient, IEndpointRouteBuilder builder, string pattern,
+            Func<HttpContext, Task<bool>> requestHandle = null,
+            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
+            => RoomServer = ClientServerEntry
+                .Create(this, bridgeClient)
+                .RunAsp(builder, pattern, requestHandle, actionConvertionBuilder);
 
         public static DefaultRoomServerStartupEntry CreateDefault()
             => new DefaultRoomServerStartupEntry();

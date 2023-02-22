@@ -44,6 +44,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.2.17.1357" />
 	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.2.17.1357" />
 	  <PackageReference Include="NSL.Logger" Version="2023.2.17.1357" />
 	  <PackageReference Include="NSL.UDP.Client" Version="2023.2.17.1357" />
