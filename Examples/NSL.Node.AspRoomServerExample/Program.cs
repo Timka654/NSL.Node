@@ -11,7 +11,7 @@ namespace NSL.Node.AspRoomServerExample
             {
                 Console.WriteLine($"{r.Path}  ::  {r.Value}");
             }
-            var builder = WebApplication.CreateBuilder(args);
+           var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
 
@@ -22,6 +22,8 @@ namespace NSL.Node.AspRoomServerExample
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.UseWebSockets();
 
             AspRoomServerStartupEntry.Create(app, "/room_server").Run();
 
