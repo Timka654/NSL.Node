@@ -8,9 +8,15 @@ namespace NSL.Node.AspRoomServerExample
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddControllers();
+
             var app = builder.Build();
 
             app.UseHttpsRedirection();
+
+            app.UseAuthorization();
+
+            app.MapControllers();
 
             AspRoomServerStartupEntry.Create(app, "/room_server").Run();
 

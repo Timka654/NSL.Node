@@ -120,6 +120,8 @@ namespace NSL.Node.RoomServer.Bridge
 
         private async Task<bool> TryConnect(int timeout = 3000)
         {
+            Logger.AppendInfo($"Try connect to Bridge({BridgeAddress})");
+
             if (!await network.ConnectAsync(timeout))
             {
                 network.ConnectionOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Cannot connect");
