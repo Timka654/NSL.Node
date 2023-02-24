@@ -17,12 +17,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.22.1350" />
-	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.2.22.1350" />
-	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.2.22.1350" />
-	  <PackageReference Include="NSL.ConfigurationEngine" Version="2023.2.22.1350" />
-	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.2.22.1350" />
-	  <PackageReference Include="NSL.Logger" Version="2023.2.22.1350" />
+	  <PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.2.22.2331" />
+	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.2.22.2331" />
+	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.2.22.2331" />
+	  <PackageReference Include="NSL.ConfigurationEngine" Version="2023.2.22.2331" />
+	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.2.22.2331" />
+	  <PackageReference Include="NSL.Logger" Version="2023.2.22.2331" />
 	</ItemGroup>
 
 	<ItemGroup>

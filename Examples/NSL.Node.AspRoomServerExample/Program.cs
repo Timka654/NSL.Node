@@ -6,7 +6,12 @@ namespace NSL.Node.AspRoomServerExample
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var x = new RoomConfigurationManager(null);
+            foreach (var r in x.GetAllValues())
+            {
+                Console.WriteLine($"{r.Path}  ::  {r.Value}");
+            }
+           var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
 
@@ -17,6 +22,8 @@ namespace NSL.Node.AspRoomServerExample
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.UseWebSockets();
 
             AspRoomServerStartupEntry.Create(app, "/room_server").Run();
 

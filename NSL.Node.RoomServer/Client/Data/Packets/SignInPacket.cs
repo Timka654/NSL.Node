@@ -33,6 +33,8 @@ namespace NSL.Node.RoomServer.Client
 
                 client.Room.AddClient(client);
 
+                client.are.Set();
+
                 LoadRoomStartupInfo(client.Room);
             }
             else

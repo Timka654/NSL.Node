@@ -4,11 +4,13 @@ using System;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.WebSockets.Server.AspNetPoint;
+using System.Threading;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
     public class TransportNetworkClient : AspNetWSNetworkServerClient, IPlayerNetwork
     {
+        public ManualResetEvent are = new ManualResetEvent(false);
         public string Token { get; set; }
 
         public Guid Id { get; set; }

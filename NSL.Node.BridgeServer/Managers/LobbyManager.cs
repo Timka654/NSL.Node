@@ -2,6 +2,7 @@
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.SocketCore.Utils.Logger.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -47,7 +48,10 @@ namespace NSL.Node.BridgeServer.Managers
             client.LobbyServer = GetLobbyById(client.LobbyServerIdentity);
 
             if (client.LobbyServer == null)
+            {
+                entry.Logger.ConsoleLog(LoggerLevel.Info, " >>>>> lobby server is null");
                 return false;
+            }
 
             bool result = default;
 
@@ -60,10 +64,11 @@ namespace NSL.Node.BridgeServer.Managers
             {
                 if (data != default)
                     result = data.ReadBool();
-
+               
                 return Task.CompletedTask;
             });
 
+            entry.Logger.ConsoleLog(LoggerLevel.Info, $" >>>>> result : {result}");
             return result;
         }
 

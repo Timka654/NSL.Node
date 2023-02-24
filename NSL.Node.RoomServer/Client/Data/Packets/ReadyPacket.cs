@@ -8,13 +8,16 @@ namespace NSL.Node.RoomServer.Client
 {
     public partial class ClientServerEntry
     {
-        private static void ReadyPacketHandle(TransportNetworkClient client, InputPacketBuffer data)
+        private void ReadyPacketHandle(TransportNetworkClient client, InputPacketBuffer data)
         {
+            if (!client.are.WaitOne(5000))
+                Logger.ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Error readyPacketHandle");
+
             var result = data
                 .CreateWaitBufferResponse()
                 .WithPid(RoomPacketEnum.ReadyNodeResult);
 
-            if(client.Room == default)
+            if (client.Room == default)
             {
                 throw new Exception();
             }

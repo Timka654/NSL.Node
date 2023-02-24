@@ -41,6 +41,9 @@ namespace NSL.Node.BridgeServer.Managers
 
             var serverArray = connectedServers.Values.ToArray();
 
+            if (serverArray.Length == 0)
+                return result;
+
             var offset = client.RoomId.GetHashCode() % serverArray.Length;
 
             var room = client.Room;
