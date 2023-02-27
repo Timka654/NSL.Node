@@ -27,6 +27,8 @@ namespace NSL.Node.BridgeServer.LS
 
         public virtual int BindingPort => Configuration.GetValue("lobby_server_port", 6999);
 
+        public virtual string BindingPoint => Configuration.GetValue("lobby_server_point", default(string));
+
         public virtual string IdentityKey => Configuration.GetValue("lobby_server_identityKey", "AABBCC");
 
         protected INetworkListener Listener { get; private set; }
@@ -100,6 +102,11 @@ namespace NSL.Node.BridgeServer.LS
 
         public LobbyServerEntry Run()
         {
+            string bindingPoint = BindingPoint;
+
+            if (bindingPoint == default)
+                bindingPoint = $"http://*:{BindingPort}/";
+
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
                 .WithOptions<NetworkOptions>()
@@ -127,7 +134,7 @@ namespace NSL.Node.BridgeServer.LS
                         NodeBridgeLobbyPacketEnum.RoomStartupInfoResultPID,
                         client => client.RequestBuffer);
                 })
-                .WithBindingPoint($"http://*:{BindingPort}/")
+                .WithBindingPoint(bindingPoint)
                 .Build();
 
             Listener.Start();

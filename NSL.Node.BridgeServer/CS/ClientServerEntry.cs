@@ -26,6 +26,8 @@ namespace NSL.Node.BridgeServer.CS
 
         public virtual int BindingPort => Configuration.GetValue("client_server_port", 7000);
 
+        public string BindingPoint => Entry.Configuration.GetValue("client_server_point", default(string));
+
         protected INetworkListener Listener { get; private set; }
 
         protected ILogger Logger { get; }
@@ -87,10 +89,15 @@ namespace NSL.Node.BridgeServer.CS
 
         public ClientServerEntry Run()
         {
+            string bindingPoint = BindingPoint;
+
+            if (bindingPoint == default)
+                bindingPoint = $"http://*:{BindingPort}/";
+
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
                 .WithOptions<NetworkOptions>()
-                .WithBindingPoint($"http://*:{BindingPort}/")
+                .WithBindingPoint(bindingPoint)
                 .WithCode(builder =>
                 {
                     builder.SetLogger(Logger);

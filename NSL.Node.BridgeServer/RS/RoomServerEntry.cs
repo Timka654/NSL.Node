@@ -24,7 +24,12 @@ namespace NSL.Node.BridgeServer.RS
     {
         protected BaseConfigurationManager Configuration => Entry.Configuration;
 
-        public virtual int BindingPort => Configuration.GetValue("transport_server_port", 6998);
+        public virtual int BindingPort => Configuration.GetValue("room_server_port", transportBindingPort);
+
+        [Obsolete]
+        public virtual int transportBindingPort => Configuration.GetValue("transport_server_port", 6998);
+
+        public virtual string BindingPoint => Configuration.GetValue("room_server_point", default(string));
 
         protected INetworkListener Listener { get; private set; }
 
@@ -92,6 +97,11 @@ namespace NSL.Node.BridgeServer.RS
 
         public RoomServerEntry Run()
         {
+            string bindingPoint = BindingPoint;
+
+            if (bindingPoint == default)
+                bindingPoint = $"http://*:{BindingPort}/";
+
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
                 .WithOptions<NetworkOptions>()
@@ -114,7 +124,7 @@ namespace NSL.Node.BridgeServer.RS
                     builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoPID, RoomStartupInfoPacket.ReceiveHandle);
                     builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoom, RoomFinishRoomPacket.ReceiveHandle);
                 })
-                .WithBindingPoint($"http://*:{BindingPort}/")
+                .WithBindingPoint(bindingPoint)
                 .Build();
 
             Listener.Start();

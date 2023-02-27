@@ -26,6 +26,8 @@ namespace NSL.Node.RoomServer.Client
 
         public int ClientBindingPort => Entry.Configuration.GetValue<int>("client_binding_port", 5920);
 
+        public string ClientBindingPoint => Entry.Configuration.GetValue("client_binding_point", default(string));
+
         protected RoomServerStartupEntry Entry { get; }
 
         protected ILogger Logger { get; }
@@ -84,10 +86,15 @@ namespace NSL.Node.RoomServer.Client
 
         public ClientServerEntry Run()
         {
+            string bindingPoint = ClientBindingPoint;
+
+            if (bindingPoint == default)
+                bindingPoint = $"http://*:{ClientBindingPort}/";
+
             Listener = WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<TransportNetworkClient>()
                 .WithOptions<WSServerOptions<TransportNetworkClient>>()
-                .WithBindingPoint($"http://*:{ClientBindingPort}/")
+                .WithBindingPoint(bindingPoint)
                 .WithCode(builder =>
                 {
                     Build(builder);

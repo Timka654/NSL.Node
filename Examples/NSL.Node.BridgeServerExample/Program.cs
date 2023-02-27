@@ -8,6 +8,8 @@ namespace NSL.Node.BridgeServerExample
         {
             BridgeServerStartupEntry.CreateDefault().RunEntry();
 
+            Console.WriteLine(">>> Success initialized");
+
             Thread.Sleep(Timeout.InfiniteTimeSpan);
         }
     }

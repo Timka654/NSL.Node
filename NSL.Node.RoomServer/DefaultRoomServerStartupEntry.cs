@@ -50,13 +50,16 @@ namespace NSL.Node.RoomServer
 
         bool initialized = false;
 
-        private void BridgeNetwork_OnStateChanged(bool state)
+        protected virtual void BridgeNetwork_OnStateChanged(bool state)
         {
             if (initialized)
                 return;
 
+            if(BridgeClient.IdentityFailed)
+                throw new Exception($"Cannot identity on bridge server!!");
+
             if (!state)
-                throw new Exception($"Cannot identity!!");
+                throw new Exception($"Cannot connect to bridge server!!");
 
             initialized = true;
         }
