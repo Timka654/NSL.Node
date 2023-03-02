@@ -19,10 +19,14 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
-        public IEnumerable<IPlayerNetwork> GetNodes() { return nodes.Values; }
+        public IEnumerable<PlayerInfo> GetNodes() { return nodes.Values.Select(x=>x.Player).ToArray(); }
 
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
+
+        private Action<OutputPacketBuffer, bool> broadcastDelegate = (packet, disposeOnSend) => { };
+
+        private SGameInfo Game;
 
         public RoomServerStartupEntry Entry { get; }
 
@@ -36,7 +40,19 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public DateTime CreateTime { get; } = DateTime.UtcNow;
 
-        private SGameInfo Game;
+        public NodeRoomStartupInfo StartupInfo { get; private set; }
+
+        public int RoomPlayerCount { get; private set; }
+
+        public bool RoomWaitAllReady { get; private set; }
+
+        public int StartupTimeout { get; private set; }
+
+        public bool ShutdownOnMissedReady { get; private set; }
+
+        public event Action<PlayerInfo> OnNodeConnect = player => { };
+
+        public event Action OnRoomReady = () => { };
 
         public RoomInfo(RoomServerStartupEntry entry, Guid roomId, string lobbyServerIdentity)
         {
@@ -50,10 +66,10 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (nodes.TryAdd(node.Id, node))
             {
+                node.Player = new PlayerInfo() { Network = node, Id = node.Id };
+
                 if (node.Network != null)
                     broadcastDelegate += node.Network.Send;
-
-                node.Player = new PlayerInfo() { Network = node, Id = node.Id };
 
                 BroadcastChangeNodeList();
 
@@ -65,7 +81,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         internal void SetStartupInfo(NodeRoomStartupInfo startupInfo)
         {
-            this.StartupInfo = startupInfo;
+            StartupInfo = startupInfo;
 
             RoomWaitAllReady = startupInfo.GetRoomWaitReady();
 
@@ -77,6 +93,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             if (ShutdownOnMissedReady)
                 RunDestroyOnMissedTimer();
+
             ar.Set();
         }
 
@@ -90,16 +107,6 @@ namespace NSL.Node.RoomServer.Client.Data
             Dispose();
         }
 
-        public NodeRoomStartupInfo StartupInfo { get; private set; }
-
-        public int RoomPlayerCount { get; private set; }
-
-        public bool RoomWaitAllReady { get; private set; }
-
-        public int StartupTimeout { get; private set; }
-
-        public bool ShutdownOnMissedReady { get; private set; }
-
         public bool ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
         {
             if (!ar.WaitOne(5000))
@@ -112,18 +119,22 @@ namespace NSL.Node.RoomServer.Client.Data
                 if (node.RoomId != RoomId)
                 {
                     node.Network.Disconnect();
+
                     ar.Set();
+
                     return false;
                 }
-                //else // m.b write change room logic or not...
-                //    AddClient(node);
+
                 ar.Set();
+
                 return false;
             }
             if (ConnectedNodesCount != nodeIds.Count())
             {
                 BroadcastChangeNodeList();
+
                 ar.Set();
+
                 return false;
             }
 
@@ -135,19 +146,21 @@ namespace NSL.Node.RoomServer.Client.Data
 
             node.Ready = true;
 
-            Game.NodeConnect(node);
+            OnNodeConnect(node.Player);
 
             if (RoomWaitAllReady)
             {
                 if (Nodes.All(x => x.Ready))
                 {
                     Broadcast(CreateReadyRoomPacket());
-                    Game.RoomReady();
+                    OnRoomReady();
                 }
             }
             else
                 SendTo(node, CreateReadyRoomPacket());
+
             ar.Set();
+
             return true;
         }
 
@@ -173,8 +186,6 @@ namespace NSL.Node.RoomServer.Client.Data
 
             Broadcast(buffer);
         }
-
-        private Action<OutputPacketBuffer, bool> broadcastDelegate = (packet, disposeOnSend) => { };
 
         public void Broadcast(OutputPacketBuffer packet)
         {
