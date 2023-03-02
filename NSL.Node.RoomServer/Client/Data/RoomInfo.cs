@@ -19,7 +19,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
-        public IEnumerable<PlayerInfo> GetNodes() { return nodes.Values.Select(x=>x.Player).ToArray(); }
+        public IEnumerable<PlayerInfo> GetNodes() { return nodes.Values.Select(x => x.Player).ToArray(); }
 
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
@@ -66,7 +66,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (nodes.TryAdd(node.Id, node))
             {
-                node.Player = new PlayerInfo() { Network = node, Id = node.Id };
+                node.Player = new PlayerInfo(node, node.Id);
 
                 if (node.Network != null)
                     broadcastDelegate += node.Network.Send;
