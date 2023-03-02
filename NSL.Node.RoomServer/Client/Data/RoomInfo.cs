@@ -19,6 +19,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
+        public IEnumerable<IPlayerNetwork> GetNodes() { return nodes.Values; }
+
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
 
@@ -125,25 +127,26 @@ namespace NSL.Node.RoomServer.Client.Data
                 return false;
             }
 
-            if (nodeIds.Count() != ConnectedNodesCount)
+            if (ConnectedNodesCount != RoomPlayerCount && RoomWaitAllReady)
             {
-                if (RoomWaitAllReady)
-                {
-                    ar.Set();
-                    return false;
-                }
+                ar.Set();
+                return false;
             }
 
             node.Ready = true;
 
+            Game.NodeConnect(node);
+
             if (RoomWaitAllReady)
             {
                 if (Nodes.All(x => x.Ready))
+                {
                     Broadcast(CreateReadyRoomPacket());
+                    Game.RoomReady();
+                }
             }
             else
                 SendTo(node, CreateReadyRoomPacket());
-
             ar.Set();
             return true;
         }
