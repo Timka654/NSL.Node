@@ -68,6 +68,13 @@ namespace NSL.Node.RoomServer.Client.Data
             {
                 node.Player = new PlayerInfo(node, node.Id);
 
+                if (ar.WaitOne(0))
+                {
+                    ar.Set();
+
+                    node.Send(CreateStartupInfoMessage());
+                }
+
                 if (node.Network != null)
                     broadcastDelegate += node.Network.Send;
 
@@ -81,8 +88,6 @@ namespace NSL.Node.RoomServer.Client.Data
 
         internal void SetStartupInfo(NodeRoomStartupInfo startupInfo)
         {
-            StartupInfo = startupInfo;
-
             RoomWaitAllReady = startupInfo.GetRoomWaitReady();
 
             RoomPlayerCount = startupInfo.GetRoomPlayerCount();
@@ -90,11 +95,29 @@ namespace NSL.Node.RoomServer.Client.Data
             StartupTimeout = startupInfo.GetRoomStartupTimeout();
 
             ShutdownOnMissedReady = startupInfo.GetRoomShutdownOnMissed();
+            
+            StartupInfo = startupInfo;
 
             if (ShutdownOnMissedReady)
                 RunDestroyOnMissedTimer();
 
+            BroadcastStartupInfo();
+
             ar.Set();
+        }
+
+        private void BroadcastStartupInfo()
+        {
+            Broadcast(CreateStartupInfoMessage());
+        }
+
+        private OutputPacketBuffer CreateStartupInfoMessage()
+        {
+            var packet = OutputPacketBuffer.Create(RoomPacketEnum.StartupInfoMessage);
+
+            packet.WriteCollection(StartupInfo.GetCollection(), item => { packet.WriteString16(item.Key); packet.WriteString16(item.Value); });
+
+            return packet;
         }
 
         private async void RunDestroyOnMissedTimer()
@@ -113,6 +136,7 @@ namespace NSL.Node.RoomServer.Client.Data
             {
                 throw new Exception();
             }
+
             //ar.WaitOne();
             if (!nodes.ContainsKey(node.Id))
             {
