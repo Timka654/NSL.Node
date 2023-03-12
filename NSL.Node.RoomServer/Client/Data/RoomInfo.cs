@@ -19,7 +19,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
-        public IEnumerable<PlayerInfo> GetNodes() { return nodes.Values.Select(x => x.Player).ToArray(); }
+        public IEnumerable<NodeInfo> GetNodes() { return nodes.Values.Select(x => x.Node).ToArray(); }
 
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
@@ -42,7 +42,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public NodeRoomStartupInfo StartupInfo { get; private set; }
 
-        public int RoomPlayerCount { get; private set; }
+        public int RoomNodeCount { get; private set; }
 
         public bool RoomWaitAllReady { get; private set; }
 
@@ -50,7 +50,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool ShutdownOnMissedReady { get; private set; }
 
-        public event Action<PlayerInfo> OnNodeConnect = player => { };
+        public event Action<NodeInfo> OnNodeConnect = node => { };
 
         public event Action OnRoomReady = () => { };
 
@@ -66,7 +66,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (nodes.TryAdd(node.Id, node))
             {
-                node.Player = new PlayerInfo(node, node.Id);
+                node.Node = new NodeInfo(node, node.Id);
 
                 if (ar.WaitOne(0))
                 {
@@ -90,7 +90,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             RoomWaitAllReady = startupInfo.GetRoomWaitReady();
 
-            RoomPlayerCount = startupInfo.GetRoomPlayerCount();
+            RoomNodeCount = startupInfo.GetRoomNodeCount();
 
             StartupTimeout = startupInfo.GetRoomStartupTimeout();
 
@@ -124,7 +124,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             await Task.Delay(StartupTimeout);
 
-            if (ConnectedNodesCount == RoomPlayerCount)
+            if (ConnectedNodesCount == RoomNodeCount)
                 return;
 
             Dispose();
@@ -162,7 +162,7 @@ namespace NSL.Node.RoomServer.Client.Data
                 return false;
             }
 
-            if (ConnectedNodesCount != RoomPlayerCount && RoomWaitAllReady)
+            if (ConnectedNodesCount != RoomNodeCount && RoomWaitAllReady)
             {
                 ar.Set();
                 return false;
@@ -170,7 +170,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             node.Ready = true;
 
-            OnNodeConnect(node.Player);
+            OnNodeConnect(node.Node);
 
             if (RoomWaitAllReady)
             {
@@ -203,7 +203,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             buffer.WriteCollection(Nodes, b =>
             {
-                buffer.WriteGuid(b.Id);
+                buffer.WriteGuid(b.NodeId);
                 buffer.WriteString16(b.Token);
                 buffer.WriteString16(b.EndPoint);
             });
@@ -235,7 +235,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (handles.TryGetValue(packet.ReadUInt16(), out var command))
             {
-                command(client.Player, packet);
+                command(client.Node, packet);
             }
         }
 
@@ -255,9 +255,9 @@ namespace NSL.Node.RoomServer.Client.Data
             SendTo(to, pbuf);
         }
 
-        public void SendTo(PlayerInfo player, OutputPacketBuffer packet, bool disposeOnSend = true)
+        public void SendTo(NodeInfo node, OutputPacketBuffer packet, bool disposeOnSend = true)
         {
-            SendTo(player.Network as TransportNetworkClient, packet, disposeOnSend);
+            SendTo(node.Network as TransportNetworkClient, packet, disposeOnSend);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -267,10 +267,10 @@ namespace NSL.Node.RoomServer.Client.Data
                 throw new Exception($"code {code} already contains in {nameof(handles)}");
         }
 
-        public PlayerInfo GetPlayer(Guid id)
+        public NodeInfo GetNode(Guid id)
         {
             if (nodes.TryGetValue(id, out var node))
-                return node.Player;
+                return node.Node;
 
             return default;
         }

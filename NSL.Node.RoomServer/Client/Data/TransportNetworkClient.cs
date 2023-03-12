@@ -5,12 +5,15 @@ using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.WebSockets.Server.AspNetPoint;
 using System.Threading;
+using NSL.UDP.Enums;
+using NSL.UDP;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public class TransportNetworkClient : AspNetWSNetworkServerClient, IPlayerNetwork
+    public class TransportNetworkClient : AspNetWSNetworkServerClient, INodeNetwork
     {
         public ManualResetEvent are = new ManualResetEvent(false);
+
         public string Token { get; set; }
 
         public Guid Id { get; set; }
@@ -25,7 +28,9 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public RoomInfo Room { get; set; }
 
-        public PlayerInfo Player { get; set; }
+        public NodeInfo Node { get; set; }
+
+        public Guid NodeId { get; set; }
 
         public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
@@ -56,5 +61,15 @@ namespace NSL.Node.RoomServer.Client.Data
 
             packet.Dispose();
         }
+
+
+        public void Transport(Action<DgramPacket> build, ushort code, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
+            => throw new NotImplementedException($"Cannot send data from server with {nameof(DgramPacket)}");
+
+        public void Transport(Action<DgramPacket> build, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
+            => throw new NotImplementedException($"Cannot send data from server with {nameof(DgramPacket)}");
+
+        public void Send(DgramPacket packet, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered, bool disposeOnSend = true)
+            => throw new NotImplementedException($"Cannot send data from server with {nameof(DgramPacket)}");
     }
 }

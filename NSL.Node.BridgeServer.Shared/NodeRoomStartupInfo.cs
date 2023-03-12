@@ -11,7 +11,7 @@ namespace NSL.Node.BridgeServer.Shared
         public const string SystemVariablePrefix = "system__room";
 
         public const string RoomWaitReadyVariableName = SystemVariablePrefix + "__wait_ready";
-        public const string RoomPlayerCountVariableName = SystemVariablePrefix + "__player_count";
+        public const string RoomNodeCountVariableName = SystemVariablePrefix + "__node_count";
         public const string RoomStartupTimeoutVariableName = SystemVariablePrefix + "__startup_timeout";
         public const string RoomShutdownOnMissedReadyVariableName = SystemVariablePrefix + "__shutdown_on_missed_ready";
 
@@ -20,7 +20,7 @@ namespace NSL.Node.BridgeServer.Shared
         public NodeRoomStartupInfo() : this(new Dictionary<string, string>())
         {
             SetRoomWaitReady(false);
-            SetRoomPlayerCount(0);
+            SetRoomNodeCount(0);
             SetRoomStartupTimeout(60_000);
             SetRoomShutdownOnMissed(false);
         }
@@ -70,11 +70,11 @@ namespace NSL.Node.BridgeServer.Shared
         public IEnumerable<KeyValuePair<string, string>> GetCollection()
             => collection;
 
-        public NodeRoomStartupInfo SetRoomPlayerCount(int value)
-            => SetValue(RoomPlayerCountVariableName, value);
+        public NodeRoomStartupInfo SetRoomNodeCount(int value)
+            => SetValue(RoomNodeCountVariableName, value);
 
-        public int GetRoomPlayerCount()
-            => GetValue<int>(RoomPlayerCountVariableName);
+        public int GetRoomNodeCount()
+            => GetValue<int>(RoomNodeCountVariableName);
 
         public NodeRoomStartupInfo SetRoomWaitReady(bool value)
             => SetValue(RoomWaitReadyVariableName, value);

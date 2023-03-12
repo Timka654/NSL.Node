@@ -2,6 +2,8 @@
 using NSL.Node.RoomServer.Client.Data;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
+using System;
+using System.Linq;
 using System.Threading;
 
 namespace NSL.Node.RoomServer.Client
@@ -24,6 +26,10 @@ namespace NSL.Node.RoomServer.Client
 
             if (result)
             {
+                client.NodeId = Guid.Parse(client.Token.Split(':').First());
+
+                response.WriteGuid(client.NodeId);
+
                 client.Room = roomMap.GetOrAdd((client.LobbyServerIdentity, client.RoomId), id =>
                 {
                     var room = new RoomInfo(Entry,id.roomId, id.lobbyServerIdentity);
@@ -42,6 +48,7 @@ namespace NSL.Node.RoomServer.Client
                 client.Token = default;
                 client.Id = default;
             }
+
             client.Network.Send(response);
         }
 
