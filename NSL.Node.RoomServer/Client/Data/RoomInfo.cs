@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,7 +54,7 @@ namespace NSL.Node.RoomServer.Client.Data
                 if (node.Network != null)
                     broadcastDelegate += node.Network.Send;
 
-                node.Player = new PlayerInfo() { Network = node, Id = node.Id };
+                node.Player = new PlayerInfo(node, node.Id);
 
                 BroadcastChangeNodeList();
 
@@ -176,6 +177,9 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private Action<OutputPacketBuffer, bool> broadcastDelegate = (packet, disposeOnSend) => { };
 
+        public event Action<PlayerInfo> OnNodeConnect;
+        public event Action OnRoomReady;
+
         public void Broadcast(OutputPacketBuffer packet)
         {
             broadcastDelegate(packet, false);
@@ -271,6 +275,11 @@ namespace NSL.Node.RoomServer.Client.Data
             Broadcast(packet);
 
             return true;
+        }
+
+        IEnumerable<PlayerInfo> IRoomInfo.GetNodes()
+        {
+            return nodes.Values.Select(x => x.Player);
         }
     }
 }
