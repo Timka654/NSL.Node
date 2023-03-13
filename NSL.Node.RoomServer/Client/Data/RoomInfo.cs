@@ -3,6 +3,7 @@ using NSL.Node.RoomServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.UDP;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -50,6 +51,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool ShutdownOnMissedReady { get; private set; }
 
+        public Guid LocalNodeId => Guid.Empty;
+
         public event Action<NodeInfo> OnNodeConnect = node => { };
 
         public event Action OnRoomReady = () => { };
@@ -95,7 +98,7 @@ namespace NSL.Node.RoomServer.Client.Data
             StartupTimeout = startupInfo.GetRoomStartupTimeout();
 
             ShutdownOnMissedReady = startupInfo.GetRoomShutdownOnMissed();
-            
+
             StartupInfo = startupInfo;
 
             if (ShutdownOnMissedReady)
@@ -176,8 +179,8 @@ namespace NSL.Node.RoomServer.Client.Data
             {
                 if (Nodes.All(x => x.Ready))
                 {
-                    Broadcast(CreateReadyRoomPacket());
                     OnRoomReady();
+                    Broadcast(CreateReadyRoomPacket());
                 }
             }
             else
@@ -211,25 +214,132 @@ namespace NSL.Node.RoomServer.Client.Data
             Broadcast(buffer);
         }
 
-        public void Broadcast(OutputPacketBuffer packet)
+        public void Broadcast(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             broadcastDelegate(packet, false);
 
-            packet.Dispose();
-        }
-
-        public void SendTo(Guid nodeId, OutputPacketBuffer packet)
-        {
-            if (nodes.TryGetValue(nodeId, out var node))
-                SendTo(node, packet);
-            else
+            if (disposeOnSend)
                 packet.Dispose();
         }
 
-        public void SendTo(TransportNetworkClient node, OutputPacketBuffer packet, bool disposeOnSend = true)
+        public void Broadcast(DgramOutputPacketBuffer packet, bool disposeOnSend = true)
         {
-            node.Network?.Send(packet, disposeOnSend);
+            Broadcast((OutputPacketBuffer)packet, disposeOnSend);
         }
+
+        public bool Broadcast(ushort code, Action<DgramOutputPacketBuffer> builder)
+        {
+            return Broadcast(packet =>
+            {
+                packet.WriteUInt16(code);
+                builder(packet);
+            });
+        }
+
+        public bool Broadcast(Action<DgramOutputPacketBuffer> builder)
+        {
+            var packet = new DgramOutputPacketBuffer();
+
+            packet.PacketId = (ushort)RoomPacketEnum.Execute;
+
+            builder(packet);
+
+            Broadcast(packet);
+
+            return true;
+        }
+
+        #region SendTo
+
+        public bool SendTo(Guid nodeId, OutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            if (nodes.TryGetValue(nodeId, out var node))
+                return SendTo(node, packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
+
+            return false;
+        }
+
+        public bool SendTo(TransportNetworkClient node, OutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            if (node.Network != null)
+            {
+                node.Network.Send(packet, disposeOnSend);
+                return true;
+            }
+            else if (disposeOnSend)
+                node.Dispose();
+
+            return false;
+        }
+
+        public bool SendTo(TransportNetworkClient node, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            return SendTo(node, (OutputPacketBuffer)packet, disposeOnSend);
+        }
+
+        public bool SendTo(Guid nodeId, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            if (nodes.TryGetValue(nodeId, out var node))
+                return SendTo(node, packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
+
+            return false;
+        }
+
+        public bool SendTo(NodeInfo node, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            return SendTo(node.Network as TransportNetworkClient, packet, disposeOnSend);
+        }
+
+        public bool SendTo(Guid nodeId, ushort command, Action<DgramOutputPacketBuffer> build)
+        {
+            DgramOutputPacketBuffer packet = new DgramOutputPacketBuffer();
+
+            packet.PacketId = (ushort)RoomPacketEnum.Execute;
+
+            packet.WriteUInt16(command);
+
+            build(packet);
+
+            return SendTo(nodeId, packet);
+        }
+
+        public bool SendTo(NodeInfo node, ushort command, Action<DgramOutputPacketBuffer> build)
+        {
+            DgramOutputPacketBuffer packet = new DgramOutputPacketBuffer();
+
+            packet.PacketId = (ushort)RoomPacketEnum.Execute;
+
+            packet.WriteUInt16(command);
+
+            build(packet);
+
+            return SendTo(node, packet);
+        }
+
+        #endregion
+
+        #region SendToServer
+
+        public void SendToServer(ushort command, Action<OutputPacketBuffer> build)
+        {
+            throw new AlreadyOnServerException();
+        }
+
+        public void SendToServer(OutputPacketBuffer packet)
+        {
+            throw new AlreadyOnServerException();
+        }
+
+        public void SendToServer(OutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            throw new AlreadyOnServerException();
+        }
+
+        #endregion
 
         public void Execute(TransportNetworkClient client, InputPacketBuffer packet)
         {
@@ -255,11 +365,6 @@ namespace NSL.Node.RoomServer.Client.Data
             SendTo(to, pbuf);
         }
 
-        public void SendTo(NodeInfo node, OutputPacketBuffer packet, bool disposeOnSend = true)
-        {
-            SendTo(node.Network as TransportNetworkClient, packet, disposeOnSend);
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RegisterHandle(ushort code, ReciveHandleDelegate handle)
         {
@@ -275,37 +380,9 @@ namespace NSL.Node.RoomServer.Client.Data
             return default;
         }
 
-        public void Execute(ushort command, Action<OutputPacketBuffer> build)
-        {
-        }
-
-        public void SendToRoomServer(OutputPacketBuffer packet)
-        {
-        }
-
         public void Dispose()
         {
             Entry.BridgeClient.FinishRoom(this, null);
-        }
-
-        public bool Broadcast(Action<OutputPacketBuffer> builder, ushort code)
-        {
-            return Broadcast(packet =>
-            {
-                packet.WriteUInt16(code);
-                builder(packet);
-            });
-        }
-
-        public bool Broadcast(Action<OutputPacketBuffer> builder)
-        {
-            var packet = OutputPacketBuffer.Create(RoomPacketEnum.Execute);
-
-            builder(packet);
-
-            Broadcast(packet);
-
-            return true;
         }
     }
 }

@@ -10,7 +10,7 @@ using NSL.UDP;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public class TransportNetworkClient : AspNetWSNetworkServerClient, INodeNetwork
+    public class TransportNetworkClient : AspNetWSNetworkServerClient, INodeClientNetwork
     {
         public ManualResetEvent are = new ManualResetEvent(false);
 
@@ -32,24 +32,28 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public Guid NodeId { get; set; }
 
-        public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
+        public bool IsLocalNode => false;
+
+        public void Send(DgramOutputPacketBuffer packet, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered, bool disposeOnSend = true)
         {
             if (Network != null)
                 Network.Send(packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
         }
 
-        public void Transport(Action<OutputPacketBuffer> build, ushort code)
+        public void Send(Action<DgramOutputPacketBuffer> build, ushort code, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
         {
-            Transport(p =>
+            Send(p =>
             {
                 p.WriteUInt16(code);
                 build(p);
             });
         }
 
-        public void Transport(Action<OutputPacketBuffer> build)
+        public void Send(Action<DgramOutputPacketBuffer> build, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
         {
-            var packet = new OutputPacketBuffer();
+            var packet = new DgramOutputPacketBuffer();
 
             packet.WriteGuid(Id);
 
@@ -57,19 +61,37 @@ namespace NSL.Node.RoomServer.Client.Data
 
             packet.WithPid(RoomPacketEnum.Transport);
 
-            Send(packet, false);
-
-            packet.Dispose();
+            Send(packet, channel, true);
         }
 
+        public void Send(DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            if (Network != null)
+                Network.Send(packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
+        }
 
-        public void Transport(Action<DgramPacket> build, ushort code, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
-            => throw new NotImplementedException($"Cannot send data from server with {nameof(DgramPacket)}");
+        public void Send(Action<DgramOutputPacketBuffer> build, ushort code)
+        {
+            Send(p =>
+            {
+                p.WriteUInt16(code);
+                build(p);
+            });
+        }
 
-        public void Transport(Action<DgramPacket> build, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
-            => throw new NotImplementedException($"Cannot send data from server with {nameof(DgramPacket)}");
+        public void Send(Action<DgramOutputPacketBuffer> build)
+        {
+            var packet = new DgramOutputPacketBuffer();
 
-        public void Send(DgramPacket packet, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered, bool disposeOnSend = true)
-            => throw new NotImplementedException($"Cannot send data from server with {nameof(DgramPacket)}");
+            packet.WriteGuid(Id);
+
+            build(packet);
+
+            packet.WithPid(RoomPacketEnum.Transport);
+
+            Send(packet, true);
+        }
     }
 }
