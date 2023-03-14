@@ -42,7 +42,7 @@ namespace NSL.Node.RoomServer.Client.Data
                 packet.Dispose();
         }
 
-        public void Send(Action<DgramOutputPacketBuffer> build, ushort code, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
+        public void Send(ushort code, Action<DgramOutputPacketBuffer> build, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
         {
             Send(p =>
             {
@@ -72,7 +72,7 @@ namespace NSL.Node.RoomServer.Client.Data
                 packet.Dispose();
         }
 
-        public void Send(Action<DgramOutputPacketBuffer> build, ushort code)
+        public void Send(ushort code, Action<DgramOutputPacketBuffer> build)
         {
             Send(p =>
             {
