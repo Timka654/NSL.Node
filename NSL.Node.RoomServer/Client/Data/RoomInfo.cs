@@ -357,10 +357,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);
 
-            pbuf.WriteGuid(client.Id);
-
-            pbuf.Write(body[0..7]);
-            pbuf.Write(body[23..]);
+            pbuf.Write(body[7..]);
 
             SendTo(to, pbuf);
         }
