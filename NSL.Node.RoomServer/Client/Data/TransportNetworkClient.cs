@@ -5,12 +5,15 @@ using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.WebSockets.Server.AspNetPoint;
 using System.Threading;
+using NSL.UDP.Enums;
+using NSL.UDP;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public class TransportNetworkClient : AspNetWSNetworkServerClient, IPlayerNetwork
+    public class TransportNetworkClient : AspNetWSNetworkServerClient, INodeClientNetwork
     {
         public ManualResetEvent are = new ManualResetEvent(false);
+
         public string Token { get; set; }
 
         public Guid Id { get; set; }
@@ -25,26 +28,32 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public RoomInfo Room { get; set; }
 
-        public PlayerInfo Player { get; set; }
+        public NodeInfo Node { get; set; }
 
-        public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
+        public Guid NodeId { get; set; }
+
+        public bool IsLocalNode => false;
+
+        public void Send(DgramOutputPacketBuffer packet, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered, bool disposeOnSend = true)
         {
             if (Network != null)
                 Network.Send(packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
         }
 
-        public void Transport(Action<OutputPacketBuffer> build, ushort code)
+        public void Send(ushort code, Action<DgramOutputPacketBuffer> build, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
         {
-            Transport(p =>
+            Send(p =>
             {
                 p.WriteUInt16(code);
                 build(p);
             });
         }
 
-        public void Transport(Action<OutputPacketBuffer> build)
+        public void Send(Action<DgramOutputPacketBuffer> build, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered)
         {
-            var packet = new OutputPacketBuffer();
+            var packet = new DgramOutputPacketBuffer();
 
             packet.WriteGuid(Id);
 
@@ -52,9 +61,37 @@ namespace NSL.Node.RoomServer.Client.Data
 
             packet.WithPid(RoomPacketEnum.Transport);
 
-            Send(packet, false);
+            Send(packet, channel, true);
+        }
 
-            packet.Dispose();
+        public void Send(DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            if (Network != null)
+                Network.Send(packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
+        }
+
+        public void Send(ushort code, Action<DgramOutputPacketBuffer> build)
+        {
+            Send(p =>
+            {
+                p.WriteUInt16(code);
+                build(p);
+            });
+        }
+
+        public void Send(Action<DgramOutputPacketBuffer> build)
+        {
+            var packet = new DgramOutputPacketBuffer();
+
+            packet.WriteGuid(Id);
+
+            build(packet);
+
+            packet.WithPid(RoomPacketEnum.Transport);
+
+            Send(packet, true);
         }
     }
 }
