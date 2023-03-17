@@ -2,12 +2,10 @@
 {
     public enum NodeBridgeRoomPacketEnum : ushort
     {
-        SignServerPID = 1,
-        SignServerResultPID = SignServerPID,
-        SignSessionPID = 2,
-        SignSessionResultPID = SignSessionPID,
-        RoomStartupInfoPID = 3,
-        RoomStartupInfoResultPID = RoomStartupInfoPID,
-        FinishRoom = 4
+        SignServerRequest = 1,
+        SignSessionRequest = 2,
+        RoomStartupInfoRequest = 3,
+        FinishRoomMessage = 4,
+        Response
     }
 }

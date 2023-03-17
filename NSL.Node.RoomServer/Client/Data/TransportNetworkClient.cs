@@ -12,8 +12,6 @@ namespace NSL.Node.RoomServer.Client.Data
 {
     public class TransportNetworkClient : AspNetWSNetworkServerClient, INodeClientNetwork
     {
-        public ManualResetEvent are = new ManualResetEvent(false);
-
         public string Token { get; set; }
 
         public Guid Id { get; set; }

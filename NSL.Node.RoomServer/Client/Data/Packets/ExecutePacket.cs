@@ -7,8 +7,6 @@ namespace NSL.Node.RoomServer.Client
     {
         private void ExecutePacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
-            if (!client.are.WaitOne(5000))
-                Logger.ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Error executePacketHandle");
             client.Room?.Execute(client, buffer);
         }
     }

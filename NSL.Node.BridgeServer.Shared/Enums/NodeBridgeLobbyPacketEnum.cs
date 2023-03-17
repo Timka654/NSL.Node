@@ -2,12 +2,10 @@
 {
     public enum NodeBridgeLobbyPacketEnum : ushort
     {
-        SignServerPID = 1,
-        SignServerResultPID = SignServerPID,
-        ValidateSessionPID = 2,
-        ValidateSessionResultPID = ValidateSessionPID,
-        RoomStartupInfoPID = 3,
-        RoomStartupInfoResultPID = RoomStartupInfoPID,
-        FinishRoom = 4
+        SignServerRequest = 1,
+        ValidateSessionRequest = 2,
+        RoomStartupInfoRequest = 3,
+        FinishRoomMessage = 4,
+        Response = 5
     }
 }

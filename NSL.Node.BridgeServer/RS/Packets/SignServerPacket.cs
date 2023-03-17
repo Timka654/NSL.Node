@@ -12,7 +12,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             var response = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeRoomPacketEnum.SignServerResultPID);
+                .WithPid(NodeBridgeRoomPacketEnum.Response);
 
             client.Id = data.ReadGuid();
 

@@ -5,12 +5,13 @@ using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer.Client
 {
     public partial class ClientServerEntry
     {
-        private async void SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+        private async Task SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
             var response = OutputPacketBuffer.Create(RoomPacketEnum.SignSessionResult);
 
@@ -38,8 +39,6 @@ namespace NSL.Node.RoomServer.Client
                 });
 
                 client.Room.AddClient(client);
-
-                client.are.Set();
 
                 LoadRoomStartupInfo(client.Room);
             }

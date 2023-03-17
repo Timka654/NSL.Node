@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System;
 using NSL.SocketServer.Utils;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using NSL.EndPointBuilder;
 
 namespace NSL.Node.BridgeServer.LS
 {
@@ -52,33 +53,10 @@ namespace NSL.Node.BridgeServer.LS
             Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
         {
-            var server = WebSocketsServerEndPointBuilder.Create()
+            var server = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
-                .AspWithOptions<NetworkClient, NetworkOptions>()
-                .WithCode(builder =>
-                {
-                    builder.SetLogger(Logger);
-
-                    builder.AddConnectHandle(client =>
-                    {
-                        if (client != null)
-                            client.Entry = Entry;
-                    });
-
-                    builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
-
-                    builder.AddDefaultEventHandlers<AspNetWebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-
-                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignSessionPacket.ReceiveHandle);
-
-                    builder.AddReceivePacketHandle(
-                        NodeBridgeLobbyPacketEnum.ValidateSessionResultPID,
-                        client => client.RequestBuffer);
-
-                    builder.AddReceivePacketHandle(
-                        NodeBridgeLobbyPacketEnum.RoomStartupInfoResultPID,
-                        client => client.RequestBuffer);
-                }).BuildWithoutRoute();
+                .AspWithOptions<NetworkClient, NetworkOptions>())
+                .BuildWithoutRoute();
 
             var acceptDelegate = server.GetAcceptDelegate();
 
@@ -107,39 +85,41 @@ namespace NSL.Node.BridgeServer.LS
             if (bindingPoint == default)
                 bindingPoint = $"http://*:{BindingPort}/";
 
-            Listener = WebSocketsServerEndPointBuilder.Create()
+            Listener = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
-                .WithOptions<NetworkOptions>()
-                .WithCode(builder =>
-                {
-                    builder.SetLogger(Logger);
-
-                    builder.AddConnectHandle(client =>
-                    {
-                        if (client != null)
-                            client.Entry = Entry;
-                    });
-
-                    builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
-
-                    builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-
-                    builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerPID, SignSessionPacket.ReceiveHandle);
-
-                    builder.AddReceivePacketHandle(
-                        NodeBridgeLobbyPacketEnum.ValidateSessionResultPID,
-                        client => client.RequestBuffer);
-
-                    builder.AddReceivePacketHandle(
-                        NodeBridgeLobbyPacketEnum.RoomStartupInfoResultPID,
-                        client => client.RequestBuffer);
-                })
+                .WithOptions<NetworkOptions>())
                 .WithBindingPoint(bindingPoint)
                 .Build();
 
             Listener.Start();
 
             return this;
+        }
+
+
+        private TBuilder Fill<TBuilder>(TBuilder builder)
+            //where TBuilder : WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>
+            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder
+        {
+            builder.SetLogger(Logger);
+
+            builder.AddConnectHandle(client =>
+            {
+                if (client != null)
+                    client.Entry = Entry;
+            });
+
+            builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
+
+            builder.AddDefaultEventHandlers<TBuilder, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionPacket.ReceiveHandle);
+
+            builder.AddReceivePacketHandle(
+                NodeBridgeLobbyPacketEnum.Response,
+                client => client.RequestBuffer);
+
+            return builder;
         }
     }
 }

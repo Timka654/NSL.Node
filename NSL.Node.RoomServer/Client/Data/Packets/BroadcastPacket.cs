@@ -8,10 +8,6 @@ namespace NSL.Node.RoomServer.Client
     {
         private void BroadcastPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
-            if (!client.are.WaitOne(5000))
-
-                Logger.ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Error broadcastPacketHandle");
-
             var body = buffer.GetBuffer();
 
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);

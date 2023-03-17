@@ -17,6 +17,7 @@ using NSL.Node.BridgeServer.LS;
 using System.Threading.Tasks;
 using System;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
+using NSL.EndPointBuilder;
 
 namespace NSL.Node.BridgeServer.RS
 {
@@ -52,28 +53,10 @@ namespace NSL.Node.BridgeServer.RS
             Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
         {
-            var server = WebSocketsServerEndPointBuilder.Create()
+            var server = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
-                .AspWithOptions<NetworkClient, NetworkOptions>()
-                .WithCode(builder =>
-                {
-                    builder.SetLogger(Logger);
-
-                    builder.AddConnectHandle(client =>
-                    {
-                        if (client != null)
-                            client.Entry = Entry;
-                    });
-
-                    builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
-
-                    builder.AddDefaultEventHandlers<AspNetWebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignServerPID, SignServerPacket.ReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPID, SignSessionPacket.ReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoPID, RoomStartupInfoPacket.ReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoom, RoomFinishRoomPacket.ReceiveHandle);
-                }).BuildWithoutRoute();
+                .AspWithOptions<NetworkClient, NetworkOptions>())
+                .BuildWithoutRoute();
 
             var acceptDelegate = server.GetAcceptDelegate();
 
@@ -102,34 +85,39 @@ namespace NSL.Node.BridgeServer.RS
             if (bindingPoint == default)
                 bindingPoint = $"http://*:{BindingPort}/";
 
-            Listener = WebSocketsServerEndPointBuilder.Create()
+            Listener = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
                 .WithOptions<NetworkOptions>()
-                .WithCode(builder =>
-                {
-                    builder.SetLogger(Logger);
-
-                    builder.AddConnectHandle(client =>
-                    {
-                        if (client != null)
-                            client.Entry = Entry;
-                    });
-
-                    builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
-
-                    builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignServerPID, SignServerPacket.ReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPID, SignSessionPacket.ReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoPID, RoomStartupInfoPacket.ReceiveHandle);
-                    builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoom, RoomFinishRoomPacket.ReceiveHandle);
-                })
-                .WithBindingPoint(bindingPoint)
+                .WithBindingPoint(bindingPoint))
                 .Build();
 
             Listener.Start();
 
             return this;
+        }
+
+        private TBuilder Fill<TBuilder>(TBuilder builder)
+            //where TBuilder : WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>
+            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder
+        {
+            builder.SetLogger(Logger);
+
+            builder.AddConnectHandle(client =>
+            {
+                if (client != null)
+                    client.Entry = Entry;
+            });
+
+            builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
+
+            builder.AddDefaultEventHandlers<TBuilder, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, SignServerPacket.ReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionPacket.ReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoRequest, RoomStartupInfoPacket.ReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, RoomFinishRoomPacket.ReceiveHandle);
+
+            return builder;
         }
     }
 }

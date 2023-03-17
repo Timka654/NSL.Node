@@ -17,7 +17,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
             if (lobby == null)
                 return; // todo
 
-            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoom);
+            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoomMessage);
 
             packet.Write(dataBuffer);
 

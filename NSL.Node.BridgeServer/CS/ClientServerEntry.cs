@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System;
 using NSL.SocketServer.Utils;
+using NSL.EndPointBuilder;
 
 namespace NSL.Node.BridgeServer.CS
 {
@@ -49,23 +50,10 @@ namespace NSL.Node.BridgeServer.CS
             Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
         {
-            var server = WebSocketsServerEndPointBuilder.Create()
+            var server = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
-                .AspWithOptions<NetworkClient, NetworkOptions>()
-                .WithCode(builder =>
-                {
-                    builder.SetLogger(Logger);
-
-                    builder.AddConnectHandle(client =>
-                    {
-                        if (client != null)
-                            client.Entry = Entry;
-                    });
-
-                    builder.AddDefaultEventHandlers<AspNetWebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-
-                    builder.AddPacketHandle(NodeBridgeClientPacketEnum.SignSessionPID, SignSessionPacket.ReceiveHandle);
-                }).BuildWithoutRoute();
+                .AspWithOptions<NetworkClient, NetworkOptions>())
+                .BuildWithoutRoute();
 
             var acceptDelegate = server.GetAcceptDelegate();
 
@@ -94,29 +82,34 @@ namespace NSL.Node.BridgeServer.CS
             if (bindingPoint == default)
                 bindingPoint = $"http://*:{BindingPort}/";
 
-            Listener = WebSocketsServerEndPointBuilder.Create()
+            Listener = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
                 .WithOptions<NetworkOptions>()
-                .WithBindingPoint(bindingPoint)
-                .WithCode(builder =>
-                {
-                    builder.SetLogger(Logger);
-
-                    builder.AddConnectHandle(client =>
-                    {
-                        if (client != null)
-                            client.Entry = Entry;
-                    });
-
-                    builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-
-                    builder.AddPacketHandle(NodeBridgeClientPacketEnum.SignSessionPID, SignSessionPacket.ReceiveHandle);
-                })
+                .WithBindingPoint(bindingPoint))
                 .Build();
 
             Listener.Start();
 
             return this;
+        }
+
+        private TBuilder Fill<TBuilder>(TBuilder builder)
+            //where TBuilder : WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>
+            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder
+        {
+            builder.SetLogger(Logger);
+
+            builder.AddConnectHandle(client =>
+            {
+                if (client != null)
+                    client.Entry = Entry;
+            });
+
+            builder.AddDefaultEventHandlers<TBuilder, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+
+            builder.AddPacketHandle(NodeBridgeClientPacketEnum.SignSessionPID, SignSessionPacket.ReceiveHandle);
+
+            return builder;
         }
     }
 }
