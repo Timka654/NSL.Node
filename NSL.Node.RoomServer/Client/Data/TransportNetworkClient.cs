@@ -91,5 +91,10 @@ namespace NSL.Node.RoomServer.Client.Data
 
             Send(packet, true);
         }
+
+        public void SetObjectOwner(INodeOwneredObject _object)
+        {
+            _object.SetOwner(Room, this);
+        }
     }
 }
