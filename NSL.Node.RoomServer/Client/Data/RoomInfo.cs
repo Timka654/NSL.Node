@@ -4,6 +4,7 @@ using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.UDP;
+using NSL.UDP.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -227,6 +228,11 @@ namespace NSL.Node.RoomServer.Client.Data
             Broadcast((OutputPacketBuffer)packet, disposeOnSend);
         }
 
+        public void Broadcast(DgramOutputPacketBuffer packet, UDPChannelEnum channel, bool disposeOnSend = true)
+        {
+            Broadcast(packet, disposeOnSend);
+        }
+
         public bool Broadcast(ushort code, Action<DgramOutputPacketBuffer> builder)
         {
             return Broadcast(packet =>
@@ -234,6 +240,11 @@ namespace NSL.Node.RoomServer.Client.Data
                 packet.WriteUInt16(code);
                 builder(packet);
             });
+        }
+
+        public bool Broadcast(ushort code, UDPChannelEnum channel, Action<DgramOutputPacketBuffer> builder)
+        {
+            return Broadcast(code, builder);
         }
 
         public bool Broadcast(Action<DgramOutputPacketBuffer> builder)
@@ -249,6 +260,11 @@ namespace NSL.Node.RoomServer.Client.Data
             return true;
         }
 
+        public bool Broadcast(UDPChannelEnum channel, Action<DgramOutputPacketBuffer> builder)
+        {
+            return Broadcast(builder);
+        }
+
         #region SendTo
 
         public bool SendTo(Guid nodeId, OutputPacketBuffer packet, bool disposeOnSend = true)
@@ -259,6 +275,11 @@ namespace NSL.Node.RoomServer.Client.Data
                 packet.Dispose();
 
             return false;
+        }
+
+        public bool SendTo(Guid nodeId, UDPChannelEnum channel, OutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            return SendTo(nodeId, packet, disposeOnSend);
         }
 
         public bool SendTo(TransportNetworkClient node, OutputPacketBuffer packet, bool disposeOnSend = true)
@@ -274,9 +295,19 @@ namespace NSL.Node.RoomServer.Client.Data
             return false;
         }
 
+        public bool SendTo(TransportNetworkClient node, UDPChannelEnum channel, OutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            return SendTo(node, packet, disposeOnSend);
+        }
+
         public bool SendTo(TransportNetworkClient node, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
         {
             return SendTo(node, (OutputPacketBuffer)packet, disposeOnSend);
+        }
+
+        public bool SendTo(TransportNetworkClient node, UDPChannelEnum channel, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            return SendTo(node, packet, disposeOnSend);
         }
 
         public bool SendTo(Guid nodeId, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
@@ -289,9 +320,17 @@ namespace NSL.Node.RoomServer.Client.Data
             return false;
         }
 
+        public bool SendTo(Guid nodeId, UDPChannelEnum channel, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+            => SendTo(nodeId, packet, disposeOnSend);
+
         public bool SendTo(NodeInfo node, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
         {
             return SendTo(node.Network as TransportNetworkClient, packet, disposeOnSend);
+        }
+
+        public bool SendTo(NodeInfo node, UDPChannelEnum channel, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            return SendTo(node, packet, disposeOnSend);
         }
 
         public bool SendTo(Guid nodeId, ushort command, Action<DgramOutputPacketBuffer> build)
@@ -307,6 +346,11 @@ namespace NSL.Node.RoomServer.Client.Data
             return SendTo(nodeId, packet);
         }
 
+        public bool SendTo(Guid nodeId, ushort command, UDPChannelEnum channel, Action<DgramOutputPacketBuffer> build)
+        {
+            return SendTo(nodeId, command, build);
+        }
+
         public bool SendTo(NodeInfo node, ushort command, Action<DgramOutputPacketBuffer> build)
         {
             DgramOutputPacketBuffer packet = new DgramOutputPacketBuffer();
@@ -319,6 +363,9 @@ namespace NSL.Node.RoomServer.Client.Data
 
             return SendTo(node, packet);
         }
+
+        public bool SendTo(NodeInfo node, ushort command, UDPChannelEnum channel, Action<DgramOutputPacketBuffer> build)
+            => SendTo(node, command, build);
 
         #endregion
 

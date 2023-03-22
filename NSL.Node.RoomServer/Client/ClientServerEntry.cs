@@ -53,15 +53,9 @@ namespace NSL.Node.RoomServer.Client
             Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
         {
-            var server = WebSocketsServerEndPointBuilder.Create()
+            var server = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<TransportNetworkClient>()
-                .AspWithOptions<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>()
-                .WithCode(builder =>
-                {
-                    Build(builder);
-
-                    builder.AddDefaultEventHandlers<AspNetWebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>, TransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-                })
+                .AspWithOptions<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>())
                 .BuildWithoutRoute();
 
             var acceptDelegate = server.GetAcceptDelegate();
@@ -91,16 +85,10 @@ namespace NSL.Node.RoomServer.Client
             if (bindingPoint == default)
                 bindingPoint = $"http://*:{ClientBindingPort}/";
 
-            Listener = WebSocketsServerEndPointBuilder.Create()
+            Listener = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<TransportNetworkClient>()
                 .WithOptions<WSServerOptions<TransportNetworkClient>>()
-                .WithBindingPoint(bindingPoint)
-                .WithCode(builder =>
-                {
-                    Build(builder);
-
-                    builder.AddDefaultEventHandlers<WebSocketsServerEndPointBuilder<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>, TransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
-                })
+                .WithBindingPoint(bindingPoint))
                 .Build();
 
             Listener.Start();
@@ -108,21 +96,25 @@ namespace NSL.Node.RoomServer.Client
             return this;
         }
 
-        private void Build<TBuilder>(TBuilder builder)
+        private TBuilder Fill<TBuilder>(TBuilder builder)
             where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder
         {
             builder.SetLogger(Logger);
 
-            builder.AddPacketHandle(
+            builder.AddAsyncPacketHandle(
                 RoomPacketEnum.SignSession, SignInPacketHandle);
             builder.AddPacketHandle(
                 RoomPacketEnum.Transport, TransportPacketHandle);
             builder.AddPacketHandle(
                 RoomPacketEnum.Broadcast, BroadcastPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.ReadyNode, ReadyPacketHandle);
+                RoomPacketEnum.ReadyNodeRequest, ReadyPacketHandle);
             builder.AddPacketHandle(
                 RoomPacketEnum.Execute, ExecutePacketHandle);
+
+            builder.AddDefaultEventHandlers<TBuilder, TransportNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+
+            return builder;
         }
 
         private readonly BridgeRoomNetwork bridgeNetwork;

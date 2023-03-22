@@ -51,13 +51,7 @@ namespace NSL.Node.RoomServer.Bridge
                     builder.SetLogger(Logger);
 
                     builder.AddReceivePacketHandle(
-                        NodeBridgeRoomPacketEnum.SignServerResultPID,
-                        c => c.PacketWaitBuffer);
-                    builder.AddReceivePacketHandle(
-                        NodeBridgeRoomPacketEnum.SignSessionResultPID,
-                        c => c.PacketWaitBuffer);
-                    builder.AddReceivePacketHandle(
-                        NodeBridgeRoomPacketEnum.RoomStartupInfoResultPID,
+                        NodeBridgeRoomPacketEnum.Response,
                         c => c.PacketWaitBuffer);
 
                     builder.AddDisconnectHandle(async client =>
@@ -136,7 +130,7 @@ namespace NSL.Node.RoomServer.Bridge
         {
             var client = network.Data;
 
-            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.SignServerPID);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.SignServerRequest);
 
             output.WriteGuid(ServerIdentity);
 
@@ -169,7 +163,7 @@ namespace NSL.Node.RoomServer.Bridge
 
             bool signResult = false;
 
-            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.SignSessionPID);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.SignSessionRequest);
 
             output.WriteString16(client.Token);
 
@@ -198,7 +192,7 @@ namespace NSL.Node.RoomServer.Bridge
 
             NodeRoomStartupInfo startupInfo = default;
 
-            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomStartupInfoPID);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomStartupInfoRequest);
 
             output.WriteString16(room.LobbyServerIdentity);
 
@@ -218,11 +212,11 @@ namespace NSL.Node.RoomServer.Bridge
             return (signResult, startupInfo);
         }
 
-        internal async void FinishRoom(RoomInfo room, byte[] data)
+        internal void FinishRoom(RoomInfo room, byte[] data)
         {
             var bridgeClient = network.Data;
 
-            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.FinishRoom);
+            var output = WaitablePacketBuffer.Create(NodeBridgeRoomPacketEnum.FinishRoomMessage);
 
             output.WriteString16(room.LobbyServerIdentity);
 

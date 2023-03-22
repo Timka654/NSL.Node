@@ -12,8 +12,6 @@ namespace NSL.Node.RoomServer.Client.Data
 {
     public class TransportNetworkClient : AspNetWSNetworkServerClient, INodeClientNetwork
     {
-        public ManualResetEvent are = new ManualResetEvent(false);
-
         public string Token { get; set; }
 
         public Guid Id { get; set; }
@@ -92,6 +90,11 @@ namespace NSL.Node.RoomServer.Client.Data
             packet.WithPid(RoomPacketEnum.Transport);
 
             Send(packet, true);
+        }
+
+        public void SetObjectOwner(INodeOwneredObject _object)
+        {
+            _object.SetOwner(Room, this);
         }
     }
 }

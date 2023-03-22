@@ -10,12 +10,9 @@ namespace NSL.Node.RoomServer.Client
     {
         private void ReadyPacketHandle(TransportNetworkClient client, InputPacketBuffer data)
         {
-            if (!client.are.WaitOne(5000))
-                Logger.ConsoleLog(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Error readyPacketHandle");
-
             var result = data
                 .CreateWaitBufferResponse()
-                .WithPid(RoomPacketEnum.ReadyNodeResult);
+                .WithPid(RoomPacketEnum.Response);
 
             if (client.Room == default)
             {

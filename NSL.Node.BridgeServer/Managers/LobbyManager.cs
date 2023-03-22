@@ -55,7 +55,7 @@ namespace NSL.Node.BridgeServer.Managers
 
             bool result = default;
 
-            var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.ValidateSessionPID);
+            var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.ValidateSessionRequest);
 
             packet.WriteGuid(client.RoomId);
             packet.WriteString16(client.SessionIdentity);
@@ -81,7 +81,7 @@ namespace NSL.Node.BridgeServer.Managers
 
             byte[] bytesData = default;
 
-            var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.RoomStartupInfoPID);
+            var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.RoomStartupInfoRequest);
 
             packet.WriteGuid(roomId);
 

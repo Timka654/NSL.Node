@@ -10,7 +10,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
         public static async void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             var packet = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeRoomPacketEnum.RoomStartupInfoResultPID);
+                .WithPid(NodeBridgeRoomPacketEnum.Response);
 
             var lobbyServerIdentity = data.ReadString16();
             var roomId = data.ReadGuid();

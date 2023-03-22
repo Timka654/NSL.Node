@@ -40,14 +40,12 @@ namespace NSL.Node.BridgeLobbyClient
                 .WithCode(builder =>
                  {
                      builder.AddReceivePacketHandle(
-                         BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.SignServerResultPID,
+                         BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.Response,
                          c => c.PacketWaitBuffer);
 
-                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.ValidateSessionPID, async (c, d) =>
+                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.ValidateSessionRequest, async (c, d) =>
                      {
-                         var packet = d.CreateWaitBufferResponse();
-
-                         packet.WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.ValidateSessionResultPID);
+                         var packet = d.CreateWaitBufferResponse().WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.Response);
 
                          var roomId = d.ReadGuid();
                          var sessionId = d.ReadString16();
@@ -62,7 +60,7 @@ namespace NSL.Node.BridgeLobbyClient
                          c.Network.Send(packet);
                      });
 
-                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.FinishRoom, async (c, d) =>
+                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.FinishRoomMessage, async (c, d) =>
                      {
                          var roomId = d.ReadGuid();
 
@@ -78,11 +76,9 @@ namespace NSL.Node.BridgeLobbyClient
                          await RoomFinish(roomId, buffer);
                      });
 
-                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.RoomStartupInfoPID, async (c, d) =>
+                     builder.AddPacketHandle(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.RoomStartupInfoRequest, async (c, d) =>
                      {
-                         var packet = d.CreateWaitBufferResponse();
-
-                         packet.WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.RoomStartupInfoResultPID);
+                         var packet = d.CreateWaitBufferResponse().WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.Response);
 
                          var roomId = d.ReadGuid();
                          bool result = default;
@@ -171,7 +167,7 @@ namespace NSL.Node.BridgeLobbyClient
         {
             var client = network.Data;
 
-            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.SignServerPID);
+            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.SignServerRequest);
 
             output.WriteString16(ServerIdentity);
 
