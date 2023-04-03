@@ -1,5 +1,5 @@
 ﻿using NSL.Logger.Interface;
-using NSL.UDP.Client.Info;
+using NSL.UDP.Info;
 using System;
 
 namespace NSL.Node.RoomServer

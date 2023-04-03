@@ -5,7 +5,7 @@ using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.RoomServer.Bridge;
 using NSL.Node.RoomServer.Client;
-using NSL.UDP.Client.Info;
+using NSL.UDP.Info;
 using STUN;
 using System;
 using System.Linq;

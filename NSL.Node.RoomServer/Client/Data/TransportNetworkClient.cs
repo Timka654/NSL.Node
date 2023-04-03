@@ -32,6 +32,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool IsLocalNode => false;
 
+        public INodeNetworkClient UDPClient => throw new NotImplementedException();
+
         public void Send(DgramOutputPacketBuffer packet, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered, bool disposeOnSend = true)
         {
             if (Network != null)
