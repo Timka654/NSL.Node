@@ -55,12 +55,12 @@ namespace NSL.Node.BridgeServer.Managers
 
             bool result = default;
 
-            var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.ValidateSessionRequest);
+            var packet = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.ValidateSessionRequest);
 
             packet.WriteGuid(client.RoomId);
             packet.WriteString16(client.SessionIdentity);
 
-            await client.LobbyServer.RequestBuffer.SendWaitRequest(packet, data =>
+            await client.LobbyServer.RequestBuffer.SendRequestAsync(packet, data =>
             {
                 if (data != default)
                     result = data.ReadBool();
@@ -81,11 +81,11 @@ namespace NSL.Node.BridgeServer.Managers
 
             byte[] bytesData = default;
 
-            var packet = WaitablePacketBuffer.Create(NodeBridgeLobbyPacketEnum.RoomStartupInfoRequest);
+            var packet = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.RoomStartupInfoRequest);
 
             packet.WriteGuid(roomId);
 
-            await server.RequestBuffer.SendWaitRequest(packet, data =>
+            await server.RequestBuffer.SendRequestAsync(packet, data =>
             {
                 if (data != default)
                 {
