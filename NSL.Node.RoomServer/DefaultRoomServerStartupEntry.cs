@@ -1,12 +1,17 @@
 ﻿using NSL.Logger.Interface;
+using NSL.Node.RoomServer.Client.Data;
 using NSL.UDP.Info;
+using NSL.Utils;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer
 {
     public class DefaultRoomServerStartupEntry : RoomServerStartupEntry<DefaultRoomServerStartupEntry>
     {
-        internal DefaultRoomServerStartupEntry() { }
         private RoomConfigurationManager configuration;
         private ILogger logger;
 
@@ -34,7 +39,7 @@ namespace NSL.Node.RoomServer
             if (string.IsNullOrEmpty(endPoint))
             {
                 if (!StunAutoDetect)
-                    throw new Exception($"must be set transport.public.endpoint or transport.stun.detect(true value) for start");
+                    throw new Exception($"must be set client_public_endpoint or client_stun_detect(true value) for start");
 
                 endPoint = BuildClientPublicPoint(GetStunAddress(defaultStunServers));
             }
@@ -55,7 +60,7 @@ namespace NSL.Node.RoomServer
             if (initialized)
                 return;
 
-            if(BridgeClient.IdentityFailed)
+            if (BridgeClient.IdentityFailed)
                 throw new Exception($"Cannot identity on bridge server!!");
 
             if (!state)
