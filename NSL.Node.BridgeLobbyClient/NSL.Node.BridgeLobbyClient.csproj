@@ -28,8 +28,8 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='UnityDebug' and '$(Configuration)'!='Unity'">
-		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.4.3.949" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.4.3.949" />
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.4.4.734" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.4.4.734" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
