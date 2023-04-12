@@ -167,7 +167,7 @@ namespace NSL.Node.BridgeLobbyClient
         {
             var client = network.Data;
 
-            var output = WaitablePacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.SignServerRequest);
+            var output = RequestPacketBuffer.Create(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.SignServerRequest);
 
             output.WriteString16(ServerIdentity);
 
@@ -175,7 +175,7 @@ namespace NSL.Node.BridgeLobbyClient
 
             bool signResult = false;
 
-            await client.PacketWaitBuffer.SendWaitRequest(output, data =>
+            await client.PacketWaitBuffer.SendRequestAsync(output, data =>
             {
                 signResult = data.ReadBool();
 

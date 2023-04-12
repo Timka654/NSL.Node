@@ -13,14 +13,14 @@ namespace NSL.Node.BridgeServer.LS
 
         public bool Signed { get; set; }
 
-        public PacketWaitBuffer RequestBuffer { get; set; }
+        public RequestProcessor RequestBuffer { get; set; }
 
         internal ConcurrentDictionary<Guid, RoomDataModel> Rooms { get; } = new ConcurrentDictionary<Guid, RoomDataModel>();
         public BridgeServerStartupEntry Entry { get; internal set; }
 
         public LobbyServerNetworkClient() : base()
         {
-            RequestBuffer = new PacketWaitBuffer(this);
+            RequestBuffer = new RequestProcessor(this);
         }
 
         public override void Dispose()

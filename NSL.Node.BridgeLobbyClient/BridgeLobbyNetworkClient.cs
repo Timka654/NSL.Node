@@ -5,11 +5,11 @@ namespace NSL.Node.BridgeLobbyClient
 {
     public class BridgeLobbyNetworkClient : BaseSocketNetworkClient
     {
-        public PacketWaitBuffer PacketWaitBuffer { get; }
+        public RequestProcessor PacketWaitBuffer { get; }
 
         public BridgeLobbyNetworkClient()
         {
-            PacketWaitBuffer = new PacketWaitBuffer(this);
+            PacketWaitBuffer = new RequestProcessor(this);
         }
 
         public override void Dispose()
