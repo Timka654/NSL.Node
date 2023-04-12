@@ -10,31 +10,34 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugExamples|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugRoomServer|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseRoomServer|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;SERVER</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="NSL.BuilderExtensions.UDPServer" Version="2023.4.12.1611" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.4.12.1611" />
+		<PackageReference Include="NSL.Logger" Version="2023.4.12.1611" />
 		<PackageReference Include="NSL.SocketCore" Version="2023.4.12.1611" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Assets\Scripts\Network\Node\NSL.Node.RoomServer.Shared.Client.csproj" />
+		<ProjectReference Include="..\NSL.Node.RoomServer.Shared\NSL.Node.RoomServer.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

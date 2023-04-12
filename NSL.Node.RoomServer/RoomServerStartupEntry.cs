@@ -5,9 +5,11 @@ using NSL.Logger;
 using NSL.Logger.Interface;
 using NSL.Node.RoomServer.Bridge;
 using NSL.Node.RoomServer.Client;
+using NSL.Node.RoomServer.Client.Data;
 using NSL.UDP.Info;
 using STUN;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -89,5 +91,9 @@ namespace NSL.Node.RoomServer
 
         public static DefaultRoomServerStartupEntry CreateDefault()
             => new DefaultRoomServerStartupEntry();
+
+        public virtual Task<string> GetProxyRoomId(RoomInfo roomInfo) => Task.FromResult(string.Empty);
+
+        public virtual Task<IEnumerable<string>> GetProxyEndPoints() => Task.FromResult(Enumerable.Empty<string>());
     }
 }
