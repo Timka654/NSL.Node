@@ -84,7 +84,20 @@ namespace NSL.Node.RoomServer.Bridge
                         OnStateChanged(State);
                     });
 
-                    builder.AddDefaultEventHandlers<WebSocketsClientEndPointBuilder<BridgeRoomNetworkClient, WSClientOptions<BridgeRoomNetworkClient>>, BridgeRoomNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+                    builder.AddDefaultEventHandlers<WebSocketsClientEndPointBuilder<BridgeRoomNetworkClient, WSClientOptions<BridgeRoomNetworkClient>>, BridgeRoomNetworkClient>(null,
+                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
+
+                    builder.AddBaseSendHandle((client, pid, len, stack) =>
+                    {
+                        if (pid < ushort.MaxValue - 100)
+                            Logger.AppendInfo($"Send packet {pid}");
+                    });
+
+                    builder.AddBaseReceiveHandle((client, pid, len) =>
+                    {
+                        if (pid < ushort.MaxValue - 100)
+                            Logger.AppendInfo($"Receive packet {pid}");
+                    });
                 })
                 .Build();
 

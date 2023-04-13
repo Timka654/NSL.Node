@@ -50,7 +50,7 @@ namespace NSL.Node.P2Proxy.Client
             Listener = Fill(UDPServerEndPointBuilder.Create()
                 .WithClientProcessor<P2PNetworkClient>()
                 .WithOptions<UDPClientOptions<P2PNetworkClient>>()
-                .WithBindingPoint(p.Address,p.Port))
+                .WithBindingPoint(p.Address, p.Port))
                 .Build();
 
             Listener.Start();
@@ -70,7 +70,20 @@ namespace NSL.Node.P2Proxy.Client
             builder.AddPacketHandle(
                 RoomPacketEnum.Broadcast, BroadcastPacketHandle);
 
-            builder.AddDefaultEventHandlers<TBuilder, P2PNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+            builder.AddDefaultEventHandlers<TBuilder, P2PNetworkClient>(null,
+                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
+
+            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            {
+                if (pid < ushort.MaxValue - 100)
+                    Logger.AppendInfo($"Send packet {pid}");
+            });
+
+            builder.AddBaseReceiveHandle((client, pid, len) =>
+            {
+                if (pid < ushort.MaxValue - 100)
+                    Logger.AppendInfo($"Receive packet {pid}");
+            });
 
             return builder;
         }

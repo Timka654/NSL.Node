@@ -110,7 +110,21 @@ namespace NSL.Node.BridgeServer.RS
 
             builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
 
-            builder.AddDefaultEventHandlers<TBuilder, NetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+
+            builder.AddDefaultEventHandlers<TBuilder, NetworkClient>(null,
+                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
+
+            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            {
+                if (pid < ushort.MaxValue - 100)
+                    Logger.AppendInfo($"Send packet {pid}");
+            });
+
+            builder.AddBaseReceiveHandle((client, pid, len) =>
+            {
+                if (pid < ushort.MaxValue - 100)
+                    Logger.AppendInfo($"Receive packet {pid}");
+            });
 
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, SignServerPacket.ReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionPacket.ReceiveHandle);
