@@ -433,6 +433,13 @@ namespace NSL.Node.RoomServer.Client.Data
             SendLobbyFinishRoom();
         }
 
+        public void Dispose(byte[] data)
+        {
+            OnRoomDisposed();
+
+            SendLobbyFinishRoom(data);
+        }
+
         public void SendLobbyFinishRoom(byte[] data = null)
         {
             Entry.BridgeClient.FinishRoom(this, data);

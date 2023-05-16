@@ -10,6 +10,7 @@ using NSL.Logger.Interface;
 using NSL.Node.BridgeServer.Shared;
 using System.Collections.Generic;
 using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -229,7 +230,7 @@ namespace NSL.Node.RoomServer.Bridge
         {
             var bridgeClient = network.Data;
 
-            var output = RequestPacketBuffer.Create(NodeBridgeRoomPacketEnum.FinishRoomMessage);
+            var output = OutputPacketBuffer.Create(NodeBridgeRoomPacketEnum.FinishRoomMessage);
 
             output.WriteString16(room.LobbyServerIdentity);
 
@@ -246,7 +247,7 @@ namespace NSL.Node.RoomServer.Bridge
         {
             var bridgeClient = network.Data;
 
-            var output = RequestPacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomMessage);
+            var output = OutputPacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomMessage);
 
             output.WriteString16(room.LobbyServerIdentity);
 
