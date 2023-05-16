@@ -26,7 +26,7 @@ namespace NSL.Node.BridgeLobbyClient.AspNetCore
             string url,
             string serverIdentity,
             string identityKey,
-            Action<BridgeLobbyNetworkHandlesConfigurationModel> onHandleConfiguration,
+            Action<IServiceProvider, BridgeLobbyNetworkHandlesConfigurationModel> onHandleConfiguration,
             Action<IServiceProvider, WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild = null
             )
         {
@@ -34,7 +34,7 @@ namespace NSL.Node.BridgeLobbyClient.AspNetCore
                 new System.Uri(url),
                 serverIdentity,
                 identityKey,
-                onHandleConfiguration,
+                (handles) => onHandleConfiguration(services, handles),
                 builder =>
             {
                 builder.SetLogger(new ILoggerWrapper(services.GetRequiredService<ILogger<BridgeLobbyNetwork>>()));
