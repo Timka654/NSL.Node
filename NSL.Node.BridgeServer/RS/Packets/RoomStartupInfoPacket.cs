@@ -17,10 +17,10 @@ namespace NSL.Node.BridgeServer.RS.Packets
 
             var result = await client.Entry.LobbyManager.GetRoomStartupInfo(lobbyServerIdentity, roomId);
 
-            packet.WriteBool(result.Item1);
+            packet.WriteBool(result.result);
 
-            if (result.Item1)
-                packet.Write(result.Item2);
+            if (result.result)
+                packet.Write(result.data);
 
             client.Send(packet);
         }

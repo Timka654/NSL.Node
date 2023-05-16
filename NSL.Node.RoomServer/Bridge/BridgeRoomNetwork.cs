@@ -242,6 +242,23 @@ namespace NSL.Node.RoomServer.Bridge
 
         }
 
+        internal void RoomMessage(RoomInfo room, byte[] data)
+        {
+            var bridgeClient = network.Data;
+
+            var output = RequestPacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomMessage);
+
+            output.WriteString16(room.LobbyServerIdentity);
+
+            output.WriteGuid(room.RoomId);
+
+            if (data != null)
+                output.Write(data);
+
+            bridgeClient.Send(output);
+
+        }
+
         public event Action<bool> OnStateChanged = (state) => { };
 
         public bool State => network?.GetState() == true && signResult;

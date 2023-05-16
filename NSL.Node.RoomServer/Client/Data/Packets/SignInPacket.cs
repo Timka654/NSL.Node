@@ -31,12 +31,17 @@ namespace NSL.Node.RoomServer.Client
 
                 response.WriteGuid(client.NodeId);
 
-                client.Room = roomMap.GetOrAdd((client.LobbyServerIdentity, client.RoomId), id =>
+                client.Room = roomMap.GetOrAdd((client.LobbyServerIdentity, client.RoomId), id => new Lazy<RoomInfo>(()=>
                 {
                     var room = new RoomInfo(Entry,id.roomId, id.lobbyServerIdentity);
 
+                    room.OnRoomDisposed += () =>
+                    {
+                        roomMap.TryRemove(id, out _);
+                    };
+
                     return room;
-                });
+                })).Value;
 
                 client.Room.AddClient(client);
 

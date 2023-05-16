@@ -132,6 +132,6 @@ namespace NSL.Node.RoomServer.Client
 
         private readonly BridgeRoomNetwork bridgeNetwork;
 
-        private ConcurrentDictionary<(string lobbyServerIdentity, Guid roomId), RoomInfo> roomMap = new();
+        private ConcurrentDictionary<(string lobbyServerIdentity, Guid roomId), Lazy<RoomInfo>> roomMap = new();
     }
 }

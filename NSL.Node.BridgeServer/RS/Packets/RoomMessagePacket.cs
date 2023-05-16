@@ -3,7 +3,7 @@ using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
 
 namespace NSL.Node.BridgeServer.RS.Packets
 {
-    internal class RoomFinishRoomPacket
+    internal class RoomMessagePacket
     {
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
@@ -11,7 +11,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
 
             byte[] dataBuffer = data.Read(data.DataLength - data.DataPosition);
 
-            client.Entry.LobbyManager.SendLobbyFinishRoom(lobbyServerIdentity, dataBuffer);
+            client.Entry.LobbyManager.SendLobbyRoomMessage(lobbyServerIdentity, dataBuffer);
         }
     }
 }

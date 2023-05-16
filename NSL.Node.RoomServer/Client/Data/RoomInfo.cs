@@ -58,6 +58,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action OnRoomReady = () => { };
 
+        public event Action OnRoomDisposed = () => { };
+
         public RoomInfo(RoomServerStartupEntry entry, Guid roomId, string lobbyServerIdentity)
         {
             Entry = entry;
@@ -426,7 +428,19 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void Dispose()
         {
-            Entry.BridgeClient.FinishRoom(this, null);
+            OnRoomDisposed();
+
+            SendLobbyFinishRoom();
+        }
+
+        public void SendLobbyFinishRoom(byte[] data = null)
+        {
+            Entry.BridgeClient.FinishRoom(this, data);
+        }
+
+        public void SendLobbyRoomMessage(byte[] data)
+        {
+            Entry.BridgeClient.RoomMessage(this, data);
         }
     }
 }

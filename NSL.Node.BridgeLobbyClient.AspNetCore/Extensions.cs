@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.Logger.AspNetCore;
+using NSL.Node.BridgeLobbyClient.Models;
 using NSL.WebSockets.Client;
 using System;
 
@@ -25,10 +26,16 @@ namespace NSL.Node.BridgeLobbyClient.AspNetCore
             string url,
             string serverIdentity,
             string identityKey,
+            Action<BridgeLobbyNetworkHandlesConfigurationModel> onHandleConfiguration,
             Action<IServiceProvider, WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild = null
             )
         {
-            services.AddSingleton<BridgeLobbyNetwork>(services => new BridgeLobbyNetwork(new System.Uri(url), serverIdentity, identityKey, builder =>
+            services.AddSingleton<BridgeLobbyNetwork>(services => new BridgeLobbyNetwork(
+                new System.Uri(url),
+                serverIdentity,
+                identityKey,
+                onHandleConfiguration,
+                builder =>
             {
                 builder.SetLogger(new ILoggerWrapper(services.GetRequiredService<ILogger<BridgeLobbyNetwork>>()));
 
@@ -39,17 +46,13 @@ namespace NSL.Node.BridgeLobbyClient.AspNetCore
             return services;
         }
 
-        public static void RunBridgeLobbyClient(this IHost host, ValidateSessionDelegate validateSession, RoomStartupInfoDelegate roomStartupInfo, RoomFinishDelegate roomFinish)
-            => RunBridgeLobbyClient<BridgeLobbyNetwork>(host, validateSession, roomStartupInfo, roomFinish);
+        public static void RunBridgeLobbyClient(this IHost host)
+            => RunBridgeLobbyClient<BridgeLobbyNetwork>(host);
 
-        public static void RunBridgeLobbyClient<TNetwork>(this IHost host, ValidateSessionDelegate validateSession, RoomStartupInfoDelegate roomStartupInfo, RoomFinishDelegate roomFinish)
+        public static void RunBridgeLobbyClient<TNetwork>(this IHost host)
             where TNetwork : BridgeLobbyNetwork
         {
             var network = host.Services.GetRequiredService<TNetwork>();
-
-            network.ValidateSession = validateSession;
-            network.RoomStartupInfo = roomStartupInfo;
-            network.RoomFinish = roomFinish;
 
             network.Initialize();
         }

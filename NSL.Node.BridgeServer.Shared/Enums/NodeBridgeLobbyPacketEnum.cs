@@ -6,6 +6,7 @@
         ValidateSessionRequest = 2,
         RoomStartupInfoRequest = 3,
         FinishRoomMessage = 4,
-        Response = 5
+        Response = 5,
+        RoomMessage = 6
     }
 }

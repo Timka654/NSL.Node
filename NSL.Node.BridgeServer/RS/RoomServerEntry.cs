@@ -5,7 +5,6 @@ using NSL.BuilderExtensions.SocketCore;
 
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
 using NetworkOptions = NSL.WebSockets.Server.WSServerOptions<NSL.Node.BridgeServer.RS.RoomServerNetworkClient>;
-using NetworkListener = NSL.WebSockets.Server.WSServerListener<NSL.Node.BridgeServer.RS.RoomServerNetworkClient>;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.ConfigurationEngine;
 using NSL.Node.BridgeServer.RS.Packets;
@@ -13,7 +12,6 @@ using NSL.SocketServer.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using NSL.Node.BridgeServer.LS;
 using System.Threading.Tasks;
 using System;
 using NSL.BuilderExtensions.WebSocketsServer.AspNet;
@@ -130,6 +128,7 @@ namespace NSL.Node.BridgeServer.RS
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionPacket.ReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoRequest, RoomStartupInfoPacket.ReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, RoomFinishRoomPacket.ReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, RoomMessagePacket.ReceiveHandle);
 
             return builder;
         }
