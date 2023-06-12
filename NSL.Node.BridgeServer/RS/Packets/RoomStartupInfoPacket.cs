@@ -1,4 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.BridgeServer.Utils;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
@@ -9,13 +10,12 @@ namespace NSL.Node.BridgeServer.RS.Packets
     {
         public static async void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            var packet = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeRoomPacketEnum.Response);
+            var packet = data.CreateResponse();
 
             var lobbyServerIdentity = data.ReadString16();
             var roomId = data.ReadGuid();
 
-            var result = await client.Entry.LobbyManager.GetRoomStartupInfo(lobbyServerIdentity, roomId);
+            var result = await client.Entry.LobbyManager.GetRoomStartupInfo(client, lobbyServerIdentity, roomId);
 
             packet.WriteBool(result.result);
 

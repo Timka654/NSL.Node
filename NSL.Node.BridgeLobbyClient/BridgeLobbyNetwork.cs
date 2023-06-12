@@ -1,10 +1,12 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.Node.BridgeLobbyClient.Models;
+using NSL.Node.BridgeServer.Shared;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.WebSockets.Client;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeLobbyClient
@@ -54,10 +56,6 @@ namespace NSL.Node.BridgeLobbyClient
                      builder.AddPacketHandle(
                          NodeBridgeLobbyPacketEnum.RoomMessage,
                          Packets.RoomMessagePacket.Handle);
-
-                     builder.AddPacketHandle(
-                         NodeBridgeLobbyPacketEnum.RoomStartupInfoRequest,
-                         Packets.RoomStartupInfoRequestPacket.Handle);
 
                      builder.AddDisconnectHandle(DisconnectHandle);
 
@@ -151,6 +149,40 @@ namespace NSL.Node.BridgeLobbyClient
             });
 
             return signResult;
+        }
+        public async Task<(bool isSuccess, RoomServerPointInfo[] endPoints)> CreateRoom(Guid roomId, NodeRoomStartupInfo startupInfo)
+        {
+            var client = network.Data;
+
+            var output = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest);
+
+            output.WriteGuid(roomId);
+
+            output.WriteCollection(startupInfo.GetCollection(), i =>
+            {
+                output.WriteString16(i.Key);
+                output.WriteString32(i.Value);
+            });
+
+            (bool result, RoomServerPointInfo[] endPoints) result = (false, null);
+
+            await client.PacketWaitBuffer.SendRequestAsync(output, data =>
+            {
+                var isSuccess = data.ReadBool();
+
+                if (isSuccess)
+                    result = (
+                    isSuccess,
+                    data.ReadCollection(() => new RoomServerPointInfo()
+                    {
+                        Endpoint = data.ReadString16(),
+                        RoomId = data.ReadGuid()
+                    }).ToArray());
+
+                return Task.CompletedTask;
+            });
+
+            return result;
         }
 
         public event Action<bool> OnStateChanged = (state) => { };

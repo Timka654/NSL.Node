@@ -14,7 +14,8 @@ namespace NSL.Node.BridgeServer.LS
 
         public RequestProcessor RequestBuffer { get; set; }
 
-        internal ConcurrentDictionary<Guid, RoomDataModel> Rooms { get; } = new ConcurrentDictionary<Guid, RoomDataModel>();
+        internal ConcurrentDictionary<Guid, BridgeRoomInfoModel> Rooms { get; } = new ConcurrentDictionary<Guid, BridgeRoomInfoModel>();
+
         public BridgeServerStartupEntry Entry { get; internal set; }
 
         public LobbyServerNetworkClient() : base()

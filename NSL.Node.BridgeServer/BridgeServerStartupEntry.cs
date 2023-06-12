@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using NSL.Logger;
 using NSL.Logger.Interface;
-using NSL.Node.BridgeServer.CS;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Managers;
 using NSL.Node.BridgeServer.RS;
@@ -31,8 +30,6 @@ namespace NSL.Node.BridgeServer
         public LobbyServerEntry LobbyServer { get; protected set; }
 
         public RoomServerEntry RoomServer { get; protected set; }
-
-        public ClientServerEntry ClientServer { get; protected set; }
 
         internal RoomManager RoomManager { get; }
 
@@ -63,11 +60,6 @@ namespace NSL.Node.BridgeServer
                 .Create(this)
                 .Run();
 
-        protected virtual ClientServerEntry CreateDefaultClientServerNetwork()
-            => ClientServer = ClientServerEntry
-                .Create(this)
-                .Run();
-
         protected virtual LobbyServerEntry CreateAspLobbyServerNetwork(IEndpointRouteBuilder builder, string pattern,
             Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
@@ -79,13 +71,6 @@ namespace NSL.Node.BridgeServer
             Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
             => RoomServer = RoomServerEntry
-                .Create(this)
-                .RunAsp(builder, pattern, requestHandle, actionConvertionBuilder);
-
-        protected virtual ClientServerEntry CreateAspClientServerNetwork(IEndpointRouteBuilder builder, string pattern,
-            Func<HttpContext, Task<bool>> requestHandle = null,
-            Action<IEndpointConventionBuilder> actionConvertionBuilder = null)
-            => ClientServer = ClientServerEntry
                 .Create(this)
                 .RunAsp(builder, pattern, requestHandle, actionConvertionBuilder);
 

@@ -1,5 +1,4 @@
 ﻿using NSL.Logger.Interface;
-using NSL.Node.BridgeServer.CS;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketCore.Extensions.Buffer;
@@ -49,37 +48,6 @@ namespace NSL.Node.BridgeServer.Managers
             return lobby;
         }
 
-        public async Task<bool> ValidateClientSession(ClientServerNetworkClient client)
-        {
-            client.LobbyServer = GetLobbyById(client.LobbyServerIdentity);
-
-            if (client.LobbyServer == null)
-            {
-                LogNotFoundLobbyByIdentity(nameof(ValidateClientSession), client.LobbyServerIdentity);
-
-                return false;
-            }
-
-            bool result = default;
-
-            var packet = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.ValidateSessionRequest);
-
-            packet.WriteGuid(client.RoomId);
-            packet.WriteString16(client.SessionIdentity);
-
-            await client.LobbyServer.RequestBuffer.SendRequestAsync(packet, data =>
-            {
-                if (data != default)
-                    result = data.ReadBool();
-
-                return Task.CompletedTask;
-            });
-
-            logger.ConsoleLog(LoggerLevel.Info, $"[{nameof(ValidateClientSession)}] >>>>> result : {result}");
-
-            return result;
-        }
-
         public async Task<(bool result, byte[] data)> GetRoomStartupInfo(string lobbyServerIdentity, Guid roomId)
         {
             var server = GetLobbyById(lobbyServerIdentity);
@@ -93,24 +61,6 @@ namespace NSL.Node.BridgeServer.Managers
             bool result = default;
 
             byte[] bytesData = default;
-
-            var packet = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.RoomStartupInfoRequest);
-
-            packet.WriteGuid(roomId);
-
-            await server.RequestBuffer.SendRequestAsync(packet, data =>
-            {
-                if (data != default)
-                {
-                    result = data.ReadBool();
-
-                    if (result)
-                        bytesData = data.Read(data.DataLength - data.DataPosition);
-                }
-                return Task.CompletedTask;
-            });
-
-            return (result, bytesData);
         }
 
         internal void SendLobbyFinishRoom(string lobbyServerIdentity, byte[] dataBuffer)

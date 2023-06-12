@@ -125,7 +125,8 @@ namespace NSL.Node.BridgeServer.LS
                     Logger.AppendInfo($"Receive packet {pid}");
             });
 
-            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionPacket.ReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionRequestPacket.ReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest, CreateRoomSessionRequestPacket.ReceiveHandle);
 
             builder.AddReceivePacketHandle(
                 NodeBridgeLobbyPacketEnum.Response,

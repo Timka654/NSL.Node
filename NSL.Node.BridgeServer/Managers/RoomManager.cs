@@ -1,5 +1,4 @@
-﻿using NSL.Node.BridgeServer.CS;
-using NSL.Node.BridgeServer.RS;
+﻿using NSL.Node.BridgeServer.RS;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,75 +23,6 @@ namespace NSL.Node.BridgeServer.Managers
         {
             if (client.Signed)
                 connectedServers.Remove(client.Id, out _);
-        }
-
-        internal void CreateRoom(ClientServerNetworkClient client)
-        {
-            var lobby = client.LobbyServer;
-
-            client.Room = lobby.Rooms.GetOrAdd(client.RoomId, roomId => new Models.RoomDataModel() { RoomId = client.RoomId });
-
-            client.Room.Clients.TryAdd(client.SessionIdentity, client);
-        }
-
-        internal List<CreateSignResult> CreateSignSession(ClientServerNetworkClient client)
-        {
-            List<CreateSignResult> result = new List<CreateSignResult>();
-
-            var serverArray = connectedServers.Values.ToArray();
-
-            if (serverArray.Length == 0)
-                return result;
-
-            var offset = client.RoomId.GetHashCode() % serverArray.Length;
-
-            var room = client.Room;
-
-            // single server for now - maybe change to multiple later
-
-            var selectedServers = serverArray.Skip(offset).Take(TransportServerCountPerRoom).ToList();
-
-            var missedCount = TransportServerCountPerRoom - selectedServers.Count;
-
-            if (missedCount > 0)
-            {
-                selectedServers.AddRange(serverArray.Take(missedCount).Where(x => !selectedServers.Contains(x)));
-            }
-
-            if (selectedServers.Any())
-            {
-                var newId = Guid.NewGuid();
-
-                if (client.TransportSessions != default)
-                {
-                    foreach (var item in client.TransportSessions)
-                    {
-                        item.Dispose();
-                    }
-                }
-
-                client.TransportSessions = new TransportSession[selectedServers.Count];
-
-                int i = 0;
-
-                foreach (var server in selectedServers)
-                {
-                    var tsession = new TransportSession(client) { TransportIdentity = newId };
-
-                    while (!server.TryAddSession(tsession))
-                    {
-                        newId = tsession.TransportIdentity = Guid.NewGuid();
-                    }
-
-                    client.TransportSessions[i] = tsession;
-
-                    result.Add(new CreateSignResult(server.ConnectionEndPoint, newId));
-
-                    i++;
-                }
-            }
-
-            return result;
         }
 
         internal bool TryRoomServerConnect(RoomServerNetworkClient client)

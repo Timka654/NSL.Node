@@ -1,5 +1,4 @@
-﻿using NSL.Node.BridgeServer.CS;
-using NSL.WebSockets.Server.AspNetPoint;
+﻿using NSL.WebSockets.Server.AspNetPoint;
 using System;
 using System.Collections.Concurrent;
 
@@ -43,14 +42,8 @@ namespace NSL.Node.BridgeServer.RS
 
     public class TransportSession : IDisposable
     {
-        public TransportSession(ClientServerNetworkClient client)
-        {
-            Client = client;
-        }
 
         public Guid TransportIdentity { get; set; }
-
-        public ClientServerNetworkClient Client { get; }
 
         public event Action<TransportSession> OnDestroy = session => { };
 
