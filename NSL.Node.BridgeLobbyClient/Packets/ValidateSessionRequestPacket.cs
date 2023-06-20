@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Extensions.Buffer;
+﻿using NSL.Node.BridgeLobbyClient.Utils;
+using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.BridgeLobbyClient.Packets
@@ -7,7 +8,7 @@ namespace NSL.Node.BridgeLobbyClient.Packets
     {
         public static async void Handle(BridgeLobbyNetworkClient client, InputPacketBuffer data)
         {
-            var packet = data.CreateWaitBufferResponse().WithPid(BridgeServer.Shared.Enums.NodeBridgeLobbyPacketEnum.Response);
+            var packet = data.CreateResponse();
 
             var roomId = data.ReadGuid();
             var sessionId = data.ReadString16();

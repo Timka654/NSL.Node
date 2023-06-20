@@ -1,8 +1,9 @@
-﻿using NSL.Node.BridgeServer.Models;
+﻿using NSL.Node.BridgeServer.RS;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.WebSockets.Server.AspNetPoint;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace NSL.Node.BridgeServer.LS
 {
@@ -14,13 +15,48 @@ namespace NSL.Node.BridgeServer.LS
 
         public RequestProcessor RequestBuffer { get; set; }
 
-        internal ConcurrentDictionary<Guid, BridgeRoomInfoModel> Rooms { get; } = new ConcurrentDictionary<Guid, BridgeRoomInfoModel>();
+        public ConcurrentDictionary<Guid, List<RoomSession>> Rooms { get; private set; } = new ConcurrentDictionary<Guid, List<RoomSession>>();
 
         public BridgeServerStartupEntry Entry { get; internal set; }
 
         public LobbyServerNetworkClient() : base()
         {
             RequestBuffer = new RequestProcessor(this);
+        }
+
+        public void LoadFrom(LobbyServerNetworkClient other)
+        {
+            Rooms = other.Rooms;
+
+            foreach (var room in Rooms)
+            {
+                foreach (var session in room.Value.ToArray())
+                {
+                    session.OwnedLobbyNetwork = this;
+                }
+            }
+        }
+
+        public void AddPlayerId(Guid roomId, Guid playerId)
+        {
+            if (Rooms.TryGetValue(roomId, out var room))
+            {
+                foreach (var session in room.ToArray())
+                {
+                    session.AddPlayerId(playerId);
+                }
+            }
+        }
+
+        public void RemovePlayerId(Guid roomId, Guid playerId)
+        {
+            if (Rooms.TryGetValue(roomId, out var room))
+            {
+                foreach (var session in room.ToArray())
+                {
+                    session.RemovePlayerId(playerId);
+                }
+            }
         }
 
         public override void Dispose()

@@ -3,13 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSL.Node.BridgeServer.Shared
+namespace NSL.Node.BridgeServer.Shared.Requests
 {
     [BinaryIOType, BinaryIOMethodsFor]
-    public partial class RoomServerPointInfo
+    public partial class LobbyRoomPlayerRemoveRequestModel : LobbyRoomPlayerAddRequestModel
     {
-        public string Endpoint { get; set; }
-
-        public Guid SessionId { get; set; }
     }
 }

@@ -126,7 +126,6 @@ namespace NSL.Node.BridgeServer.RS
 
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, SignServerPacket.ReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionPacket.ReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomStartupInfoRequest, RoomStartupInfoPacket.ReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, RoomFinishRoomPacket.ReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, RoomMessagePacket.ReceiveHandle);
 

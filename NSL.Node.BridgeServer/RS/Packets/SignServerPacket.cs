@@ -2,6 +2,8 @@
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Extensions.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
+using NSL.Node.BridgeServer.Utils;
+using NSL.Node.BridgeServer.Shared.Requests;
 
 namespace NSL.Node.BridgeServer.RS.Packets
 {
@@ -11,17 +13,16 @@ namespace NSL.Node.BridgeServer.RS.Packets
 
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            var response = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeRoomPacketEnum.Response);
+            var response = data.CreateResponse();
 
-            client.Id = data.ReadGuid();
-
-            client.ConnectionEndPoint = data.ReadString16();
-
-            var serverIdentityKey = data.ReadString16();
+            var request = RoomSignInRequestModel.ReadFullFrom(data);
 
 
-            if (!GetIdentityKey(client).Equals(serverIdentityKey))
+            client.Id = request.Identity;
+
+            client.ConnectionEndPoint = request.ConnectionEndPoint;
+
+            if (!GetIdentityKey(client).Equals(request.IdentityKey))
             {
                 response.WriteBool(false);
 

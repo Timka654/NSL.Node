@@ -12,44 +12,34 @@ namespace NSL.Node.BridgeServer.RS
 
         public string ConnectionEndPoint { get; set; }
 
-        private ConcurrentDictionary<Guid, TransportSession> SessionMap { get; } = new ConcurrentDictionary<Guid, TransportSession>();
+        public string Location { get; set; }
+
+        public int SessionsCount => SessionMap.Count;
+
+        private ConcurrentDictionary<Guid, RoomSession> SessionMap { get; } = new ConcurrentDictionary<Guid, RoomSession>();
+
         public BridgeServerStartupEntry Entry { get; internal set; }
 
-        public bool TryAddSession(TransportSession session)
+        public RoomSession CreateSession(RoomSession session)
         {
-            if (SessionMap.TryAdd(session.TransportIdentity, session))
-            {
-                session.OnDestroy += _ => TryRemoveSession(session.TransportIdentity);
-                return true;
-            }
+            while (!SessionMap.TryAdd(session.SessionId = Guid.NewGuid(), session)) ;
 
-            return false;
+            session.OnDestroy += session => TryRemoveSession(session.SessionId);
+
+            return session;
         }
 
-        public void TryRemoveSession(Guid id)
+        public void TryRemoveSession(Guid sessionId)
         {
-            if (SessionMap.TryRemove(id, out var session))
+            if (SessionMap.TryRemove(sessionId, out var session))
                 session.Dispose();
         }
 
-        public TransportSession GetSession(Guid sessionId)
+        public RoomSession GetSession(Guid sessionId)
         {
             SessionMap.TryGetValue(sessionId, out var session);
 
             return session;
-        }
-    }
-
-    public class TransportSession : IDisposable
-    {
-
-        public Guid TransportIdentity { get; set; }
-
-        public event Action<TransportSession> OnDestroy = session => { };
-
-        public void Dispose()
-        {
-            OnDestroy(this);
         }
     }
 }

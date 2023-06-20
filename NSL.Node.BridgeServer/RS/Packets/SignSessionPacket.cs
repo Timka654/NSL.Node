@@ -1,4 +1,7 @@
 ﻿using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.BridgeServer.Shared.Requests;
+using NSL.Node.BridgeServer.Shared.Response;
+using NSL.Node.BridgeServer.Utils;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
@@ -9,27 +12,22 @@ namespace NSL.Node.BridgeServer.RS.Packets
     {
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            var packet = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeRoomPacketEnum.Response);
+            var packet = data.CreateResponse();
 
-            var identityKey = data.ReadString16();
-            var id = data.ReadGuid();
+            var request = RoomSignSessionRequestModel.ReadFullFrom(data);
 
-            var session = client.GetSession(id);
+            RoomSignSessionResponseModel result = new RoomSignSessionResponseModel();
 
-            if (session == null || !session.Client.SessionIdentity.Equals(identityKey))
+            var session = client.GetSession(request.SessionIdentity);
+
+            result.Result = session != null && session.RoomIdentity.Equals(request.RoomIdentity);
+
+            if (result.Result)
             {
-                packet.WriteBool(false);
-
-                client.Send(packet);
-
-                return;
+                session.Active = true;
             }
 
-            packet.WriteBool(true);
-
-            packet.WriteString16(session.Client.LobbyServerIdentity);
-            packet.WriteGuid(session.Client.RoomId);
+            result.WriteFullTo(packet);
 
             client.Send(packet);
         }

@@ -20,7 +20,6 @@ namespace NSL.Node.BridgeServer
 
             base.CreateDefaultLobbyServerNetwork();
             base.CreateDefaultRoomServerNetwork();
-            base.CreateDefaultClientServerNetwork();
         }
 
         public static DefaultBridgeServerStartupEntry Create() => new DefaultBridgeServerStartupEntry();

@@ -5,6 +5,7 @@ using NSL.SocketCore.Extensions.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 using NSL.Node.BridgeServer.Utils;
 using System.Collections.Generic;
+using NSL.Node.BridgeServer.Shared.Requests;
 
 namespace NSL.Node.BridgeServer.LS.Packets
 {
@@ -12,17 +13,15 @@ namespace NSL.Node.BridgeServer.LS.Packets
     {
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            var packet = data.CreateResponse();
+            var response = data.CreateResponse();
 
-            var roomId = data.ReadGuid();
+            var request = LobbyCreateRoomSessionRequestModel.ReadFullFrom(data);
 
-            var roomStartupInfo = data.ReadCollection(x=>new KeyValuePair<>)
+            var result = client.Entry.RoomManager.CreateRoomSession(client, request);
 
-            bool result = client.Entry.LobbyManager.TryLobbyServerConnect(client, data.ReadString16());
+            result.WriteFullTo(response);
 
-            packet.WriteBool(result);
-
-            client.Network.Send(packet);
+            client.Network.Send(response);
         }
     }
 }

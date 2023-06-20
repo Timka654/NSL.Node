@@ -5,7 +5,6 @@
         Response = 1,
         SignServerRequest,
         SignSessionRequest,
-        RoomStartupInfoRequest,
         FinishRoomMessage,
         RoomMessage
     }

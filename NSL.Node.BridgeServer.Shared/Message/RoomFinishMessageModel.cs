@@ -3,13 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSL.Node.BridgeServer.Shared
+namespace NSL.Node.BridgeServer.Shared.Message
 {
     [BinaryIOType, BinaryIOMethodsFor]
-    public partial class RoomServerPointInfo
+    public partial class RoomFinishMessageModel : RoomMessageModel
     {
-        public string Endpoint { get; set; }
-
-        public Guid SessionId { get; set; }
     }
 }

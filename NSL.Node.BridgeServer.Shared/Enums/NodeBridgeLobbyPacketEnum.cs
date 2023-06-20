@@ -6,7 +6,10 @@
         SignServerRequest,
         ValidateSessionRequest,
         CreateRoomSessionRequest,
+        AddPlayerRequest,
+        RemovePlayerRequest,
         FinishRoomMessage,
+        RoomChangeStateMessage,
         RoomMessage
     }
 }

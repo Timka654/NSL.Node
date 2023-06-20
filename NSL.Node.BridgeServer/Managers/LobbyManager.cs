@@ -1,6 +1,8 @@
 ﻿using NSL.Logger.Interface;
 using NSL.Node.BridgeServer.LS;
+using NSL.Node.BridgeServer.RS;
 using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.SocketCore.Utils.Logger.Enums;
@@ -28,11 +30,21 @@ namespace NSL.Node.BridgeServer.Managers
                 connectedServers.Remove(client.Identity, out _);
         }
 
-        public bool TryLobbyServerConnect(LobbyServerNetworkClient client, string identityKey)
+        public bool TryLobbyServerConnect(LobbyServerNetworkClient client, LobbySignInRequestModel request)
         {
             //todo: add validation by identityKey
 
-            connectedServers.Remove(client.Identity, out _);
+            if(connectedServers.TryGetValue(client.Identity, out var oldClient))
+            {
+                if (oldClient.Network?.GetState() == true)
+                {
+                    return false;
+                }
+
+                client.LoadFrom(oldClient);
+
+                connectedServers.TryRemove(client.Identity, out _);
+            }
 
             connectedServers.TryAdd(client.Identity, client);
 
@@ -48,57 +60,6 @@ namespace NSL.Node.BridgeServer.Managers
             return lobby;
         }
 
-        public async Task<(bool result, byte[] data)> GetRoomStartupInfo(string lobbyServerIdentity, Guid roomId)
-        {
-            var server = GetLobbyById(lobbyServerIdentity);
-
-            if (server == default)
-            {
-                LogNotFoundLobbyByIdentity(nameof(GetRoomStartupInfo), lobbyServerIdentity);
-
-                return (false, default);
-            }
-            bool result = default;
-
-            byte[] bytesData = default;
-        }
-
-        internal void SendLobbyFinishRoom(string lobbyServerIdentity, byte[] dataBuffer)
-        {
-            var lobby = GetLobbyById(lobbyServerIdentity);
-
-            if (lobby == null)
-            {
-                LogNotFoundLobbyByIdentity(nameof(SendLobbyFinishRoom), lobbyServerIdentity);
-
-                return; // todo
-            }
-
-
-            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoomMessage);
-
-            packet.Write(dataBuffer);
-
-            lobby.Network.Send(packet);
-        }
-
-        internal void SendLobbyRoomMessage(string lobbyServerIdentity, byte[] dataBuffer)
-        {
-            var lobby = GetLobbyById(lobbyServerIdentity);
-
-            if (lobby == null)
-            {
-                LogNotFoundLobbyByIdentity(nameof(SendLobbyRoomMessage), lobbyServerIdentity);
-
-                return; // todo
-            }
-
-            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.RoomMessage);
-
-            packet.Write(dataBuffer);
-
-            lobby.Network.Send(packet);
-        }
 
         private ConcurrentDictionary<string, LobbyServerNetworkClient> connectedServers = new ConcurrentDictionary<string, LobbyServerNetworkClient>();
 

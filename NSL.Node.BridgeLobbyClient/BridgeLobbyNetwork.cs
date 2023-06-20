@@ -3,6 +3,8 @@ using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.Node.BridgeLobbyClient.Models;
 using NSL.Node.BridgeServer.Shared;
 using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.Node.BridgeServer.Shared.Requests;
+using NSL.Node.BridgeServer.Shared.Response;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.WebSockets.Client;
 using System;
@@ -31,6 +33,15 @@ namespace NSL.Node.BridgeLobbyClient
             WsUrl = wsUrl;
             ServerIdentity = serverIdentity;
             IdentityKey = identityKey;
+
+            OnStateChanged += state =>
+            {
+                if (HasSuccessConnections)
+                    return;
+
+                if (state)
+                    HasSuccessConnections = state;
+            };
 
             if (onHandleConfiguration != null)
                 onHandleConfiguration(HandleConfiguration);
@@ -131,9 +142,12 @@ namespace NSL.Node.BridgeLobbyClient
 
             var output = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.SignServerRequest);
 
-            output.WriteString16(ServerIdentity);
-
-            output.WriteString16(IdentityKey);
+            new LobbySignInRequestModel()
+            {
+                Identity = ServerIdentity,
+                IdentityKey = IdentityKey,
+                IsRecovery = HasSuccessConnections
+            }.WriteFullTo(output);
 
             bool signResult = false;
 
@@ -150,39 +164,53 @@ namespace NSL.Node.BridgeLobbyClient
 
             return signResult;
         }
-        public async Task<(bool isSuccess, RoomServerPointInfo[] endPoints)> CreateRoom(Guid roomId, NodeRoomStartupInfo startupInfo)
+
+        public async Task<CreateRoomSessionResponseModel> CreateRoom(LobbyCreateRoomSessionRequestModel roomInfo)
         {
             var client = network.Data;
 
             var output = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest);
 
-            output.WriteGuid(roomId);
+            roomInfo.WriteFullTo(output);
 
-            output.WriteCollection(startupInfo.GetCollection(), i =>
-            {
-                output.WriteString16(i.Key);
-                output.WriteString32(i.Value);
-            });
-
-            (bool result, RoomServerPointInfo[] endPoints) result = (false, null);
+            CreateRoomSessionResponseModel response = default;
 
             await client.PacketWaitBuffer.SendRequestAsync(output, data =>
             {
-                var isSuccess = data.ReadBool();
-
-                if (isSuccess)
-                    result = (
-                    isSuccess,
-                    data.ReadCollection(() => new RoomServerPointInfo()
-                    {
-                        Endpoint = data.ReadString16(),
-                        RoomId = data.ReadGuid()
-                    }).ToArray());
+                response = CreateRoomSessionResponseModel.ReadFullFrom(data);
 
                 return Task.CompletedTask;
             });
 
-            return result;
+            return response;
+        }
+
+        public async Task AddPlayer(LobbyRoomPlayerAddRequestModel playerInfo)
+        {
+            var client = network.Data;
+
+            var output = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.AddPlayerRequest);
+
+            playerInfo.WriteFullTo(output);
+
+            await client.PacketWaitBuffer.SendRequestAsync(output, data =>
+            {
+                return Task.CompletedTask;
+            });
+        }
+
+        public async Task RemovePlayer(LobbyRoomPlayerRemoveRequestModel playerInfo)
+        {
+            var client = network.Data;
+
+            var output = RequestPacketBuffer.Create(NodeBridgeLobbyPacketEnum.RemovePlayerRequest);
+
+            playerInfo.WriteFullTo(output);
+
+            await client.PacketWaitBuffer.SendRequestAsync(output, data =>
+            {
+                return Task.CompletedTask;
+            });
         }
 
         public event Action<bool> OnStateChanged = (state) => { };
@@ -190,6 +218,8 @@ namespace NSL.Node.BridgeLobbyClient
         public bool State => network?.GetState() == true && signResult;
 
         public bool IdentityFailed { get; private set; }
+
+        private bool HasSuccessConnections { get; set; }
 
         internal BridgeLobbyNetworkHandlesConfigurationModel HandleConfiguration { get; set; } = new BridgeLobbyNetworkHandlesConfigurationModel();
     }

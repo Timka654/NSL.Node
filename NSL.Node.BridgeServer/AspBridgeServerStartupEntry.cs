@@ -34,7 +34,6 @@ namespace NSL.Node.BridgeServer
 
             base.CreateAspLobbyServerNetwork(builder, lobbyPattern);
             base.CreateAspRoomServerNetwork(builder, roomPattern);
-            base.CreateAspClientServerNetwork(builder, clientPattern);
         }
 
         public static AspBridgeServerStartupEntry Create(IEndpointRouteBuilder builder, string lobbyPattern, string roomPattern, string clientPattern) 

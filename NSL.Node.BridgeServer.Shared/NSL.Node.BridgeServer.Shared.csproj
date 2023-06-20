@@ -28,12 +28,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator" Version="2023.6.18.1521">
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator" Version="2023.6.21.236">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2023.6.18.1521" />
-		<PackageReference Include="NSL.SocketCore" Version="2023.6.18.1521" />
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2023.6.21.236" />
+		<PackageReference Include="NSL.SocketCore" Version="2023.6.21.236" />
 	</ItemGroup>
 
 </Project>

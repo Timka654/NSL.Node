@@ -7,19 +7,15 @@ using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 
 namespace NSL.Node.BridgeServer.LS.Packets
 {
-    internal class SignSessionRequestPacket
+    internal class RemovePlayerRequestPacket
     {
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
             var packet = data.CreateResponse();
 
-            var request = LobbySignInRequestModel.ReadFullFrom(data);
+            var request = LobbyRoomPlayerRemoveRequestModel.ReadFullFrom(data);
 
-            client.Identity = request.Identity;
-
-            bool result = client.Entry.LobbyManager.TryLobbyServerConnect(client, request);
-
-            packet.WriteBool(result);
+            client.RemovePlayerId(request.RoomId, request.PlayerId);
 
             client.Network.Send(packet);
         }
