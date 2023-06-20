@@ -1,10 +1,12 @@
-﻿using System;
+﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace NSL.Node.BridgeServer.Shared
 {
-    public class RoomServerPointInfo
+    [BinaryIOType, BinaryIOMethodsFor]
+    public partial class RoomServerPointInfo
     {
         public string Endpoint { get; set; }
 

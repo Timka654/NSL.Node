@@ -25,6 +25,10 @@ namespace NSL.Node.BridgeServer.Shared
         }
 
         public NodeRoomStartupInfo(IEnumerable<KeyValuePair<string, string>> collection)
+             : this(collection.ToDictionary(x => x.Key, x => x.Value))
+        { }
+
+        public NodeRoomStartupInfo(Dictionary<string, string> collection)
         {
             this.collection = collection.ToDictionary(x => x.Key, x => x.Value);
         }

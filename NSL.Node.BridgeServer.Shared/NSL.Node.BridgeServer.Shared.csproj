@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
@@ -26,5 +26,14 @@
 		<AssemblyName>Unity.$(MSBuildProjectName)</AssemblyName>
 		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator" Version="2023.6.18.1521">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2023.6.18.1521" />
+		<PackageReference Include="NSL.SocketCore" Version="2023.6.18.1521" />
+	</ItemGroup>
 
 </Project>
