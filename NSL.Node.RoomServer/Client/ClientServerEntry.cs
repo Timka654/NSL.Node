@@ -112,8 +112,8 @@ namespace NSL.Node.RoomServer.Client
             builder.AddPacketHandle(
                 RoomPacketEnum.Execute, ExecutePacketHandle);
 
-            builder.AddDefaultEventHandlers<TBuilder, TransportNetworkClient>(null, 
-                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~ DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
+            builder.AddDefaultEventHandlers<TBuilder, TransportNetworkClient>(null,
+                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
             builder.AddBaseSendHandle((client, pid, len, stack) =>
             {
@@ -127,11 +127,18 @@ namespace NSL.Node.RoomServer.Client
                     Logger.AppendInfo($"Receive packet {pid}");
             });
 
+            builder.AddDisconnectHandle(client =>
+            {
+
+                if (client.Room != null)
+                    client.Room.OnClientDisconnected(client);
+            });
+
             return builder;
         }
 
         private readonly BridgeRoomNetwork bridgeNetwork;
 
-        private ConcurrentDictionary<(string lobbyServerIdentity, Guid roomId), Lazy<RoomInfo>> roomMap = new();
+        private ConcurrentDictionary<Guid, Lazy<RoomInfo>> roomMap = new();
     }
 }

@@ -31,10 +31,8 @@ namespace NSL.Node.RoomServer.Client.Data
         private SGameInfo Game;
 
         public RoomServerStartupEntry Entry { get; }
-
+        public Guid SessionId { get; }
         public Guid RoomId { get; }
-
-        public string LobbyServerIdentity { get; }
 
         public int ConnectedNodesCount => nodes.Count;
 
@@ -60,11 +58,11 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action OnRoomDisposed = () => { };
 
-        public RoomInfo(RoomServerStartupEntry entry, Guid roomId, string lobbyServerIdentity)
+        public RoomInfo(RoomServerStartupEntry entry, Guid sessionId, Guid roomId)
         {
             Entry = entry;
+            SessionId = sessionId;
             RoomId = roomId;
-            LobbyServerIdentity = lobbyServerIdentity;
             Game = new SGameInfo(this);
         }
 
@@ -90,6 +88,15 @@ namespace NSL.Node.RoomServer.Client.Data
             }
 
             return false;
+        }
+
+        public void OnClientDisconnected(TransportNetworkClient node)
+        {
+            if (nodes.TryRemove(node.Id, out _))
+            {
+                if (StartupInfo.GetDestroyOnEmpty())
+                    Dispose();
+            }
         }
 
         internal void SetStartupInfo(NodeRoomStartupInfo startupInfo)
@@ -121,7 +128,13 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var packet = OutputPacketBuffer.Create(RoomPacketEnum.StartupInfoMessage);
 
-            packet.WriteCollection(StartupInfo.GetCollection(), item => { packet.WriteString16(item.Key); packet.WriteString16(item.Value); });
+            Dictionary<string, string> startupInfo = new()
+            {
+                { "waitAll", this.RoomWaitAllReady.ToString() },
+                { "nodeWaitCount", this.RoomNodeCount.ToString() }
+            };
+
+            packet.WriteCollection(startupInfo, item => { packet.WriteString(item.Key); packet.WriteString(item.Value); });
 
             return packet;
         }
@@ -210,8 +223,8 @@ namespace NSL.Node.RoomServer.Client.Data
             buffer.WriteCollection(Nodes, b =>
             {
                 buffer.WriteGuid(b.NodeId);
-                buffer.WriteString16(b.Token);
-                buffer.WriteString16(b.EndPoint);
+                buffer.WriteString(b.Token);
+                buffer.WriteString(b.EndPoint);
             });
 
             Broadcast(buffer);
@@ -442,12 +455,12 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void SendLobbyFinishRoom(byte[] data = null)
         {
-            Entry.BridgeClient.FinishRoom(this, data);
+            Entry.FinishRoomHandle(this, data);
         }
 
         public void SendLobbyRoomMessage(byte[] data)
         {
-            Entry.BridgeClient.RoomMessage(this, data);
+            Entry.RoomMessageHandle(this, data);
         }
     }
 }

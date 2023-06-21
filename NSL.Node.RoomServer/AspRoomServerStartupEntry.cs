@@ -45,7 +45,7 @@ namespace NSL.Node.RoomServer
             if (string.IsNullOrEmpty(endPoint))
             {
                 if (!StunAutoDetect)
-                    throw new Exception($"must be set transport.client_public_endpoint or client_stun_detect(true value) for start");
+                    throw new Exception($"must be set client_public_endpoint or client_stun_detect(true value) for start");
 
                 endPoint = BuildClientPublicPoint(GetStunAddress(defaultStunServers));
             }

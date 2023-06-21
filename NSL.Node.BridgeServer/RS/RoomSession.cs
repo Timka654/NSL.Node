@@ -97,5 +97,20 @@ namespace NSL.Node.BridgeServer.RS
         {
             OnDestroy(this);
         }
+
+        internal bool ValidatePlayer(Guid playerId)
+        {
+            if (PlayerIds == default)
+                return true;
+
+
+            playerIdsLocker.WaitOne();
+
+            bool result = PlayerIds.Contains(playerId);
+             
+            playerIdsLocker.Set();
+
+            return result;
+        }
     }
 }

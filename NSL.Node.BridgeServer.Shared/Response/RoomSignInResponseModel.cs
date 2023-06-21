@@ -6,12 +6,10 @@ using System.Text;
 namespace NSL.Node.BridgeServer.Shared.Response
 {
     [BinaryIOType, BinaryIOMethodsFor]
-    public partial class RoomSignSessionResponseModel
+    public partial class RoomSignInResponseModel
     {
         public bool Result { get; set; }
 
-        public Guid? RoomId { get; set; }
-
-        public Dictionary<string, string> Options { get; set; }
+        public Guid ServerIdentity { get; set; }
     }
 }

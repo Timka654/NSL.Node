@@ -15,72 +15,77 @@ namespace NSL.Node.RoomServer.Client
         {
             var response = OutputPacketBuffer.Create(RoomPacketEnum.SignSessionResult);
 
-            client.Token = buffer.ReadString16();
+            var sessionId = buffer.ReadGuid();
 
-            client.Id = buffer.ReadGuid();
+            var roomId = buffer.ReadGuid();
 
-            client.EndPoint = buffer.ReadString16();
+            var token = buffer.ReadString();
 
-            var result = await bridgeNetwork.TryAuthorize(client);
+            client.EndPoint = buffer.ReadString();
 
-            response.WriteBool(result);
+            bool success = false;
 
-            if (result)
+            if (!roomMap.TryGetValue(sessionId, out var roomInfo))
             {
-                client.NodeId = Guid.Parse(client.Token.Split(':').First());
+                var result = await Entry.ValidateSession(new BridgeServer.Shared.Requests.RoomSignSessionRequestModel()
+                {
+                    SessionIdentity = sessionId,
+                    RoomIdentity = roomId
+                });
 
+                if (result.Result == true)
+                {
+                    roomInfo = roomMap.GetOrAdd(sessionId, id => new Lazy<RoomInfo>(() =>
+                    {
+                        var room = new RoomInfo(Entry, sessionId, roomId);
+
+                        room.OnRoomDisposed += () =>
+                        {
+                            roomMap.TryRemove(id, out _);
+                        };
+
+                        room.SetStartupInfo(new NodeRoomStartupInfo(result.Options));
+
+                        return room;
+                    }));
+                }
+            }
+
+            if (roomInfo != null)
+            {
+                if (Guid.TryParse(token.Split(':').First(), out var nodeId))
+                {
+                    var validatePlayer = await Entry.ValidateSessionPlayer(new BridgeServer.Shared.Requests.RoomSignSessionPlayerRequestModel()
+                    {
+                        SessionId = sessionId,
+                        PlayerId = nodeId
+                    });
+
+                    if (!validatePlayer.ExistsSession)
+                    {
+                        if (roomMap.TryRemove(sessionId, out var expiredSession))
+                        {
+                            expiredSession.Value.Dispose();
+                        }
+                    }
+
+                    if (validatePlayer.ExistsPlayer)
+                    {
+                        client.Room = roomInfo.Value;
+                        client.Id = client.NodeId = nodeId;
+                        client.Token = token;
+
+                        success = client.Room.AddClient(client);;
+                    }
+                }
+            }
+
+            response.WriteBool(success);
+
+            if (success)
                 response.WriteGuid(client.NodeId);
 
-                client.Room = roomMap.GetOrAdd((client.LobbyServerIdentity, client.RoomId), id => new Lazy<RoomInfo>(()=>
-                {
-                    var room = new RoomInfo(Entry,id.roomId, id.lobbyServerIdentity);
-
-                    room.OnRoomDisposed += () =>
-                    {
-                        roomMap.TryRemove(id, out _);
-                    };
-
-                    return room;
-                })).Value;
-
-                client.Room.AddClient(client);
-
-                LoadRoomStartupInfo(client.Room);
-            }
-            else
-            {
-                client.Token = default;
-                client.Id = default;
-            }
-
             client.Network.Send(response);
-        }
-
-        private AutoResetEvent loadStartupInfoLocker = new AutoResetEvent(true);
-
-        private async void LoadRoomStartupInfo(RoomInfo room)
-        {
-            loadStartupInfoLocker.WaitOne();
-
-            try
-            {
-                if (room.StartupInfo != null)
-                {
-                    loadStartupInfoLocker.Set();
-                    return;
-                }
-
-                var startupInfoTask = await bridgeNetwork.GetRoomStartupInfo(room);
-
-                if (startupInfoTask.Item1)
-                    room.SetStartupInfo(startupInfoTask.Item2);
-                else
-                    Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"Cannot receive startupInfo for {room.LobbyServerIdentity} - {room.RoomId}");
-            }
-            finally
-            {
-                loadStartupInfoLocker.Set();
-            }
         }
     }
 }

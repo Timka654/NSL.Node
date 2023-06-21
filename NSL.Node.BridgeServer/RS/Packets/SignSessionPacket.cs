@@ -25,6 +25,8 @@ namespace NSL.Node.BridgeServer.RS.Packets
             if (result.Result)
             {
                 session.Active = true;
+
+                result.Options = session.StartupInfo.GetDictionary()
             }
 
             result.WriteFullTo(packet);

@@ -6,6 +6,7 @@
         SignServerRequest,
         SignSessionRequest,
         FinishRoomMessage,
-        RoomMessage
+        RoomMessage,
+        SignSessionPlayerRequest
     }
 }

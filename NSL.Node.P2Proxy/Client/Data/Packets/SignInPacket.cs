@@ -16,7 +16,7 @@ namespace NSL.Node.P2Proxy.Client
 
             client.Id = buffer.ReadGuid();
 
-            var room = this.roomMap.GetOrAdd(buffer.ReadString16(), key => new Lazy<ProxyRoomInfo>(() => new ProxyRoomInfo(key)));
+            var room = this.roomMap.GetOrAdd(buffer.ReadString(), key => new Lazy<ProxyRoomInfo>(() => new ProxyRoomInfo(key)));
 
             var searchId = buffer.ReadNullable(() => buffer.ReadGuid());
 

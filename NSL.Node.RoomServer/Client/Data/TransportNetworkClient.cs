@@ -16,9 +16,9 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public Guid Id { get; set; }
 
-        public string LobbyServerIdentity { get; set; }
-
         public Guid RoomId { get; set; }
+
+        public Guid NodeId { get; set; }
 
         public string EndPoint { get; set; }
 
@@ -27,8 +27,6 @@ namespace NSL.Node.RoomServer.Client.Data
         public RoomInfo Room { get; set; }
 
         public NodeInfo Node { get; set; }
-
-        public Guid NodeId { get; set; }
 
         public bool IsLocalNode => false;
 

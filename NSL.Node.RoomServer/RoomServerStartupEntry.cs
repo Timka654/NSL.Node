@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using NSL.Logger;
 using NSL.Logger.Interface;
+using NSL.Node.BridgeServer.Shared.Requests;
+using NSL.Node.BridgeServer.Shared.Response;
 using NSL.Node.RoomServer.Bridge;
 using NSL.Node.RoomServer.Client;
 using NSL.Node.RoomServer.Client.Data;
@@ -67,7 +69,7 @@ namespace NSL.Node.RoomServer
 
         public abstract void Run();
 
-        protected RoomConfigurationManager CreateDefaultConfigurationManager()
+        protected virtual RoomConfigurationManager CreateDefaultConfigurationManager()
             => new RoomConfigurationManager(Logger);
 
         protected ILogger CreateConsoleLogger()
@@ -88,6 +90,15 @@ namespace NSL.Node.RoomServer
             => RoomServer = ClientServerEntry
                 .Create(this, bridgeClient)
                 .RunAsp(builder, pattern, requestHandle, actionConvertionBuilder);
+
+
+        public virtual Task<RoomSignSessionResponseModel> ValidateSession(RoomSignSessionRequestModel request) => BridgeClient.TrySignSession(request);
+
+        public virtual Task<RoomSignSessionPlayerResponseModel> ValidateSessionPlayer(RoomSignSessionPlayerRequestModel request) => BridgeClient.TrySignSessionPlayer(request);
+
+        public virtual void FinishRoomHandle(RoomInfo room, byte[] data) => BridgeClient.FinishRoom(room,data);
+
+        public virtual void RoomMessageHandle(RoomInfo room, byte[] data) => BridgeClient.RoomMessage(room,data);
 
         public static DefaultRoomServerStartupEntry CreateDefault()
             => new DefaultRoomServerStartupEntry();

@@ -11,6 +11,8 @@ using NSL.Node.BridgeServer.Shared;
 using System.Collections.Generic;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.Node.BridgeServer.Shared.Requests;
+using NSL.Node.BridgeServer.Shared.Response;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -72,7 +74,7 @@ namespace NSL.Node.RoomServer.Bridge
 
                         client.PingPongEnabled = true;
 
-                        if (!await TrySign())
+                        if (!(await TrySign()).Result)
                         {
                             network.ConnectionOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Invalid identity data");
                             client.Network.Disconnect();
@@ -129,7 +131,7 @@ namespace NSL.Node.RoomServer.Bridge
         private async Task<bool> TryConnect(int timeout = 9000)
         {
             Logger?.AppendInfo($"Try connect to Bridge({BridgeAddress})");
-         
+
             if (!await network.ConnectAsync(timeout))
             {
                 network.ConnectionOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Cannot connect");
@@ -140,90 +142,82 @@ namespace NSL.Node.RoomServer.Bridge
             return true;
         }
 
-        private async Task<bool> TrySign()
+        private async Task<RoomSignInResponseModel> TrySign()
         {
             var client = network.Data;
 
             var output = RequestPacketBuffer.Create(NodeBridgeRoomPacketEnum.SignServerRequest);
 
-            output.WriteGuid(ServerIdentity);
-
-            output.WriteString16(transportEndPoint);
-
-            output.WriteString16(IdentityKey);
+            new RoomSignInRequestModel()
+            {
+                Identity = ServerIdentity,
+                ConnectionEndPoint = transportEndPoint,
+                IdentityKey = IdentityKey
+            }.WriteFullTo(output);
 
             _signResult = false;
 
+            RoomSignInResponseModel response = default;
+
             await client.PacketWaitBuffer.SendRequestAsync(output, data =>
             {
-                _signResult = data.ReadBool();
-
-                IdentityFailed = !_signResult;
-
-                if (_signResult)
-                    ServerIdentity = data.ReadGuid();
-
-                OnStateChanged(State);
+                response = RoomSignInResponseModel.ReadFullFrom(data);
 
                 return Task.CompletedTask;
             });
 
-            return signResult;
+            response ??= new RoomSignInResponseModel();
+
+            _signResult = response.Result;
+
+            IdentityFailed = !_signResult;
+
+            if (_signResult)
+                ServerIdentity = response.ServerIdentity;
+
+            OnStateChanged(State);
+
+            return response;
         }
 
-        internal async Task<bool> TryAuthorize(TransportNetworkClient client)
+        internal async Task<RoomSignSessionResponseModel> TrySignSession(RoomSignSessionRequestModel data)
         {
             var bridgeClient = network.Data;
-
-            bool signResult = false;
 
             var output = RequestPacketBuffer.Create(NodeBridgeRoomPacketEnum.SignSessionRequest);
 
-            output.WriteString16(client.Token);
+            data.WriteFullTo(output);
 
-            output.WriteGuid(client.Id);
+            RoomSignSessionResponseModel result = default;
 
             await bridgeClient.PacketWaitBuffer.SendRequestAsync(output, data =>
             {
-                signResult = data.ReadBool();
+                result = RoomSignSessionResponseModel.ReadFullFrom(data);
 
-                if (signResult)
-                {
-                    client.LobbyServerIdentity = data.ReadString16();
-                    client.RoomId = data.ReadGuid();
-                }
                 return Task.CompletedTask;
             });
 
-            return signResult;
+            return result ?? new RoomSignSessionResponseModel() { Result = false };
         }
 
-        internal async Task<(bool, NodeRoomStartupInfo)> GetRoomStartupInfo(RoomInfo room)
+        internal async Task<RoomSignSessionPlayerResponseModel> TrySignSessionPlayer(RoomSignSessionPlayerRequestModel data)
         {
             var bridgeClient = network.Data;
 
-            bool signResult = false;
+            var output = RequestPacketBuffer.Create(NodeBridgeRoomPacketEnum.SignSessionPlayerRequest);
 
-            NodeRoomStartupInfo startupInfo = default;
+            data.WriteFullTo(output);
 
-            var output = RequestPacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomStartupInfoRequest);
-
-            output.WriteString16(room.LobbyServerIdentity);
-
-            output.WriteGuid(room.RoomId);
+            RoomSignSessionPlayerResponseModel result = default;
 
             await bridgeClient.PacketWaitBuffer.SendRequestAsync(output, data =>
             {
-                signResult = data.ReadBool();
+                result = RoomSignSessionPlayerResponseModel.ReadFullFrom(data);
 
-                if (signResult)
-                {
-                    startupInfo = new NodeRoomStartupInfo(data.ReadCollection(p => new KeyValuePair<string, string>(p.ReadString16(), p.ReadString16())));
-                }
                 return Task.CompletedTask;
             });
 
-            return (signResult, startupInfo);
+            return result ?? new RoomSignSessionPlayerResponseModel();
         }
 
         internal void FinishRoom(RoomInfo room, byte[] data)
@@ -232,9 +226,7 @@ namespace NSL.Node.RoomServer.Bridge
 
             var output = OutputPacketBuffer.Create(NodeBridgeRoomPacketEnum.FinishRoomMessage);
 
-            output.WriteString16(room.LobbyServerIdentity);
-
-            output.WriteGuid(room.RoomId);
+            output.WriteGuid(room.SessionId);
 
             if (data != null)
                 output.Write(data);
@@ -249,9 +241,7 @@ namespace NSL.Node.RoomServer.Bridge
 
             var output = OutputPacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomMessage);
 
-            output.WriteString16(room.LobbyServerIdentity);
-
-            output.WriteGuid(room.RoomId);
+            output.WriteGuid(room.SessionId);
 
             if (data != null)
                 output.Write(data);

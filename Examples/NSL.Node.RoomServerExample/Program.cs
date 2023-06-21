@@ -24,7 +24,7 @@ namespace NSL.Node.BridgeTransportExample
 
     public class ExampleRoomServerStartupEntry: DefaultRoomServerStartupEntry
     {
-        public override Task<string> GetProxyRoomId(RoomInfo roomInfo) => Task.FromResult($"{roomInfo.LobbyServerIdentity}_{roomInfo.LobbyServerIdentity}");
+        public override Task<string> GetProxyRoomId(RoomInfo roomInfo) => Task.FromResult($"{roomInfo.SessionId}");
 
         public override Task<IEnumerable<string>> GetProxyEndPoints() => Task.FromResult(Enumerable.Repeat("udp://localhost:5980", 1));
 
