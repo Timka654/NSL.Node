@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.P2Proxy", "NSL.Nod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.P2ProxyExample", "Examples\NSL.Node.P2ProxyExample\NSL.Node.P2ProxyExample.csproj", "{E88F039B-4D19-404D-9BA1-D28D01379A8B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared.Client", "..\..\..\Assets\Game\Networking\Node\NSL.Node.RoomServer.Shared.Client.csproj", "{710E020C-5A7C-47D8-8F4E-DC9B71025372}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared.Client", "..\..\Assets\Game\Shared\NSL.Node.RoomServer.Shared.Client.csproj", "{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,16 +100,16 @@ Global
 		{E88F039B-4D19-404D-9BA1-D28D01379A8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E88F039B-4D19-404D-9BA1-D28D01379A8B}.ReleaseRoomServer|Any CPU.ActiveCfg = ReleaseRoomServer|Any CPU
 		{E88F039B-4D19-404D-9BA1-D28D01379A8B}.ReleaseRoomServer|Any CPU.Build.0 = ReleaseRoomServer|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.DebugExamples|Any CPU.ActiveCfg = DebugExamples|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.DebugExamples|Any CPU.Build.0 = DebugExamples|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.DebugRoomServer|Any CPU.ActiveCfg = DebugRoomServer|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.DebugRoomServer|Any CPU.Build.0 = DebugRoomServer|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.Release|Any CPU.Build.0 = Release|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.ReleaseRoomServer|Any CPU.ActiveCfg = ReleaseRoomServer|Any CPU
-		{710E020C-5A7C-47D8-8F4E-DC9B71025372}.ReleaseRoomServer|Any CPU.Build.0 = ReleaseRoomServer|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugExamples|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugExamples|Any CPU.Build.0 = Debug|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugRoomServer|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugRoomServer|Any CPU.Build.0 = Debug|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.ReleaseRoomServer|Any CPU.ActiveCfg = Release|Any CPU
+		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.ReleaseRoomServer|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
