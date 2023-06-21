@@ -16,7 +16,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
             var request
                 = RoomSignSessionPlayerRequestModel.ReadFullFrom(data);
 
-            var result = new RoomSignSessionPlayerResponseModel;
+            var result = new RoomSignSessionPlayerResponseModel();
 
             var session = client.GetSession(request.SessionId);
 
