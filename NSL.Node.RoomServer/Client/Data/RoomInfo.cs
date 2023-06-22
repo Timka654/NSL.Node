@@ -100,7 +100,6 @@ namespace NSL.Node.RoomServer.Client.Data
 
                 if (StartupInfo.GetDestroyOnEmpty())
                     Dispose();
-
             }
         }
 
