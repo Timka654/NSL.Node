@@ -54,6 +54,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action<NodeInfo> OnNodeConnect = node => { };
 
+        public event Action<NodeInfo> OnNodeDisconnect = node => { };
+
         public event Action OnRoomReady = () => { };
 
         public event Action OnRoomDisposed = () => { };
@@ -94,8 +96,11 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (nodes.TryRemove(node.Id, out _))
             {
+                OnNodeDisconnect(node.Node);
+
                 if (StartupInfo.GetDestroyOnEmpty())
                     Dispose();
+
             }
         }
 
