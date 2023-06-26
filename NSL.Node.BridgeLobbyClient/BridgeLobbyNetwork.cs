@@ -57,10 +57,6 @@ namespace NSL.Node.BridgeLobbyClient
                          c => c.PacketWaitBuffer);
 
                      builder.AddPacketHandle(
-                         NodeBridgeLobbyPacketEnum.ValidateSessionRequest,
-                         Packets.ValidateSessionRequestPacket.Handle);
-
-                     builder.AddPacketHandle(
                          NodeBridgeLobbyPacketEnum.FinishRoomMessage,
                          Packets.FinishRoomMessagePacket.Handle);
 

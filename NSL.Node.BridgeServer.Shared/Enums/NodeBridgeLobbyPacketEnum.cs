@@ -4,7 +4,6 @@
     {
         Response = 1,
         SignServerRequest,
-        ValidateSessionRequest,
         CreateRoomSessionRequest,
         AddPlayerRequest,
         RemovePlayerRequest,
