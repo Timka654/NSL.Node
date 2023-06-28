@@ -466,5 +466,9 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             Entry.RoomMessageHandle(this, data);
         }
+
+        public TValue GetOption<TValue>(string key)
+            where TValue : IConvertible
+            => StartupInfo.GetValue<TValue>(key);
     }
 }
