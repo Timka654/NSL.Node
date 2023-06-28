@@ -65,7 +65,6 @@ namespace NSL.Node.RoomServer.Client.Data
             Entry = entry;
             SessionId = sessionId;
             RoomId = roomId;
-            Game = new SGameInfo(this);
         }
 
         public bool AddClient(TransportNetworkClient node)
@@ -117,6 +116,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
             if (ShutdownOnMissedReady)
                 RunDestroyOnMissedTimer();
+
+            Game = new SGameInfo(this);
 
             BroadcastStartupInfo();
 
