@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public class RoomInfo : IRoomInfo, IDisposable
+    public class RoomInfo : IServerRoomInfo, IDisposable
     {
         private AutoResetEvent ar = new AutoResetEvent(false);
 

@@ -33,8 +33,4 @@
 		<PackageReference Include="NSL.SocketCore" Version="2023.6.26.1649" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Assets\Game\Shared\NSL.Node.RoomServer.Shared.Client.csproj" />
-	</ItemGroup>
-
 </Project>

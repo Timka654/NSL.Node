@@ -7,7 +7,7 @@ namespace NSL.Node.RoomServer.Shared
 {
     public class SGameInfo : GameInfo
     {
-        public SGameInfo(IRoomInfo roomInfo) : base(roomInfo)
+        public SGameInfo(IServerRoomInfo roomInfo) : base(roomInfo)
         {
         }
     }
