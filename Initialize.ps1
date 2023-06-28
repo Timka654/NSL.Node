@@ -10,3 +10,6 @@ Copy-Item -Path "NSL.Node.RoomServer.sln.example" -Destination "$basePath\NSL.No
 
 Copy-Item -Path "$basePath\NSL.Node.AspRoomServerExample\NSL.Node.AspRoomServerExample.csproj.example" -Destination "$basePath\NSL.Node.AspRoomServerExample\NSL.Node.AspRoomServerExample.csproj" -Force
 Copy-Item -Path "$basePath\NSL.Node.LocalRoomServerExample\NSL.Node.LocalRoomServerExample.csproj.example" -Destination "$basePath\NSL.Node.LocalRoomServerExample\NSL.Node.LocalRoomServerExample.csproj" -Force
+
+Remove-Item "$basePath\NSL.Node.AspRoomServerExample\NSL.Node.AspRoomServerExample.csproj.example"
+Remove-Item "$basePath\NSL.Node.LocalRoomServerExample\NSL.Node.LocalRoomServerExample.csproj.example"
