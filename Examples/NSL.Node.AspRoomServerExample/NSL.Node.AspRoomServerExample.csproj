@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\NSL.Node.RoomServer.AspNetCore\NSL.Node.RoomServer.AspNetCore.csproj" />
     <ProjectReference Include="..\..\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
   </ItemGroup>
 

@@ -12,7 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NSL.Node.BridgeServer\NSL.Node.BridgeServer.csproj" />
+    <ProjectReference Include="..\..\NSL.Node.BridgeLobbyClient.AspNetCore\NSL.Node.BridgeLobbyClient.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\NSL.Node.BridgeServer.AspNetCore\NSL.Node.BridgeServer.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

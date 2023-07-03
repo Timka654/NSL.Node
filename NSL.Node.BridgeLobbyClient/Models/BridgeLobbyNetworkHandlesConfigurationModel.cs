@@ -1,5 +1,4 @@
-﻿using NSL.Node.BridgeServer.Shared;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeLobbyClient.Models

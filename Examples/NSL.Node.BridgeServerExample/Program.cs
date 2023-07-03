@@ -1,6 +1,4 @@
-﻿using NSL.Node.BridgeServer;
-
-namespace NSL.Node.BridgeServerExample
+﻿namespace NSL.Node.BridgeServerExample
 {
     internal class Program
     {

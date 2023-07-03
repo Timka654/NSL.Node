@@ -17,7 +17,7 @@ namespace NSL.Node.BridgeServer.LS
 
         public ConcurrentDictionary<Guid, List<RoomSession>> Rooms { get; private set; } = new ConcurrentDictionary<Guid, List<RoomSession>>();
 
-        public BridgeServerStartupEntry Entry { get; internal set; }
+        public NodeBridgeServerEntry Entry { get; internal set; }
 
         public LobbyServerNetworkClient() : base()
         {

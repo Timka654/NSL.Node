@@ -9,17 +9,11 @@ using System.Linq;
 
 namespace NSL.Node.BridgeServer.Managers
 {
-    internal class RoomManager
+    public class RoomManager
     {
-        private readonly BridgeServerStartupEntry entry;
-
-        private BridgeConfigurationManager Configuration => entry.Configuration;
-
-        public virtual int TransportServerCountPerRoom => Configuration.GetValue("transport_server_count_perRoom", 1);
-
-        public RoomManager(BridgeServerStartupEntry entry)
+        public RoomManager(string identityKey)
         {
-            this.entry = entry;
+            this.identityKey = identityKey;
         }
 
         public void OnDisconnectedRoomServer(RoomServerNetworkClient client)
@@ -28,8 +22,11 @@ namespace NSL.Node.BridgeServer.Managers
                 connectedServers.Remove(client.Id, out _);
         }
 
-        internal bool TryRoomServerConnect(RoomServerNetworkClient client)
+        public bool TryRoomServerConnect(RoomServerNetworkClient client, string identityKey)
         {
+            if (!object.Equals(this.identityKey, identityKey))
+                return false;
+
             if (!Guid.Empty.Equals(client.Id))
             {
                 if (connectedServers.TryGetValue(client.Id, out var server))
@@ -61,7 +58,7 @@ namespace NSL.Node.BridgeServer.Managers
             return true;
         }
 
-        internal CreateRoomSessionResponseModel CreateRoomSession(LobbyServerNetworkClient client, LobbyCreateRoomSessionRequestModel request)
+        public CreateRoomSessionResponseModel CreateRoomSession(LobbyServerNetworkClient client, LobbyCreateRoomSessionRequestModel request)
         {
             var result = new CreateRoomSessionResponseModel();
 
@@ -123,6 +120,7 @@ namespace NSL.Node.BridgeServer.Managers
         }
 
         private ConcurrentDictionary<Guid, RoomServerNetworkClient> connectedServers = new ConcurrentDictionary<Guid, RoomServerNetworkClient>();
+        private readonly string identityKey;
     }
 
     public record CreateSignResult(string endPoint, Guid id);

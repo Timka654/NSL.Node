@@ -1,5 +1,4 @@
-﻿using NSL.Node.RoomServer;
-using NSL.Node.RoomServer.Client.Data;
+﻿using NSL.Node.RoomServer.Client.Data;
 
 namespace NSL.Node.BridgeTransportExample
 {

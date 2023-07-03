@@ -30,7 +30,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private SGameInfo Game;
 
-        public RoomServerStartupEntry Entry { get; }
+        public NodeRoomServerEntry Entry { get; }
         public Guid SessionId { get; }
         public Guid RoomId { get; }
 
@@ -60,7 +60,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action OnRoomDisposed = () => { };
 
-        public RoomInfo(RoomServerStartupEntry entry, Guid sessionId, Guid roomId)
+        public RoomInfo(NodeRoomServerEntry entry, Guid sessionId, Guid roomId)
         {
             Entry = entry;
             SessionId = sessionId;
@@ -460,7 +460,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void SendLobbyFinishRoom(byte[] data = null)
         {
-            Entry.FinishRoomHandle(this, data);
+            Entry.RoomFinishHandle(this, data);
         }
 
         public void SendLobbyRoomMessage(byte[] data)

@@ -4,12 +4,11 @@ using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer.Client
 {
-    public partial class ClientServerEntry
+    public partial class ClientServerBaseEntry
     {
         private async Task SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {

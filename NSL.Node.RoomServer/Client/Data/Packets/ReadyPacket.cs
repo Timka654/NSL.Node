@@ -6,7 +6,7 @@ using System;
 
 namespace NSL.Node.RoomServer.Client
 {
-    public partial class ClientServerEntry
+    public partial class ClientServerBaseEntry
     {
         private void ReadyPacketHandle(TransportNetworkClient client, InputPacketBuffer data)
         {

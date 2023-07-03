@@ -18,7 +18,7 @@ namespace NSL.Node.BridgeServer.RS
 
         private ConcurrentDictionary<Guid, RoomSession> SessionMap { get; } = new ConcurrentDictionary<Guid, RoomSession>();
 
-        public BridgeServerStartupEntry Entry { get; internal set; }
+        public NodeBridgeServerEntry Entry { get; internal set; }
 
         public RoomSession CreateSession(RoomSession session)
         {

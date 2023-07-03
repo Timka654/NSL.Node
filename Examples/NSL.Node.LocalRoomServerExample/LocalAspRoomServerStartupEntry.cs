@@ -1,39 +1,14 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using NSL.Node.BridgeServer.Shared.Requests;
+﻿using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
-using NSL.Node.RoomServer;
-using NSL.Node.RoomServer.Bridge;
-using NSL.Logger.Interface;
-using ILogger = NSL.Logger.Interface.ILogger;
 using NSL.Node.BridgeServer.Shared;
 using NSL.Node.RoomServer.Client.Data;
+using NSL.Node.RoomServer.Data;
 
 namespace NSL.Node.LocalRoomServerExample
 {
-    public class LocalAspRoomServerStartupEntry : AspRoomServerStartupEntry
+    public class LocalAspRoomServerStartupEntry : RoomServerHandleProcessor
     {
-        private readonly IEndpointRouteBuilder builder;
-        private readonly string clientPattern;
-
-        private RoomConfigurationManager configuration;
-        private ILogger logger;
-
-
-        public override RoomConfigurationManager Configuration => configuration;
-
-        public override ILogger Logger => logger;
-
-        public LocalAspRoomServerStartupEntry(IEndpointRouteBuilder builder, string clientPattern) : base(builder, clientPattern)
-        {
-            this.builder = builder;
-            this.clientPattern = clientPattern;
-        }
-
-        protected override BridgeRoomNetwork CreateBridgeClientNetwork()
-        {
-            return null;
-        }
+        private const string LocationId = "";
 
         public override Task<RoomSignSessionResponseModel> ValidateSession(RoomSignSessionRequestModel request)
         {
@@ -43,6 +18,13 @@ namespace NSL.Node.LocalRoomServerExample
             options.SetRoomWaitReady(false);
 
             options.SetDestroyOnEmpty(true);
+
+
+            options.SetValue("LocationId", LocationId);
+            //need only for network lobby sign
+            options.SetValue("LobbyEndPointUrl", string.Empty);
+            options.SetValue("AuthorizeKey", string.Empty);
+
 
             return Task.FromResult(new RoomSignSessionResponseModel() { Result = true, RoomId = request.RoomIdentity, Options = options.GetDictionary() });
         }
@@ -62,12 +44,8 @@ namespace NSL.Node.LocalRoomServerExample
             // ignore on local
         }
 
-        public override void Run()
+        public override void OnBridgeStateChangeHandle(bool state)
         {
-            //base.Run();
-
-            logger = CreateConsoleLogger();
-            base.CreateAspClientServerNetwork(null, builder, clientPattern);
         }
     }
 }

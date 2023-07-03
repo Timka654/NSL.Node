@@ -1,3 +1,5 @@
+using NSL.Node.RoomServer.AspNetCore;
+
 namespace NSL.Node.LocalRoomServerExample
 {
     public class Program
@@ -9,6 +11,7 @@ namespace NSL.Node.LocalRoomServerExample
             // Add services to the container.
             builder.Services.AddAuthorization();
 
+            builder.Services.AddNodeRoomServer();
 
             var app = builder.Build();
 
@@ -20,7 +23,12 @@ namespace NSL.Node.LocalRoomServerExample
 
             app.UseWebSockets();
 
-            new LocalAspRoomServerStartupEntry(app, "/room_server").Run();
+            app.RunNodeRoomServer(c => c
+            .WithAspLogger(app.Logger)
+            .WithHandleProcessor(new LocalAspRoomServerStartupEntry())
+            .GetPublicAddressFromStun(out var publicAddr)
+            .WithClientServerAspBinding(app, "/room_server")
+            );
 
             app.Run();
         }

@@ -28,13 +28,17 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='UnityDebug' and '$(Configuration)'!='Unity'">
-		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.6.23.1129" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.6.23.1129" />
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.7.2.1403" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.7.2.1403" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
 		<PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2023.4.12.1611" />
 		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2023.4.12.1611" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2023.7.2.1403" />
 	</ItemGroup>
 
 	<ItemGroup>

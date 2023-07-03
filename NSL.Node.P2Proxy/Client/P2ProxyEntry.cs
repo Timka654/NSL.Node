@@ -9,7 +9,7 @@ using NSL.EndPointBuilder;
 using NSL.SocketServer.Utils;
 using NSL.UDP;
 using NSL.BuilderExtensions.UDPServer;
-using NSL.Node.RoomServer.Shared.Client.Core.Enums;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.P2Proxy.Client
 {
@@ -75,13 +75,13 @@ namespace NSL.Node.P2Proxy.Client
 
             builder.AddBaseSendHandle((client, pid, len, stack) =>
             {
-                if (pid < ushort.MaxValue - 100)
+                if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Send packet {pid}");
             });
 
             builder.AddBaseReceiveHandle((client, pid, len) =>
             {
-                if (pid < ushort.MaxValue - 100)
+                if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Receive packet {pid}");
             });
 

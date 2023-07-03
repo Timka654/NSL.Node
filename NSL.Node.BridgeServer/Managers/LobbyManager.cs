@@ -1,27 +1,15 @@
-﻿using NSL.Logger.Interface;
-using NSL.Node.BridgeServer.LS;
-using NSL.Node.BridgeServer.RS;
-using NSL.Node.BridgeServer.Shared.Enums;
+﻿using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Shared.Requests;
-using NSL.SocketCore.Extensions.Buffer;
-using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketCore.Utils.Logger.Enums;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeServer.Managers
 {
-    internal class LobbyManager
+    public class LobbyManager
     {
-        private readonly BridgeServerStartupEntry entry;
-
-        private ILogger logger => entry.Logger;
-
-        public LobbyManager(BridgeServerStartupEntry entry)
+        public LobbyManager(string identityKey)
         {
-            this.entry = entry;
+            this.identityKey = identityKey;
         }
 
         public void OnDisconnectedLobbyServer(LobbyServerNetworkClient client)
@@ -32,7 +20,8 @@ namespace NSL.Node.BridgeServer.Managers
 
         public bool TryLobbyServerConnect(LobbyServerNetworkClient client, LobbySignInRequestModel request)
         {
-            //todo: add validation by identityKey
+            if (!object.Equals(request.IdentityKey, identityKey))
+                return false;
 
             if(connectedServers.TryGetValue(client.Identity, out var oldClient))
             {
@@ -62,16 +51,6 @@ namespace NSL.Node.BridgeServer.Managers
 
 
         private ConcurrentDictionary<string, LobbyServerNetworkClient> connectedServers = new ConcurrentDictionary<string, LobbyServerNetworkClient>();
-
-
-        #region helpers
-
-        private void LogNotFoundLobbyByIdentity(string methodName, string identity)
-        {
-            logger.ConsoleLog(LoggerLevel.Error, $"[{methodName}] not found lobby by id {identity}");
-        }
-
-        #endregion
-
+        private readonly string identityKey;
     }
 }
