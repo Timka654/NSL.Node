@@ -1,4 +1,5 @@
 using NSL.Node.RoomServer.AspNetCore;
+using NSL.Node.RoomServer.Shared.Client.Core;
 
 namespace NSL.Node.LocalRoomServerExample
 {
@@ -26,7 +27,7 @@ namespace NSL.Node.LocalRoomServerExample
             app.RunNodeRoomServer(c => c
             .WithAspLogger(app.Logger)
             .WithHandleProcessor(new LocalAspRoomServerStartupEntry())
-            //.WithCreateSessionHandle(roomInfo=> new SGameInfo(roomInfo))
+            //.WithCreateSessionHandle(roomInfo => new GameInfo(roomInfo))
             .GetPublicAddressFromStun(out var publicAddr)
             .WithClientServerAspBinding(app, "/room_server")
             );

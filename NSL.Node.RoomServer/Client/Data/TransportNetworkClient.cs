@@ -68,6 +68,14 @@ namespace NSL.Node.RoomServer.Client.Data
                 packet.Dispose();
         }
 
+        public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            if (Network != null)
+                Network.Send(packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
+        }
+
         public void Send(ushort code, Action<DgramOutputPacketBuffer> build)
         {
             Send(p =>

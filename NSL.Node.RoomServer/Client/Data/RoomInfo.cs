@@ -80,8 +80,7 @@ namespace NSL.Node.RoomServer.Client.Data
                     node.Send(CreateStartupInfoMessage());
                 }
 
-                if (node.Network != null)
-                    broadcastDelegate += node.Network.Send;
+                    broadcastDelegate += node.Send;
 
                 BroadcastChangeNodeList();
 
@@ -95,9 +94,11 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (nodes.TryRemove(node.Id, out _))
             {
+                broadcastDelegate -= node.Send;
+
                 OnNodeDisconnect(node.Node);
 
-                if (StartupInfo.GetDestroyOnEmpty())
+                if (StartupInfo.GetDestroyOnEmpty() && !nodes.Any())
                     Dispose();
             }
         }

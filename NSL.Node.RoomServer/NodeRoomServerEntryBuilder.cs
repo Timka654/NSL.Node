@@ -111,23 +111,23 @@ namespace NSL.Node.RoomServer
         public NodeRoomServerEntryBuilder WithConsoleLogger()
             => WithLogger(new ConsoleLogger());
 
-        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(int port, bool isHttps, out string address)
+        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(int port, bool isHttps, out string address, StunServerInfo[] stunServers = null)
         {
-            GetPublicAddressFromStun(defaultStunServers, out address);
+            GetPublicAddressFromStun(out address, stunServers);
 
             if (address != default)
                 address = $"ws{(isHttps ? "w" : "")}://{address}:{port}/";
 
             return this;
         }
-            public NodeRoomServerEntryBuilder GetPublicAddressFromStun(out string address)
-            => GetPublicAddressFromStun(defaultStunServers, out address);
 
-        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(StunServerInfo[] stunServers, out string address)
+        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(out string address, StunServerInfo[] stunServers = null)
         {
             STUNQueryResult stunResult = default;
 
             STUNClient.ReceiveTimeout = 700;
+
+            stunServers ??= defaultStunServers;
 
             foreach (var item in stunServers)
             {

@@ -1,5 +1,6 @@
 ﻿using NSL.Node.RoomServer;
 using NSL.Node.RoomServer.Bridge;
+using NSL.Node.RoomServer.Client;
 using NSL.Node.RoomServer.Client.Data;
 using NSL.Node.RoomServer.Data;
 
@@ -18,10 +19,16 @@ namespace NSL.Node.BridgeTransportExample
 
             //ExampleRoomServerStartupEntry.CreateDefault().RunEntry();
 
+            int clientPort = 9999;
+
             NodeRoomServerEntryBuilder.Create()
                 .WithConsoleLogger()
                 .WithBridgeDefaultHandles()
-                .WithRoomBridgeNetwork("wss://localhost")
+                //.WithCreateSessionHandle(roomInfo=> new GameInfo(roomInfo))
+                .GetPublicAddressFromStun(clientPort,false, out var connectionPoint)
+                .WithRoomBridgeNetwork("wss://localhost:7023/room_server", connectionPoint, string.Empty)
+                .WithClientServerBinding(clientPort)
+                .Run();
 
 
             Console.WriteLine("Success initialized");
