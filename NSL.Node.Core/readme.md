@@ -1,1 +1,0 @@
-This files must replace with packages after release
