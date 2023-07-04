@@ -54,12 +54,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Reference Include="NSL.Node.Core">
-	    <HintPath>..\NSL.Node.Core\NSL.Node.Core.dll</HintPath>
-	  </Reference>
+		<ProjectReference Include="..\NSL.Node.Core\NSL.Node.Core.csproj" />
 	</ItemGroup>
 
 </Project>
