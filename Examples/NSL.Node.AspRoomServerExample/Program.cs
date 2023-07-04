@@ -31,6 +31,7 @@ namespace NSL.Node.AspRoomServerExample
             app.RunNodeRoomServer(c => c
             .WithAspLogger(app.Logger)
             .WithBridgeDefaultHandles()
+            //.WithCreateSessionHandle(roomInfo=> new SGameInfo(roomInfo))
             .GetPublicAddressFromStun(out var publicAddr)
             .WithRoomBridgeNetwork("wss://localhost:7023/room_server", publicAddr, string.Empty)
             .WithClientServerAspBinding(app, "/room_server")

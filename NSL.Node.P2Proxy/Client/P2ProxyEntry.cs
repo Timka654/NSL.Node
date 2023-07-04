@@ -10,6 +10,7 @@ using NSL.SocketServer.Utils;
 using NSL.UDP;
 using NSL.BuilderExtensions.UDPServer;
 using NSL.SocketCore.Utils.Buffer;
+using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 
 namespace NSL.Node.P2Proxy.Client
 {

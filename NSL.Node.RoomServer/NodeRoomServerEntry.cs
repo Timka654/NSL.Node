@@ -4,6 +4,7 @@ using NSL.Node.BridgeServer.Shared.Response;
 using NSL.Node.RoomServer.Bridge;
 using NSL.Node.RoomServer.Client;
 using NSL.Node.RoomServer.Client.Data;
+using NSL.Node.RoomServer.Shared.Client.Core;
 using System;
 using System.Threading.Tasks;
 
@@ -16,8 +17,10 @@ namespace NSL.Node.RoomServer
         public delegate void RoomFinishHandleDelegate(RoomInfo roomInfo, byte[] data);
         public delegate void RoomMessageHandleDelegate(RoomInfo roomInfo, byte[] data);
 
-        public delegate void OnStateChangeDelegate(bool state);
-        
+        public delegate void StateChangeDelegate(bool state);
+
+        public delegate IRoomSession CreateSessionDelegate(IServerRoomInfo roomInfo);
+
         internal BridgeRoomBaseNetwork BridgeNetworkClient { get; set; }
 
         internal ClientServerBaseEntry ClientServerListener { get; set; }
@@ -32,7 +35,9 @@ namespace NSL.Node.RoomServer
 
         internal RoomMessageHandleDelegate RoomMessageHandle { get; set; } = (room,data) => { };
 
-        internal OnStateChangeDelegate BridgeConnectionStateChangedHandle { get; set; } = (state) => { };
+        internal StateChangeDelegate BridgeConnectionStateChangedHandle { get; set; } = (state) => { };
+
+        internal CreateSessionDelegate CreateRoomSession { get; set; } = (serverInfo) => default;
 
         internal void Run()
         {

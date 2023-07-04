@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeServer.Share
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer", "NSL.Node.RoomServer\NSL.Node.RoomServer.csproj", "{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared", "NSL.Node.RoomServer.Shared\NSL.Node.RoomServer.Shared.csproj", "{392EB482-64F9-48F2-940C-2654724572F5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServerExample", "Examples\NSL.Node.RoomServerExample\NSL.Node.RoomServerExample.csproj", "{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.AspRoomServerExample", "Examples\NSL.Node.AspRoomServerExample\NSL.Node.AspRoomServerExample.csproj", "{3808D6C8-2630-46A2-9C23-2CCF8B4D80AA}"
@@ -19,11 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.P2Proxy", "NSL.Nod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.P2ProxyExample", "Examples\NSL.Node.P2ProxyExample\NSL.Node.P2ProxyExample.csproj", "{E88F039B-4D19-404D-9BA1-D28D01379A8B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared.Client", "..\..\Assets\Game\Shared\NSL.Node.RoomServer.Shared.Client.csproj", "{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.LocalRoomServerExample", "Examples\NSL.Node.LocalRoomServerExample\NSL.Node.LocalRoomServerExample.csproj", "{86D5A22F-2B6C-4D06-8351-9B08DDDE85B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Node.RoomServer.AspNetCore", "NSL.Node.RoomServer.AspNetCore\NSL.Node.RoomServer.AspNetCore.csproj", "{05E1F789-FAF6-4E7D-9208-245080FE51A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.AspNetCore", "NSL.Node.RoomServer.AspNetCore\NSL.Node.RoomServer.AspNetCore.csproj", "{05E1F789-FAF6-4E7D-9208-245080FE51A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,16 +50,6 @@ Global
 		{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}.ReleaseRoomServer|Any CPU.ActiveCfg = ReleaseRoomServer|Any CPU
 		{29DA5AA5-8DE5-4ED3-94DC-D957FDCEB297}.ReleaseRoomServer|Any CPU.Build.0 = ReleaseRoomServer|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.DebugExamples|Any CPU.ActiveCfg = DebugExamples|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.DebugExamples|Any CPU.Build.0 = DebugExamples|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.DebugRoomServer|Any CPU.ActiveCfg = DebugRoomServer|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.DebugRoomServer|Any CPU.Build.0 = DebugRoomServer|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.ReleaseRoomServer|Any CPU.ActiveCfg = ReleaseRoomServer|Any CPU
-		{392EB482-64F9-48F2-940C-2654724572F5}.ReleaseRoomServer|Any CPU.Build.0 = ReleaseRoomServer|Any CPU
 		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1081A6B1-FE4C-472A-AA4B-C6EB4F911374}.DebugExamples|Any CPU.ActiveCfg = DebugExamples|Any CPU
@@ -104,16 +90,6 @@ Global
 		{E88F039B-4D19-404D-9BA1-D28D01379A8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E88F039B-4D19-404D-9BA1-D28D01379A8B}.ReleaseRoomServer|Any CPU.ActiveCfg = ReleaseRoomServer|Any CPU
 		{E88F039B-4D19-404D-9BA1-D28D01379A8B}.ReleaseRoomServer|Any CPU.Build.0 = ReleaseRoomServer|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugExamples|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugExamples|Any CPU.Build.0 = Debug|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugRoomServer|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.DebugRoomServer|Any CPU.Build.0 = Debug|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.ReleaseRoomServer|Any CPU.ActiveCfg = Release|Any CPU
-		{3D7B4802-91E2-4B51-AC70-95523EB9A2C7}.ReleaseRoomServer|Any CPU.Build.0 = Release|Any CPU
 		{86D5A22F-2B6C-4D06-8351-9B08DDDE85B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{86D5A22F-2B6C-4D06-8351-9B08DDDE85B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86D5A22F-2B6C-4D06-8351-9B08DDDE85B4}.DebugExamples|Any CPU.ActiveCfg = Debug|Any CPU

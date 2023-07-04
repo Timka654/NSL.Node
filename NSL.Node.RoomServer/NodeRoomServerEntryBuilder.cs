@@ -8,6 +8,7 @@ using STUN;
 using System;
 using System.Linq;
 using System.Net;
+using System.Runtime.Loader;
 
 namespace NSL.Node.RoomServer
 {
@@ -35,7 +36,14 @@ namespace NSL.Node.RoomServer
                 .WithRoomMessageHandle(value.RoomMessageHandle)
                 .WithRoomFinishHandle(value.FinishRoomHandle);
 
-        public NodeRoomServerEntryBuilder WithBridgeStateChangedHandle(NodeRoomServerEntry.OnStateChangeDelegate value)
+        public NodeRoomServerEntryBuilder WithCreateSessionHandle(NodeRoomServerEntry.CreateSessionDelegate value)
+        {
+            Entry.CreateRoomSession = value;
+
+            return this;
+        }
+
+        public NodeRoomServerEntryBuilder WithBridgeStateChangedHandle(NodeRoomServerEntry.StateChangeDelegate value)
         {
             Entry.BridgeConnectionStateChangedHandle = value;
 
@@ -103,7 +111,16 @@ namespace NSL.Node.RoomServer
         public NodeRoomServerEntryBuilder WithConsoleLogger()
             => WithLogger(new ConsoleLogger());
 
-        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(out string address)
+        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(int port, bool isHttps, out string address)
+        {
+            GetPublicAddressFromStun(defaultStunServers, out address);
+
+            if (address != default)
+                address = $"ws{(isHttps ? "w" : "")}://{address}:{port}/";
+
+            return this;
+        }
+            public NodeRoomServerEntryBuilder GetPublicAddressFromStun(out string address)
             => GetPublicAddressFromStun(defaultStunServers, out address);
 
         public NodeRoomServerEntryBuilder GetPublicAddressFromStun(StunServerInfo[] stunServers, out string address)

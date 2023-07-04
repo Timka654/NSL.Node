@@ -13,11 +13,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='DebugRoomServer'">
-	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
+		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='UnityDebug'">
@@ -44,17 +44,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2023.7.2.1403" />
-	  <PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.7.2.1403" />
-	  <PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.7.2.1403" />
-	  <PackageReference Include="NSL.Logger" Version="2023.7.2.1403" />
-	  <PackageReference Include="NSL.UDP.Client" Version="2023.7.2.1403" />
-	  <PackageReference Include="STUN" Version="0.5.0" />
+		<PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2023.7.2.1403" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.7.2.1403" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.7.2.1403" />
+		<PackageReference Include="NSL.Logger" Version="2023.7.2.1403" />
+		<PackageReference Include="NSL.UDP.Client" Version="2023.7.2.1403" />
+		<PackageReference Include="STUN" Version="0.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
-		<ProjectReference Include="..\..\NSL.Node.RoomServer.Shared\NSL.Node.RoomServer.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="NSL.Node.Core">
+	    <HintPath>..\NSL.Node.Core\NSL.Node.Core.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>

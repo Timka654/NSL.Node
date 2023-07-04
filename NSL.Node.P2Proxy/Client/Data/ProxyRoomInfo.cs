@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.Node.RoomServer.Shared.Client.Core.Enums;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.UDP;
 using System;
 using System.Collections.Concurrent;

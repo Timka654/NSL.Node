@@ -1,4 +1,5 @@
 ﻿using NSL.Node.P2Proxy.Client.Data;
+using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 

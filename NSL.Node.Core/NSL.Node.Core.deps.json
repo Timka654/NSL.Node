@@ -1,0 +1,152 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "NSL.Node.Core/1.0.0": {
+        "dependencies": {
+          "NSL.UDP.Client": "2023.7.2.1403"
+        },
+        "runtime": {
+          "NSL.Node.Core.dll": {}
+        }
+      },
+      "NSL.EndPointBuilder/2023.7.2.1403": {
+        "dependencies": {
+          "NSL.SocketCore": "2023.7.2.1403"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NSL.EndPointBuilder.dll": {
+            "assemblyVersion": "2023.7.2.1403",
+            "fileVersion": "2023.7.2.1403"
+          }
+        }
+      },
+      "NSL.SocketClient/2023.7.2.1403": {
+        "dependencies": {
+          "NSL.EndPointBuilder": "2023.7.2.1403",
+          "NSL.SocketCore": "2023.7.2.1403"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NSL.SocketClient.dll": {
+            "assemblyVersion": "2023.7.2.1403",
+            "fileVersion": "2023.7.2.1403"
+          }
+        }
+      },
+      "NSL.SocketCore/2023.7.2.1403": {
+        "runtime": {
+          "lib/netstandard2.0/NSL.SocketCore.dll": {
+            "assemblyVersion": "2023.7.2.1403",
+            "fileVersion": "2023.7.2.1403"
+          }
+        }
+      },
+      "NSL.SocketServer/2023.7.2.1403": {
+        "dependencies": {
+          "NSL.EndPointBuilder": "2023.7.2.1403",
+          "NSL.SocketCore": "2023.7.2.1403"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NSL.SocketServer.dll": {
+            "assemblyVersion": "2023.7.2.1403",
+            "fileVersion": "2023.7.2.1403"
+          }
+        }
+      },
+      "NSL.UDP/2023.7.2.1403": {
+        "dependencies": {
+          "NSL.SocketCore": "2023.7.2.1403",
+          "NSL.SocketServer": "2023.7.2.1403",
+          "STUN": "0.5.0"
+        },
+        "runtime": {
+          "lib/net7.0/NSL.UDP.dll": {
+            "assemblyVersion": "2023.7.2.1403",
+            "fileVersion": "2023.7.2.1403"
+          }
+        }
+      },
+      "NSL.UDP.Client/2023.7.2.1403": {
+        "dependencies": {
+          "NSL.SocketClient": "2023.7.2.1403",
+          "NSL.SocketServer": "2023.7.2.1403",
+          "NSL.UDP": "2023.7.2.1403"
+        },
+        "runtime": {
+          "lib/net7.0/NSL.UDP.Client.dll": {
+            "assemblyVersion": "2023.7.2.1403",
+            "fileVersion": "2023.7.2.1403"
+          }
+        }
+      },
+      "STUN/0.5.0": {
+        "runtime": {
+          "lib/netstandard2.0/STUN.dll": {
+            "assemblyVersion": "0.5.0.0",
+            "fileVersion": "0.5.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "NSL.Node.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NSL.EndPointBuilder/2023.7.2.1403": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-m3GRP9Xhh4wgqJ6m5TMfPFIZCJEmWLKMsxbLDkZm+3mwrQCEMairH/PjZ1s65oXca6mb9orbm2AjEoV0lqqWCA==",
+      "path": "nsl.endpointbuilder/2023.7.2.1403",
+      "hashPath": "nsl.endpointbuilder.2023.7.2.1403.nupkg.sha512"
+    },
+    "NSL.SocketClient/2023.7.2.1403": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NYS3lKZzIkOKWN796vBpMttpP6SHR74Z3c0lHqKFHymRCZNL4ok7H5DtEWr8T6tdRPJQULnuii0monDsOe1hHQ==",
+      "path": "nsl.socketclient/2023.7.2.1403",
+      "hashPath": "nsl.socketclient.2023.7.2.1403.nupkg.sha512"
+    },
+    "NSL.SocketCore/2023.7.2.1403": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qIeCSn0tniWV4FS+95wIVdBQ0L2mTIJwo6gMTgRKZ9G7cw1cj0wKtYt65dj60WIikx9kPyv3ye+v+dPSnmloVg==",
+      "path": "nsl.socketcore/2023.7.2.1403",
+      "hashPath": "nsl.socketcore.2023.7.2.1403.nupkg.sha512"
+    },
+    "NSL.SocketServer/2023.7.2.1403": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qNqAg8kwJ2YG/i/4SWwICZrfDizlrelGu66zJYjXtX4dhQ87oSyaJj4rFGAz4l4l9pfRPevLcyx55crROmde+g==",
+      "path": "nsl.socketserver/2023.7.2.1403",
+      "hashPath": "nsl.socketserver.2023.7.2.1403.nupkg.sha512"
+    },
+    "NSL.UDP/2023.7.2.1403": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Fc1z0utG17f+qJD8B/8ZZnZEU9kjGgroSKjsJtMiQVyPQxOTjA8zlIfM45b3DCErt/pCc4mdkoQMnVrM9Ux0kQ==",
+      "path": "nsl.udp/2023.7.2.1403",
+      "hashPath": "nsl.udp.2023.7.2.1403.nupkg.sha512"
+    },
+    "NSL.UDP.Client/2023.7.2.1403": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9+vKBLR3uMWrDzrh65w9vl3z+BriZz1ueSeLybmdDWlVUaw58dxN6qj7U2eDb2w3jLpBrDWvfqSMDv7Ex14YRg==",
+      "path": "nsl.udp.client/2023.7.2.1403",
+      "hashPath": "nsl.udp.client.2023.7.2.1403.nupkg.sha512"
+    },
+    "STUN/0.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xycAOIaCT2bdndchrCMCqhCK+KnGSWgJZWOe2YPDuDDK0eqHO+20utU66tKgqH9trJnZ/XyZk5bdDdZQHSIKig==",
+      "path": "stun/0.5.0",
+      "hashPath": "stun.0.5.0.nupkg.sha512"
+    }
+  }
+}

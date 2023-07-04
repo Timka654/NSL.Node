@@ -28,7 +28,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private Action<OutputPacketBuffer, bool> broadcastDelegate = (packet, disposeOnSend) => { };
 
-        private SGameInfo Game;
+        private IRoomSession Game;
 
         public NodeRoomServerEntry Entry { get; }
         public Guid SessionId { get; }
@@ -117,7 +117,7 @@ namespace NSL.Node.RoomServer.Client.Data
             if (ShutdownOnMissedReady)
                 RunDestroyOnMissedTimer();
 
-            Game = new SGameInfo(this);
+            Game = Entry.CreateRoomSession(this);
 
             BroadcastStartupInfo();
 
