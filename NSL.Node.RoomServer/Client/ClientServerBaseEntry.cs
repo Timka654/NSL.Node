@@ -8,6 +8,9 @@ using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.EndPointBuilder;
 using NSL.SocketServer.Utils;
 using NSL.SocketCore.Utils.Buffer;
+using System.Threading.Tasks;
+using NSL.Node.BridgeServer.Shared;
+using NSL.Node.RoomServer.Shared.Client.Core;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -28,6 +31,37 @@ namespace NSL.Node.RoomServer.Client
         }
 
         public abstract void Run();
+
+        public async Task<RoomInfo> TryLoadRoomAsync(Guid roomId, Guid sessionId)
+        {
+            if (!roomMap.TryGetValue(sessionId, out var roomInfo))
+            {
+                var result = await Entry.ValidateSession(new BridgeServer.Shared.Requests.RoomSignSessionRequestModel()
+                {
+                    SessionIdentity = sessionId,
+                    RoomIdentity = roomId
+                });
+
+                if (result.Result == true)
+                {
+                    roomInfo = roomMap.GetOrAdd(sessionId, id => new Lazy<RoomInfo>(() =>
+                    {
+                        var room = new RoomInfo(Entry, sessionId, roomId);
+
+                        room.OnRoomDisposed += () =>
+                        {
+                            roomMap.TryRemove(id, out _);
+                        };
+
+                        room.SetStartupInfo(new NodeRoomStartupInfo(result.Options));
+
+                        return room;
+                    }));
+                }
+            }
+
+            return roomInfo?.Value;
+        }
 
         protected TBuilder Fill<TBuilder>(TBuilder builder)
             where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder

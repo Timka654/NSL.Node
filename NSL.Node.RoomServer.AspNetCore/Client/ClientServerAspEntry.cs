@@ -30,12 +30,6 @@ namespace NSL.Node.RoomServer.AspNetCore.Client
             this.pattern = pattern;
             this.requestHandle = requestHandle;
             this.actionConventionBuilder = actionConventionBuilder;
-        }
-
-        public override void Run()
-        {
-            if (Listener != null)
-                return;
 
             var server = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<TransportNetworkClient>()
@@ -58,6 +52,10 @@ namespace NSL.Node.RoomServer.AspNetCore.Client
 
 
             Listener = server;
+        }
+
+        public override void Run()
+        {
         }
     }
 }

@@ -23,7 +23,7 @@ namespace NSL.Node.RoomServer
 
         internal BridgeRoomBaseNetwork BridgeNetworkClient { get; set; }
 
-        internal ClientServerBaseEntry ClientServerListener { get; set; }
+        public ClientServerBaseEntry ClientServerListener { get; set; }
 
         internal ILogger Logger { get; set; }
 

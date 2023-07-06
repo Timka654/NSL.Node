@@ -23,7 +23,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
 
             if (session != null)
             {
-                session.ValidatePlayer(request.PlayerId);
+                result.ExistsPlayer = session.ValidatePlayer(request.PlayerId);
             }
 
             result.WriteFullTo(response);

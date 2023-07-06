@@ -24,31 +24,7 @@ namespace NSL.Node.RoomServer.Client
 
             bool success = false;
 
-            if (!roomMap.TryGetValue(sessionId, out var roomInfo))
-            {
-                var result = await Entry.ValidateSession(new BridgeServer.Shared.Requests.RoomSignSessionRequestModel()
-                {
-                    SessionIdentity = sessionId,
-                    RoomIdentity = roomId
-                });
-
-                if (result.Result == true)
-                {
-                    roomInfo = roomMap.GetOrAdd(sessionId, id => new Lazy<RoomInfo>(() =>
-                    {
-                        var room = new RoomInfo(Entry, sessionId, roomId);
-
-                        room.OnRoomDisposed += () =>
-                        {
-                            roomMap.TryRemove(id, out _);
-                        };
-
-                        room.SetStartupInfo(new NodeRoomStartupInfo(result.Options));
-
-                        return room;
-                    }));
-                }
-            }
+            var roomInfo = await TryLoadRoomAsync(roomId, sessionId);
 
             if (roomInfo != null)
             {
@@ -70,7 +46,7 @@ namespace NSL.Node.RoomServer.Client
 
                     if (validatePlayer.ExistsPlayer)
                     {
-                        client.Room = roomInfo.Value;
+                        client.Room = roomInfo;
                         client.Id = client.NodeId = nodeId;
                         client.Token = token;
 

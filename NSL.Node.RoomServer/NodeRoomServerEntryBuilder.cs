@@ -116,7 +116,7 @@ namespace NSL.Node.RoomServer
             GetPublicAddressFromStun(out address, stunServers);
 
             if (address != default)
-                address = $"ws{(isHttps ? "w" : "")}://{address}:{port}/";
+                address = $"ws{(isHttps ? "s" : "")}://{address}:{port}/";
 
             return this;
         }

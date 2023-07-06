@@ -29,12 +29,6 @@ namespace NSL.Node.BridgeServer.LS
             this.pattern = pattern;
             this.requestHandle = requestHandle;
             this.actionConventionBuilder = actionConventionBuilder;
-        }
-
-        public override void Run()
-        {
-            if (Listener != null)
-                throw new Exception($"Already invoked");
 
             var server = Fill(WebSocketsServerEndPointBuilder.Create()
                 .WithClientProcessor<NetworkClient>()
@@ -57,6 +51,10 @@ namespace NSL.Node.BridgeServer.LS
 
 
             Listener = server;
+        }
+
+        public override void Run()
+        {
         }
     }
 }

@@ -13,7 +13,7 @@ namespace NSL.Node.BridgeServer.Shared.Requests
 
         public Guid? SpecialServer { get; set; }
 
-        public List<Guid> InitialPlayers { get; set; }
+        public List<Guid>? InitialPlayers { get; set; }
 
         public int NeedPointCount { get; set; } = 1;
 

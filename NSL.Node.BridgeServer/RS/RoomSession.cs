@@ -27,7 +27,7 @@ namespace NSL.Node.BridgeServer.RS
 
         public NodeRoomStartupInfo StartupInfo { get; set; }
 
-        public List<Guid>? PlayerIds { get; set; }
+        public List<Guid>? PlayerIds { get; set; } = default;
 
         public void AddPlayerId(Guid playerId)
         {
@@ -100,7 +100,6 @@ namespace NSL.Node.BridgeServer.RS
         {
             if (PlayerIds == default)
                 return true;
-
 
             playerIdsLocker.WaitOne();
 
