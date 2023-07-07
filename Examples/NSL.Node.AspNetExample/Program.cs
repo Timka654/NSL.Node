@@ -19,7 +19,6 @@ namespace NSL.Node.AspNetExample
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton<TempService>();
 
             AddNode(builder.Services);
 
@@ -52,7 +51,9 @@ namespace NSL.Node.AspNetExample
             services.AddNodeBridgeLobbyLocalBridgeClient<LobbyServerNetworkClient>(
                 string.Empty,
                 string.Empty,
-                (services, handles) => services.GetRequiredService<TempService>().ConfigureNodeHandles(handles));
+                (services, handles) => {
+
+                });
 
             return services;
         }
