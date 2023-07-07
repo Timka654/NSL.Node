@@ -1,4 +1,5 @@
-﻿using NSL.SocketCore.Utils.Buffer;
+﻿using NSL.Node.BridgeServer.Shared.Message;
+using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.BridgeLobbyClient.Packets
 {
@@ -6,17 +7,10 @@ namespace NSL.Node.BridgeLobbyClient.Packets
     {
         public static async void Handle(BridgeLobbyNetworkClient client, InputPacketBuffer data)
         {
-            var roomId = data.ReadGuid();
-
-            var dataLen = data.DataLength - data.DataPosition;
-
-            byte[] buffer = default;
-
-            if (dataLen > 0)
-                buffer = data.Read(dataLen);
+            var message = RoomFinishMessageModel.ReadFullFrom(data);
 
             if (client.HandlesConfiguration.RoomFinishHandle != null)
-                await client.HandlesConfiguration.RoomFinishHandle(roomId, buffer);
+                await client.HandlesConfiguration.RoomFinishHandle(message.SessionId, message.Data);
         }
     }
 }

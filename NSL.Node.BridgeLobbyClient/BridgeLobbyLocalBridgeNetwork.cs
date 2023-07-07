@@ -12,19 +12,13 @@ namespace NSL.Node.BridgeLobbyClient
     public class BridgeLobbyLocalBridgeNetwork<TServerClient> : BridgeLobbyBaseNetwork
         where TServerClient : INetworkClient, new()
     {
+        private readonly Action<WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild;
         LocalBridgeClient<TServerClient, BridgeLobbyNetworkClient> serverNetwork;
         LocalBridgeClient<BridgeLobbyNetworkClient, TServerClient> localNetwork;
 
         public BridgeLobbyLocalBridgeNetwork(string serverIdentity, string identityKey, Action<BridgeLobbyNetworkHandlesConfigurationModel> onHandleConfiguration, Action<WebSocketsClientEndPointBuilder<BridgeLobbyNetworkClient, WSClientOptions<BridgeLobbyNetworkClient>>> onBuild = null) : base(serverIdentity, identityKey, onHandleConfiguration)
         {
-            var builder = FillOptions(WebSocketsClientEndPointBuilder.Create()
-                .WithClientProcessor<BridgeLobbyNetworkClient>()
-                .WithOptions<WSClientOptions<BridgeLobbyNetworkClient>>(), onBuild);
-
-            localNetwork =  builder
-                .CreateLocalBridge<BridgeLobbyNetworkClient, TServerClient>();
-
-            var bridgeNetwork = localNetwork.GetUserData() as BridgeLobbyNetworkClient;
+            this.onBuild = onBuild;
         }
 
         public BridgeLobbyLocalBridgeNetwork<TServerClient> WithServerClient(LocalBridgeClient<TServerClient, BridgeLobbyNetworkClient> serverClient)
@@ -36,6 +30,19 @@ namespace NSL.Node.BridgeLobbyClient
 
         protected override Task<bool> InitNetwork()
         {
+            if (localNetwork == null)
+            {
+                if (OnHandleConfiguration != null)
+                    OnHandleConfiguration(HandleConfiguration);
+
+                var builder = FillOptions(WebSocketsClientEndPointBuilder.Create()
+                    .WithClientProcessor<BridgeLobbyNetworkClient>()
+                    .WithOptions<WSClientOptions<BridgeLobbyNetworkClient>>(), onBuild);
+
+                localNetwork = builder
+                    .CreateLocalBridge<BridgeLobbyNetworkClient, TServerClient>();
+            }
+
             localNetwork.SetOtherClient(serverNetwork);
 
             return Task.FromResult(true);

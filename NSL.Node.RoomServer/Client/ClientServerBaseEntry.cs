@@ -11,6 +11,7 @@ using NSL.SocketCore.Utils.Buffer;
 using System.Threading.Tasks;
 using NSL.Node.BridgeServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
+using NSL.Node.BridgeServer.Shared.Enums;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -85,13 +86,13 @@ namespace NSL.Node.RoomServer.Client
             builder.AddBaseSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Send packet {pid}");
+                    Logger.AppendInfo($"Send packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
             });
 
             builder.AddBaseReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Receive packet {pid}");
+                    Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
             });
 
             builder.AddDisconnectHandle(client =>

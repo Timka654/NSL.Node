@@ -16,11 +16,6 @@ namespace NSL.Node.RoomServer.Bridge
 
         public BridgeRoomLocalBridgeNetwork(NodeRoomServerEntry entry, string publicEndPoint, string identityKey, Guid serverId = default, string logPrefix = null) : base(entry, publicEndPoint, identityKey, serverId, logPrefix)
         {
-            var builder = FillOptions(WebSocketsClientEndPointBuilder.Create()
-                .WithClientProcessor<BridgeRoomNetworkClient>()
-                .WithOptions<WSClientOptions<BridgeRoomNetworkClient>>());
-
-            localNetwork = builder.CreateLocalBridge<BridgeRoomNetworkClient, TServerClient>();
         }
 
         public BridgeRoomLocalBridgeNetwork<TServerClient> WithServerClient(LocalBridgeClient<TServerClient, BridgeRoomNetworkClient> serverClient)
@@ -32,6 +27,15 @@ namespace NSL.Node.RoomServer.Bridge
 
         protected override Task<bool> InitNetwork()
         {
+            if (localNetwork == null)
+            {
+                var builder = FillOptions(WebSocketsClientEndPointBuilder.Create()
+                    .WithClientProcessor<BridgeRoomNetworkClient>()
+                    .WithOptions<WSClientOptions<BridgeRoomNetworkClient>>());
+
+                localNetwork = builder.CreateLocalBridge<BridgeRoomNetworkClient, TServerClient>();
+            }
+
             localNetwork.SetOtherClient(serverNetwork);
 
             return Task.FromResult(true);

@@ -1,4 +1,5 @@
-﻿using NSL.WebSockets.Server.AspNetPoint;
+﻿using NSL.SocketServer.Utils;
+using NSL.WebSockets.Server.AspNetPoint;
 using System;
 using System.Collections.Concurrent;
 
@@ -16,7 +17,7 @@ namespace NSL.Node.BridgeServer.RS
 
         public int SessionsCount => SessionMap.Count;
 
-        private ConcurrentDictionary<Guid, RoomSession> SessionMap { get; } = new ConcurrentDictionary<Guid, RoomSession>();
+        private ConcurrentDictionary<Guid, RoomSession> SessionMap { get; set; } = new ConcurrentDictionary<Guid, RoomSession>();
 
         public NodeBridgeServerEntry Entry { get; internal set; }
 
@@ -40,6 +41,30 @@ namespace NSL.Node.BridgeServer.RS
             SessionMap.TryGetValue(sessionId, out var session);
 
             return session;
+        }
+
+        public override void ChangeOwner(IServerNetworkClient from)
+        {
+            if (from is not RoomServerNetworkClient other)
+                throw new InvalidOperationException($"{nameof(ChangeOwner)} invalid {nameof(from)} type");
+
+            SessionMap = other.SessionMap;
+
+            foreach (var item in SessionMap)
+            {
+                item.Value.OwnedRoomNetwork = this;
+            }
+
+            base.ChangeOwner(from);
+        }
+
+        public void Disconnect()
+        {
+            foreach (var item in SessionMap.Values)
+            {
+                item.SendLobbyFinishRoom(null);
+                item.Dispose();
+            }
         }
     }
 }

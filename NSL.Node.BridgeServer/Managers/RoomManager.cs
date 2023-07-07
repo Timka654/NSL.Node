@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeServer.Managers
 {
@@ -16,73 +17,88 @@ namespace NSL.Node.BridgeServer.Managers
             this.identityKey = identityKey;
         }
 
-        public void OnDisconnectedRoomServer(RoomServerNetworkClient client)
+        public async void OnDisconnectedRoomServer(RoomServerNetworkClient client)
         {
-            if (client.Signed)
-                connectedServers.Remove(client.Id, out _);
+            if (!client.Signed)
+                return;
+
+            await Task.Delay(2000);
+
+            if (connectedServers[client.Id] != client)
+                return;
+
+            connectedServers.Remove(client.Id, out _);
+
+            client.Disconnect();
         }
 
-        public bool TryRoomServerConnect(RoomServerNetworkClient client, string identityKey)
+        public bool TryRoomServerConnect(RoomServerNetworkClient client, RoomSignInRequestModel request)
         {
-            if (!object.Equals(this.identityKey, identityKey))
+            if (!Equals(identityKey, request.IdentityKey))
                 return false;
 
-            if (!Guid.Empty.Equals(client.Id))
+            if (Guid.Empty.Equals(request.Identity))
+                request.Identity = Guid.NewGuid();
+            else
             {
-                if (connectedServers.TryGetValue(client.Id, out var server))
+                if (connectedServers.TryGetValue(request.Identity, out var exists))
                 {
-                    if (server.GetState())
-                    {
+                    if (exists.GetState())
                         return false;
-                    }
 
-                    connectedServers[client.Id] = client;
+                    SignRoom(client, request);
 
-                    server.ChangeOwner(client);
+                    connectedServers[request.Identity] = client;
 
-                    client.Signed = true;
+                    client.ChangeOwner(exists);
 
                     return true;
                 }
             }
-            else
-                client.Id = Guid.NewGuid();
 
-            while (!connectedServers.TryAdd(client.Id, client))
+            while (!connectedServers.TryAdd(request.Identity, client))
             {
-                client.Id = Guid.NewGuid();
+                request.Identity = Guid.NewGuid();
             }
 
-            client.Signed = true;
+            SignRoom(client, request);
 
             return true;
+        }
+
+        private void SignRoom(RoomServerNetworkClient client, RoomSignInRequestModel request)
+        {
+            client.Id = request.Identity;
+
+            client.ConnectionEndPoint = request.ConnectionEndPoint;
+
+            client.Signed = true;
         }
 
         public CreateRoomSessionResponseModel CreateRoomSession(LobbyServerNetworkClient client, LobbyCreateRoomSessionRequestModel request)
         {
             var result = new CreateRoomSessionResponseModel();
 
-            RoomServerNetworkClient[] servers = default;
+            IEnumerable<RoomServerNetworkClient> servers = default;
 
             if (request.SpecialServer.HasValue)
             {
-                result.Result = connectedServers.TryGetValue(request.SpecialServer.Value, out var server);
-
-                if (result.Result)
-                    servers = Enumerable.Repeat(server, 1).ToArray();
+                if (connectedServers.TryGetValue(request.SpecialServer.Value, out var server))
+                    servers = Enumerable.Repeat(server, 1);
             }
             else
             {
                 IEnumerable<RoomServerNetworkClient> serverSelector = connectedServers.Values;
 
                 if (request.Location != default)
-                    serverSelector = serverSelector.Where(request.Location.Equals);
+                    serverSelector = serverSelector.Where(x=>request.Location.Equals(x.Location));
 
-                servers = serverSelector.OrderBy(x => x.SessionsCount).Take(request.NeedPointCount).ToArray();
-
-
-                result.Result = servers.Any();
+                servers = serverSelector.OrderBy(x => x.SessionsCount).Take(request.NeedPointCount);
             }
+
+            servers = servers.Where(x => x.Network?.GetState() == true);
+
+            result.Result = servers.Any();
 
             if (result.Result)
             {

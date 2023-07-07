@@ -14,12 +14,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
 
             var request = RoomSignInRequestModel.ReadFullFrom(data);
 
-
-            client.Id = request.Identity;
-
-            client.ConnectionEndPoint = request.ConnectionEndPoint;
-
-            bool result = client.Entry.RoomManager.TryRoomServerConnect(client, request.IdentityKey);
+            bool result = client.Entry.RoomManager.TryRoomServerConnect(client, request);
 
             new RoomSignInResponseModel { Result = result, ServerIdentity = client.Id}.WriteFullTo(response);
 

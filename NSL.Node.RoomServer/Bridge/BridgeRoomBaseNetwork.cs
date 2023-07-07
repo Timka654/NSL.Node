@@ -11,6 +11,7 @@ using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
 using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils;
+using NSL.Node.BridgeServer.Shared.Message;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -87,13 +88,13 @@ namespace NSL.Node.RoomServer.Bridge
             builder.AddBaseSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Send packet {pid}");
+                    Logger.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
             });
 
             builder.AddBaseReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Receive packet {pid}");
+                    Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
             });
 
             return builder;
@@ -190,14 +191,11 @@ namespace NSL.Node.RoomServer.Bridge
             return result ?? new RoomSignSessionPlayerResponseModel();
         }
 
-        internal void FinishRoom(RoomInfo room, byte[] data)
+        internal void FinishRoom(RoomInfo room, byte[]? data)
         {
             var output = OutputPacketBuffer.Create(NodeBridgeRoomPacketEnum.FinishRoomMessage);
 
-            output.WriteGuid(room.SessionId);
-
-            if (data != null)
-                output.Write(data);
+            new RoomFinishMessageModel() { SessionId = room.SessionId, Data = data }.WriteFullTo(output);
 
             network.Network?.Send(output);
 
@@ -207,10 +205,7 @@ namespace NSL.Node.RoomServer.Bridge
         {
             var output = OutputPacketBuffer.Create(NodeBridgeRoomPacketEnum.RoomMessage);
 
-            output.WriteGuid(room.SessionId);
-
-            if (data != null)
-                output.Write(data);
+            new RoomMessageModel() { SessionId = room.SessionId, Data = data }.WriteFullTo(output);
 
             network.Network?.Send(output);
 

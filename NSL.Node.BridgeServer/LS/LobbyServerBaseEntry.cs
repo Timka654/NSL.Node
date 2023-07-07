@@ -8,6 +8,7 @@ using NSL.Logger.Interface;
 
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 using NSL.SocketCore.Utils.Buffer;
+using System;
 
 namespace NSL.Node.BridgeServer.LS
 {
@@ -50,13 +51,13 @@ namespace NSL.Node.BridgeServer.LS
             builder.AddBaseSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger?.AppendInfo($"Send packet {pid}");
+                    Logger?.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeLobbyPacketEnum)pid)})");
             });
 
             builder.AddBaseReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger?.AppendInfo($"Receive packet {pid}");
+                    Logger?.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeLobbyPacketEnum)pid)})");
             });
 
             builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionRequestPacket.ReceiveHandle);

@@ -55,7 +55,7 @@ namespace NSL.Node.BridgeServer.RS
             playerIdsLocker.Set();
         }
 
-        internal void SendLobbyFinishRoom(byte[] dataBuffer)
+        internal void SendLobbyFinishRoom(byte[]? dataBuffer)
         {
             var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoomMessage);
 

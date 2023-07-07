@@ -17,6 +17,8 @@ namespace NSL.Node.BridgeLobbyClient
 
         public string IdentityKey { get; }
 
+        protected Action<BridgeLobbyNetworkHandlesConfigurationModel> OnHandleConfiguration { get; }
+
         protected INetworkClient network { get; private set; }
 
         protected RequestProcessor PacketWaitBuffer { get; private set; }
@@ -28,7 +30,7 @@ namespace NSL.Node.BridgeLobbyClient
         {
             ServerIdentity = serverIdentity;
             IdentityKey = identityKey;
-
+            OnHandleConfiguration = onHandleConfiguration;
             OnStateChanged += state =>
             {
                 if (HasSuccessConnections)
@@ -37,9 +39,6 @@ namespace NSL.Node.BridgeLobbyClient
                 if (state)
                     HasSuccessConnections = state;
             };
-
-            if (onHandleConfiguration != null)
-                onHandleConfiguration(HandleConfiguration);
         }
 
 
