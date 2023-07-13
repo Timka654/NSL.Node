@@ -1,4 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared;
+using NSL.Node.Core.Models.Message;
 using NSL.Node.RoomServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
@@ -56,6 +57,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action<NodeInfo> OnNodeDisconnect = node => { };
 
+        public event Action<NodeInfo> OnNodeConnectionLost = node => { };
+
         public event Action OnRoomReady = () => { };
 
         public event Action OnRoomDisposed = () => { };
@@ -76,13 +79,11 @@ namespace NSL.Node.RoomServer.Client.Data
                 if (ar.WaitOne(0))
                 {
                     ar.Set();
-
-                    node.Send(CreateStartupInfoMessage());
                 }
 
-                    broadcastDelegate += node.Send;
+                broadcastDelegate += node.Send;
 
-                BroadcastChangeNodeList();
+                BroadcastConnectNode(node);
 
                 return true;
             }
@@ -90,11 +91,24 @@ namespace NSL.Node.RoomServer.Client.Data
             return false;
         }
 
-        public void OnClientDisconnected(TransportNetworkClient node)
+        public void OnClientDisconnected(TransportNetworkClient node, bool expired = false)
         {
+            if (!node.DisconnectedFromNodeSide)
+            {
+                if (!expired)
+                {
+                    BroadcastConnectionLostNode(node);
+                    return;
+                }
+            }
+
             if (nodes.TryRemove(node.Id, out _))
             {
+                node.Room = null;
+
                 broadcastDelegate -= node.Send;
+
+                BroadcastDisconnectNode(node);
 
                 OnNodeDisconnect(node.Node);
 
@@ -120,30 +134,19 @@ namespace NSL.Node.RoomServer.Client.Data
 
             Game = Entry.CreateRoomSession(this);
 
-            BroadcastStartupInfo();
+            if (!RoomWaitAllReady)
+                OnRoomReady();
 
             ar.Set();
+
         }
 
-        private void BroadcastStartupInfo()
-        {
-            Broadcast(CreateStartupInfoMessage());
-        }
-
-        private OutputPacketBuffer CreateStartupInfoMessage()
-        {
-            var packet = OutputPacketBuffer.Create(RoomPacketEnum.StartupInfoMessage);
-
-            Dictionary<string, string> startupInfo = new()
+        public Dictionary<string, string> GetClientOptions()
+            => new()
             {
                 { "waitAll", this.RoomWaitAllReady.ToString() },
                 { "nodeWaitCount", this.RoomNodeCount.ToString() }
             };
-
-            packet.WriteCollection(startupInfo, item => { packet.WriteString(item.Key); packet.WriteString(item.Value); });
-
-            return packet;
-        }
 
         private async void RunDestroyOnMissedTimer()
         {
@@ -155,7 +158,7 @@ namespace NSL.Node.RoomServer.Client.Data
             Dispose();
         }
 
-        public bool ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
+        public async Task<bool> ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
         {
             if (!ar.WaitOne(5000))
             {
@@ -178,19 +181,36 @@ namespace NSL.Node.RoomServer.Client.Data
 
                 return false;
             }
-            if (ConnectedNodesCount != nodeIds.Count())
+
+            if (RoomWaitAllReady)
             {
-                BroadcastChangeNodeList();
+                if (ConnectedNodesCount != nodeIds.Count())
+                {
+                    Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
 
-                ar.Set();
+                    foreach (var item in nodes)
+                    {
+                        if (nodeIds.Contains(item.Key))
+                            continue;
 
-                return false;
-            }
+                        SendConnectNodeInformation(node, item.Value);
+                    }
 
-            if (ConnectedNodesCount != RoomNodeCount && RoomWaitAllReady)
-            {
-                ar.Set();
-                return false;
+                    ar.Set();
+
+                    return false;
+                }
+
+                if (ConnectedNodesCount != RoomNodeCount)
+                {
+                    Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
+
+                    ar.Set();
+
+                    await Task.Delay(2_000);
+
+                    return false;
+                }
             }
 
             node.Ready = true;
@@ -215,26 +235,76 @@ namespace NSL.Node.RoomServer.Client.Data
 
         protected OutputPacketBuffer CreateReadyRoomPacket()
         {
-            var p = OutputPacketBuffer.Create(RoomPacketEnum.ReadyRoom);
+            var p = OutputPacketBuffer.Create(RoomPacketEnum.ReadyRoomMessage);
 
             p.WriteDateTime(CreateTime);
 
             return p;
         }
 
-        private void BroadcastChangeNodeList()
+        private void BroadcastConnectNode(TransportNetworkClient node)
         {
-            var buffer = OutputPacketBuffer.Create(RoomPacketEnum.ChangeNodeList);
+            var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeConnectMessage);
 
-            buffer.WriteCollection(Nodes, b =>
+            new ConnectNodeMessageModel()
             {
-                buffer.WriteGuid(b.NodeId);
-                buffer.WriteString(b.Token);
-                buffer.WriteString(b.EndPoint);
-            });
+                NodeId = node.NodeId,
+                Token = node.Token,
+                EndPoint = node.EndPoint
+            }.WriteFullTo(buffer);
 
             Broadcast(buffer);
         }
+
+        private void SendConnectNodeInformation(TransportNetworkClient to, TransportNetworkClient node)
+        {
+            var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeConnectMessage);
+
+            new ConnectNodeMessageModel()
+            {
+                NodeId = node.NodeId,
+                Token = node.Token,
+                EndPoint = node.EndPoint
+            }.WriteFullTo(buffer);
+
+            SendTo(to, buffer);
+        }
+
+        private void BroadcastRoomDestroy()
+            => Broadcast(OutputPacketBuffer.Create(RoomPacketEnum.RoomDestroyMessage));
+
+        private void SendRoomDestroy(TransportNetworkClient to)
+            => SendTo(to, OutputPacketBuffer.Create(RoomPacketEnum.RoomDestroyMessage));
+
+        private void BroadcastConnectionLostNode(TransportNetworkClient node)
+        {
+            var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeConnectionLostMessage);
+
+            buffer.WriteGuid(node.NodeId);
+
+            Broadcast(buffer);
+        }
+
+        private void BroadcastChangeNodeEndPoint(TransportNetworkClient node)
+        {
+            var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeChangeEndPointMessage);
+
+            buffer.WriteGuid(node.NodeId);
+            buffer.WriteString(node.EndPoint);
+
+            Broadcast(buffer);
+        }
+
+        private void BroadcastDisconnectNode(TransportNetworkClient node)
+        {
+            var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeDisconnectMessage);
+
+            buffer.WriteGuid(node.NodeId);
+
+            Broadcast(buffer);
+        }
+
+        #region Broadcast
 
         public void Broadcast(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
@@ -272,7 +342,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var packet = new DgramOutputPacketBuffer();
 
-            packet.PacketId = (ushort)RoomPacketEnum.Execute;
+            packet.PacketId = (ushort)RoomPacketEnum.ExecuteMessage;
 
             builder(packet);
 
@@ -285,6 +355,8 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             return Broadcast(builder);
         }
+
+        #endregion
 
         #region SendTo
 
@@ -358,7 +430,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             DgramOutputPacketBuffer packet = new DgramOutputPacketBuffer();
 
-            packet.PacketId = (ushort)RoomPacketEnum.Execute;
+            packet.PacketId = (ushort)RoomPacketEnum.ExecuteMessage;
 
             packet.WriteUInt16(command);
 
@@ -376,7 +448,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             DgramOutputPacketBuffer packet = new DgramOutputPacketBuffer();
 
-            packet.PacketId = (ushort)RoomPacketEnum.Execute;
+            packet.PacketId = (ushort)RoomPacketEnum.ExecuteMessage;
 
             packet.WriteUInt16(command);
 
@@ -423,7 +495,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             var to = packet.ReadGuid();
 
-            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);
+            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.TransportMessage);
 
             pbuf.Write(body[7..]);
 
@@ -447,14 +519,21 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void Dispose()
         {
-            OnRoomDisposed();
-
-            SendLobbyFinishRoom();
+            Dispose(null);
         }
+
+        public bool Destroyed { get; private set; }
 
         public void Dispose(byte[] data)
         {
+            if (Destroyed)
+                return;
+
+            Destroyed = true;
+
             OnRoomDisposed();
+
+            BroadcastRoomDestroy();
 
             SendLobbyFinishRoom(data);
         }
@@ -472,5 +551,31 @@ namespace NSL.Node.RoomServer.Client.Data
         public TValue GetOption<TValue>(string key)
             where TValue : IConvertible
             => StartupInfo.GetValue<TValue>(key);
+
+        internal bool TryRecoverySession(TransportNetworkClient transportNetworkClient)
+        {
+            if (Destroyed)
+            {
+                SendRoomDestroy(transportNetworkClient);
+
+                return false;
+            }
+
+            if (nodes.ContainsKey(transportNetworkClient.NodeId))
+            {
+                nodes[transportNetworkClient.NodeId] = transportNetworkClient;
+
+                BroadcastConnectNode(transportNetworkClient);
+            }
+
+            return true;
+        }
+
+        internal void ChangeNodeConnectionPoint(TransportNetworkClient client, string endPoint)
+        {
+            client.EndPoint = endPoint;
+
+            BroadcastChangeNodeEndPoint(client);
+        }
     }
 }

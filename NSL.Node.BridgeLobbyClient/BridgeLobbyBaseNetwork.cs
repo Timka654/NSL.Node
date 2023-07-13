@@ -45,7 +45,7 @@ namespace NSL.Node.BridgeLobbyClient
         protected TBuilder FillOptions<TBuilder>(TBuilder builder, Action<TBuilder> onBuild)
             where TBuilder : IOptionableEndPointBuilder<BridgeLobbyNetworkClient>, IHandleIOBuilder
         {
-            builder.AddReceivePacketHandle(
+            builder.AddResponsePacketHandle(
                 NodeBridgeLobbyPacketEnum.Response,
                 c => c.PacketWaitBuffer);
 

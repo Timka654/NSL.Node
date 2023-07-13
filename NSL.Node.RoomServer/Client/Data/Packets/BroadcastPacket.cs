@@ -10,7 +10,7 @@ namespace NSL.Node.RoomServer.Client
         {
             var body = buffer.GetBuffer();
 
-            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);
+            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.TransportMessage);
 
             pbuf.WriteGuid(client.Id);
 

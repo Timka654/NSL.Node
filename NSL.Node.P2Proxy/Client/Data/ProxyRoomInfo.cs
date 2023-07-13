@@ -49,7 +49,7 @@ namespace NSL.Node.P2Proxy.Client.Data
             {
                 var output = new DgramOutputPacketBuffer();
 
-                output.PacketId = (ushort)RoomPacketEnum.Broadcast;
+                output.PacketId = (ushort)RoomPacketEnum.BroadcastMessage;
 
                 output.Channel = dgram.SourceChannel;
 
@@ -65,7 +65,7 @@ namespace NSL.Node.P2Proxy.Client.Data
             {
                 var output = new DgramOutputPacketBuffer();
 
-                output.PacketId = (ushort)RoomPacketEnum.Transport;
+                output.PacketId = (ushort)RoomPacketEnum.TransportMessage;
 
                 output.Channel = dgram.SourceChannel;
 

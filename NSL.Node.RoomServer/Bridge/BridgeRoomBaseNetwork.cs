@@ -12,6 +12,7 @@ using NSL.Node.BridgeServer.Shared.Response;
 using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils;
 using NSL.Node.BridgeServer.Shared.Message;
+using System.Threading;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -38,15 +39,37 @@ namespace NSL.Node.RoomServer.Bridge
                 Logger = new PrefixableLoggerProxy(entry.Logger, logPrefix ?? "[BridgeClient]");
         }
 
+        CancellationTokenSource rcts = default;
+
+        protected async void Reconnect()
+        {
+            try
+            {
+                rcts?.Cancel();
+                rcts = new CancellationTokenSource();
+
+                await Task.Delay(4_000, rcts.Token);
+
+                await InitNetwork();
+
+            }
+            catch (TaskCanceledException)
+            {
+            }
+
+        }
+
         protected TBuilder FillOptions<TBuilder>(TBuilder builder)
             where TBuilder : IOptionableEndPointBuilder<BridgeRoomNetworkClient>, IHandleIOBuilder
         {
 
             builder.SetLogger(Logger);
 
-            builder.AddReceivePacketHandle(
+            builder.AddResponsePacketHandle(
                 NodeBridgeRoomPacketEnum.Response,
                 c => c.PacketWaitBuffer);
+
+            CancellationTokenSource rcts = default;
 
             builder.AddDisconnectHandle(async client =>
             {
@@ -54,9 +77,7 @@ namespace NSL.Node.RoomServer.Bridge
 
                 OnStateChanged(State);
 
-                await Task.Delay(4_000);
-
-                await InitNetwork();
+                Reconnect();
             });
 
             builder.AddConnectHandle(async client =>
@@ -82,7 +103,7 @@ namespace NSL.Node.RoomServer.Bridge
                 OnStateChanged(State);
             });
 
-            builder.AddDefaultEventHandlers<TBuilder,  BridgeRoomNetworkClient>(null,
+            builder.AddDefaultEventHandlers<TBuilder, BridgeRoomNetworkClient>(null,
         DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
             builder.AddBaseSendHandle((client, pid, len, stack) =>
@@ -112,7 +133,7 @@ namespace NSL.Node.RoomServer.Bridge
             if (initialized)
                 return;
 
-            initialized = true; 
+            initialized = true;
 
             await InitNetwork();
         }

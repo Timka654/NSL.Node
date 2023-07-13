@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using NSL.Node.BridgeServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.BridgeServer.Shared.Enums;
+using NSL.SocketServer;
+using NSL.Extensions.Session.Server;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -64,21 +66,59 @@ namespace NSL.Node.RoomServer.Client
             return roomInfo?.Value;
         }
 
+        protected NSLSessionManager<TransportNetworkClient> sessionManager;
+
         protected TBuilder Fill<TBuilder>(TBuilder builder)
             where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder
         {
+            var options = builder.GetCoreOptions() as ServerOptions<TransportNetworkClient>;
+
+            sessionManager = options.AddNSLSessions(c =>
+            {
+                c.CloseSessionDelay = TimeSpan.FromSeconds(10);
+                c.OnRecoverySession += (client, session) =>
+                {
+                    var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
+
+                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Try recovery session {sSession.Session} from {client.Network?.GetRemotePoint()}");
+
+                    client.ChangeOwner(sSession.Client);
+
+                    if (client.Room == null)
+                    {
+                        Task.Delay(1000).ContinueWith((t) =>
+                        {
+                            client.Network?.Disconnect();
+                        });
+                    }
+                };
+
+                c.OnExpiredSession += (network, session) =>
+                {
+                    var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
+
+                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
+
+                    sSession.Client.Room?.OnClientDisconnected(sSession.Client, true);
+                };
+            });
+
             builder.SetLogger(Logger);
 
             builder.AddAsyncPacketHandle(
-                RoomPacketEnum.SignSession, SignInPacketHandle);
+                RoomPacketEnum.SignSessionRequest, SignInPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.Transport, TransportPacketHandle);
+                RoomPacketEnum.TransportMessage, TransportPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.Broadcast, BroadcastPacketHandle);
-            builder.AddPacketHandle(
+                RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
+            builder.AddAsyncPacketHandle(
                 RoomPacketEnum.ReadyNodeRequest, ReadyPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.Execute, ExecutePacketHandle);
+                RoomPacketEnum.ExecuteMessage, ExecutePacketHandle);
+            builder.AddPacketHandle(
+                RoomPacketEnum.DisconnectMessage, DisconnectMessagePacketHandle);
+            builder.AddPacketHandle(
+                RoomPacketEnum.NodeChangeEndPointMessage, ChangeConnectionPointPacketHandle);
 
             builder.AddDefaultEventHandlers<TBuilder, TransportNetworkClient>(null,
                 DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
@@ -97,7 +137,6 @@ namespace NSL.Node.RoomServer.Client
 
             builder.AddDisconnectHandle(client =>
             {
-
                 if (client.Room != null)
                     client.Room.OnClientDisconnected(client);
             });

@@ -1,6 +1,9 @@
 ﻿using NSL.Node.BridgeServer.Shared;
+using NSL.Node.Core.Models.Requests;
+using NSL.Node.Core.Models.Response;
 using NSL.Node.RoomServer.Client.Data;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
+using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Linq;
@@ -12,34 +15,33 @@ namespace NSL.Node.RoomServer.Client
     {
         private async Task SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
-            var response = OutputPacketBuffer.Create(RoomPacketEnum.SignSessionResult);
+            var response = buffer.CreateResponse();
 
-            var sessionId = buffer.ReadGuid();
+            var request = RoomNodeSignInRequestModel.ReadFullFrom(buffer);
 
-            var roomId = buffer.ReadGuid();
+            var result = new RoomNodeSignInResponseModel();
 
-            var token = buffer.ReadString();
+            client.EndPoint = request.ConnectionEndPoint;
 
-            client.EndPoint = buffer.ReadString();
-
-            bool success = false;
-
-            var roomInfo = await TryLoadRoomAsync(roomId, sessionId);
+            var roomInfo = await TryLoadRoomAsync(request.RoomId, request.SessionId);
 
             if (roomInfo != null)
             {
-                if (Guid.TryParse(token.Split(':').First(), out var nodeId))
+                var splitedToken = request.Token.Split(':');
+
+                if (Guid.TryParse(splitedToken.First(), out var nodeId))
                 {
                     var validatePlayer = await Entry.ValidateSessionPlayer(new BridgeServer.Shared.Requests.RoomSignSessionPlayerRequestModel()
                     {
-                        SessionId = sessionId,
+                        SessionId = request.SessionId,
                         PlayerId = nodeId
                     });
 
                     if (!validatePlayer.ExistsSession)
                     {
-                        if (roomMap.TryRemove(sessionId, out var expiredSession))
+                        if (roomMap.TryRemove(request.SessionId, out var expiredSession))
                         {
+                            client.Network?.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $" - [SignIn] Remove session {request.SessionId} by no exists information on Bridge");
                             expiredSession.Value.Dispose();
                         }
                     }
@@ -48,17 +50,22 @@ namespace NSL.Node.RoomServer.Client
                     {
                         client.Room = roomInfo;
                         client.Id = client.NodeId = nodeId;
-                        client.Token = token;
+                        client.Token = string.Join(':', splitedToken.Skip(1).ToArray());
 
-                        success = client.Room.AddClient(client);;
+                        result.Success = client.Room.AddClient(client);
+
+                        if (result.Success)
+                        {
+                            result.NodeId = client.NodeId;
+                            result.Options = roomInfo.GetClientOptions();
+                            var session = sessionManager.CreateSession(client, client.NodeId.ToString());
+                            result.SessionInfo = session;
+                        }
                     }
                 }
             }
 
-            response.WriteBool(success);
-
-            if (success)
-                response.WriteGuid(client.NodeId);
+            result.WriteFullTo(response);
 
             client.Network.Send(response);
         }

@@ -31,7 +31,7 @@ namespace NSL.Node.RoomServer.Bridge
             {
                 var builder = FillOptions(WebSocketsClientEndPointBuilder.Create()
                     .WithClientProcessor<BridgeRoomNetworkClient>()
-                    .WithOptions<WSClientOptions<BridgeRoomNetworkClient>>());
+                    .WithOptions());
 
                 localNetwork = builder.CreateLocalBridge<BridgeRoomNetworkClient, TServerClient>();
             }

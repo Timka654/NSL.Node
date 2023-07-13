@@ -23,7 +23,7 @@ namespace NSL.Node.RoomServer.Bridge
             {
                 wsNetwork = FillOptions(WebSocketsClientEndPointBuilder.Create()
                     .WithClientProcessor<BridgeRoomNetworkClient>()
-                    .WithOptions<WSClientOptions<BridgeRoomNetworkClient>>()
+                    .WithOptions()
                     .WithUrl(wsUrl))
                     .Build();
             }
@@ -31,6 +31,8 @@ namespace NSL.Node.RoomServer.Bridge
             if (!await wsNetwork.ConnectAsync(3000))
             {
                 Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, "Cannot connect");
+
+                Reconnect();
 
                 return false;
             }

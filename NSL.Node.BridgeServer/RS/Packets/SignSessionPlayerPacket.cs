@@ -1,4 +1,5 @@
-﻿using NSL.Node.BridgeServer.Shared.Requests;
+﻿using Newtonsoft.Json;
+using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
 using NSL.Node.BridgeServer.Utils;
 using NSL.SocketCore.Utils.Buffer;
@@ -27,6 +28,8 @@ namespace NSL.Node.BridgeServer.RS.Packets
             }
 
             result.WriteFullTo(response);
+
+            client.ServerOptions.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, JsonConvert.SerializeObject(result));
 
             client.Network?.Send(response);
         }

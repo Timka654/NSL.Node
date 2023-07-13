@@ -65,7 +65,7 @@ namespace NSL.Node.BridgeServer.LS
             builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.AddPlayerRequest, AddPlayerRequestPacket.ReceiveHandle);
             builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.RemovePlayerRequest, RemovePlayerRequestPacket.ReceiveHandle);
 
-            builder.AddReceivePacketHandle(
+            builder.AddResponsePacketHandle(
                 NodeBridgeLobbyPacketEnum.Response,
                 client => client.RequestBuffer);
 

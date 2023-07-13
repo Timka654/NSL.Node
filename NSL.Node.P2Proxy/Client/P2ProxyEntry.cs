@@ -65,11 +65,11 @@ namespace NSL.Node.P2Proxy.Client
             builder.SetLogger(Logger);
 
             builder.AddPacketHandle(
-                RoomPacketEnum.SignSession, SignInPacketHandle);
+                RoomPacketEnum.SignSessionRequest, SignInPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.Transport, TransportPacketHandle);
+                RoomPacketEnum.TransportMessage, TransportPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.Broadcast, BroadcastPacketHandle);
+                RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
 
             builder.AddDefaultEventHandlers<TBuilder, P2PNetworkClient>(null,
                 DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
