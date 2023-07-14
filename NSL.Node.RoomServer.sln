@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.AspNetC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.Core", "NSL.Node.Core\NSL.Node.Core.csproj", "{9104E005-5574-4D3A-B1A7-196F4AE41CC3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.RoomServer.Shared.Client", "..\..\..\Assets\Game\Shared\NSL.Node.RoomServer.Shared.Client.csproj", "{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -154,20 +152,6 @@ Global
 		{9104E005-5574-4D3A-B1A7-196F4AE41CC3}.Unity|Any CPU.Build.0 = Unity|Any CPU
 		{9104E005-5574-4D3A-B1A7-196F4AE41CC3}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
 		{9104E005-5574-4D3A-B1A7-196F4AE41CC3}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.DebugExamples|Any CPU.ActiveCfg = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.DebugExamples|Any CPU.Build.0 = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.DebugRoomServer|Any CPU.ActiveCfg = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.DebugRoomServer|Any CPU.Build.0 = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.ReleaseRoomServer|Any CPU.ActiveCfg = Release|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.ReleaseRoomServer|Any CPU.Build.0 = Release|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.Unity|Any CPU.ActiveCfg = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.Unity|Any CPU.Build.0 = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -177,7 +161,6 @@ Global
 		{3808D6C8-2630-46A2-9C23-2CCF8B4D80AA} = {BC3466B4-8239-425D-BB35-7F65AD1D6001}
 		{E88F039B-4D19-404D-9BA1-D28D01379A8B} = {BC3466B4-8239-425D-BB35-7F65AD1D6001}
 		{86D5A22F-2B6C-4D06-8351-9B08DDDE85B4} = {BC3466B4-8239-425D-BB35-7F65AD1D6001}
-		{80AF8793-8944-4EC0-B821-D9E7BC8C35E3} = {BC3466B4-8239-425D-BB35-7F65AD1D6001}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FAC0C61D-775D-4347-9BD3-3A114A731C7C}
