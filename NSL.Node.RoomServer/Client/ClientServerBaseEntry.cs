@@ -71,11 +71,13 @@ namespace NSL.Node.RoomServer.Client
         protected TBuilder Fill<TBuilder>(TBuilder builder)
             where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder
         {
+            builder.AddConnectHandle(client => client.InitializeObjectBag());
+
             var options = builder.GetCoreOptions() as ServerOptions<TransportNetworkClient>;
 
             sessionManager = options.AddNSLSessions(c =>
             {
-                c.CloseSessionDelay = TimeSpan.FromSeconds(10);
+                c.CloseSessionDelay = TimeSpan.FromSeconds(3);
                 c.OnRecoverySession += (client, session) =>
                 {
                     var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;

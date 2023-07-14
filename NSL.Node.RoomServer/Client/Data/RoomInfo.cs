@@ -160,40 +160,32 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public async Task<bool> ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
         {
-            if (!ar.WaitOne(5000))
+            if (node.Node == null)
+            {
+                await Task.Delay(1_000);
+                return false;
+            }
+
+            if (!ar.WaitOne(10_000))
             {
                 throw new Exception();
             }
 
-            //ar.WaitOne();
-            if (!nodes.ContainsKey(node.Id))
+            if (node.Ready)
+                return true;
+
+            try
             {
-                if (node.RoomId != RoomId)
+                //ar.WaitOne();
+                if (!nodes.ContainsKey(node.Id))
                 {
-                    node.Network.Disconnect();
-
-                    ar.Set();
-
-                    return false;
-                }
-
-                ar.Set();
-
-                return false;
-            }
-
-            if (RoomWaitAllReady)
-            {
-                if (ConnectedNodesCount != nodeIds.Count())
-                {
-                    Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
-
-                    foreach (var item in nodes)
+                    if (node.RoomId != RoomId)
                     {
-                        if (nodeIds.Contains(item.Key))
-                            continue;
+                        node.Network.Disconnect();
 
-                        SendConnectNodeInformation(node, item.Value);
+                        ar.Set();
+
+                        return false;
                     }
 
                     ar.Set();
@@ -201,34 +193,62 @@ namespace NSL.Node.RoomServer.Client.Data
                     return false;
                 }
 
-                if (ConnectedNodesCount != RoomNodeCount)
+                if (RoomWaitAllReady)
                 {
-                    Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
+                    if (ConnectedNodesCount != nodeIds.Count())
+                    {
+                        Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
 
-                    ar.Set();
+                        foreach (var item in nodes)
+                        {
+                            if (nodeIds.Contains(item.Key))
+                                continue;
 
-                    await Task.Delay(2_000);
+                            SendConnectNodeInformation(node, item.Value);
+                        }
 
-                    return false;
+                        ar.Set();
+
+                        return false;
+                    }
+
+                    if (ConnectedNodesCount != RoomNodeCount)
+                    {
+                        Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
+
+                        ar.Set();
+
+                        await Task.Delay(2_000);
+
+                        return false;
+                    }
                 }
+
+                node.Ready = true;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(DateTime.UtcNow);
+                OnNodeConnect(node.Node);
+
+                if (RoomWaitAllReady)
+                {
+                    if (Nodes.All(x => x.Ready))
+                    {
+                        OnRoomReady();
+                        Broadcast(CreateReadyRoomPacket());
+                    }
+                }
+                else
+                    SendTo(node, CreateReadyRoomPacket());
             }
-
-            node.Ready = true;
-
-            OnNodeConnect(node.Node);
-
-            if (RoomWaitAllReady)
+            catch (Exception ex)
             {
-                if (Nodes.All(x => x.Ready))
-                {
-                    OnRoomReady();
-                    Broadcast(CreateReadyRoomPacket());
-                }
+                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
+                return false;
             }
-            else
-                SendTo(node, CreateReadyRoomPacket());
-
-            ar.Set();
+            finally
+            {
+                ar.Set();
+            }
 
             return true;
         }

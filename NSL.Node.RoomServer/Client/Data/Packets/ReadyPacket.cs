@@ -15,11 +15,19 @@ namespace NSL.Node.RoomServer.Client
             var result = data.CreateResponse();
 
             if (client.Room == default)
-                throw new Exception($"Player {client?.Network.GetRemotePoint()} is not (success?) signed");
+            {
+                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"Player {client?.Network.GetRemotePoint()} is not (success?) signed");
 
-            var request = RoomNodeReadyRequestModel.ReadFullFrom(data);
+                await Task.Delay(2_000);
 
-            result.WriteBool(await client.Room.ValidateNodeReady(client, request.ConnectedNodesCount, request.ConnectedNodes));
+                result.WriteBool(false);
+            }
+            else
+            {
+                var request = RoomNodeReadyRequestModel.ReadFullFrom(data);
+
+                result.WriteBool(await client.Room.ValidateNodeReady(client, request.ConnectedNodesCount, request.ConnectedNodes));
+            }
 
             client.Network.Send(result);
         }
