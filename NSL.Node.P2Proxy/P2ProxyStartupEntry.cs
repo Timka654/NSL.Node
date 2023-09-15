@@ -6,7 +6,6 @@ using STUN;
 using System;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace NSL.Node.P2Proxy
 {

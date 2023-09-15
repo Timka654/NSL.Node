@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeServerExampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.AspNetExample", "Examples\NSL.Node.AspNetExample\NSL.Node.AspNetExample.csproj", "{8B013D2F-4B96-4967-A063-5A47CF2192C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Node.BridgeServer.AspNetCore", "NSL.Node.BridgeServer.AspNetCore\NSL.Node.BridgeServer.AspNetCore.csproj", "{A70CC51E-FF17-4EF3-A313-8C23E10DA0B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,12 @@ Global
 		{8B013D2F-4B96-4967-A063-5A47CF2192C7}.DebugExamples|Any CPU.ActiveCfg = Debug|Any CPU
 		{8B013D2F-4B96-4967-A063-5A47CF2192C7}.DebugExamples|Any CPU.Build.0 = Debug|Any CPU
 		{8B013D2F-4B96-4967-A063-5A47CF2192C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A70CC51E-FF17-4EF3-A313-8C23E10DA0B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A70CC51E-FF17-4EF3-A313-8C23E10DA0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A70CC51E-FF17-4EF3-A313-8C23E10DA0B6}.DebugExamples|Any CPU.ActiveCfg = Debug|Any CPU
+		{A70CC51E-FF17-4EF3-A313-8C23E10DA0B6}.DebugExamples|Any CPU.Build.0 = Debug|Any CPU
+		{A70CC51E-FF17-4EF3-A313-8C23E10DA0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A70CC51E-FF17-4EF3-A313-8C23E10DA0B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

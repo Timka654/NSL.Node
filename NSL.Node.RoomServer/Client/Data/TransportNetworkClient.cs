@@ -1,34 +1,33 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketServer.Utils;
 using System;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.WebSockets.Server.AspNetPoint;
-using System.Threading;
 using NSL.UDP.Enums;
 using NSL.UDP;
+using NSL.SocketServer.Utils;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public class TransportNetworkClient : AspNetWSNetworkServerClient, INodeClientNetwork
+    public partial class TransportNetworkClient : AspNetWSNetworkServerClient, INodeClientNetwork
     {
         public string Token { get; set; }
 
         public Guid Id { get; set; }
 
-        public string LobbyServerIdentity { get; set; }
-
         public Guid RoomId { get; set; }
+
+        public Guid NodeId { get; set; }
 
         public string EndPoint { get; set; }
 
         public bool Ready { get; set; }
 
+        public bool DisconnectedFromNodeSide { get; set; }
+
         public RoomInfo Room { get; set; }
 
         public NodeInfo Node { get; set; }
-
-        public Guid NodeId { get; set; }
 
         public bool IsLocalNode => false;
 
@@ -59,12 +58,20 @@ namespace NSL.Node.RoomServer.Client.Data
 
             build(packet);
 
-            packet.WithPid(RoomPacketEnum.Transport);
+            packet.WithPid(RoomPacketEnum.TransportMessage);
 
             Send(packet, channel, true);
         }
 
         public void Send(DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        {
+            if (Network != null)
+                Network.Send(packet, disposeOnSend);
+            else if (disposeOnSend)
+                packet.Dispose();
+        }
+
+        public void Send(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             if (Network != null)
                 Network.Send(packet, disposeOnSend);
@@ -89,7 +96,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             build(packet);
 
-            packet.WithPid(RoomPacketEnum.Transport);
+            packet.WithPid(RoomPacketEnum.TransportMessage);
 
             Send(packet, true);
         }
@@ -97,6 +104,36 @@ namespace NSL.Node.RoomServer.Client.Data
         public void SetObjectOwner(INodeOwneredObject _object)
         {
             _object.SetOwner(Room, this);
+        }
+
+        public override void ChangeOwner(IServerNetworkClient from)
+        {
+            if (!(from is TransportNetworkClient another))
+                throw new Exception($"Invalid type for ChangeOwner - {from.GetType().Name}");
+
+            base.ChangeOwner(from);
+
+            Token = another.Token;
+
+            Id = another.Id;
+
+            RoomId = another.RoomId;
+
+            NodeId = another.NodeId;
+
+            EndPoint = another.EndPoint;
+
+            Ready = another.Ready;
+
+            Node = another.Node?.ChangeTo(this);
+
+            Room = another.Room;
+
+            if (Room?.TryRecoverySession(this) != true)
+            {
+                Room = null;
+            }
+
         }
     }
 }

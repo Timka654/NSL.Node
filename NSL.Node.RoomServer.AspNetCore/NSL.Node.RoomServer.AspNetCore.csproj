@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+		<Configurations>Debug;Release;DebugExamples</Configurations>
+
+		<Version>$(VersionSuffix)</Version>
+		<Authors>Relife87</Authors>
+
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2023.7.26.1030" />
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.7.26.1030" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.7.26.1030" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.7.26.1030" />
+		<PackageReference Include="NSL.ConfigurationEngine" Version="2023.7.26.1030" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.7.26.1030" />
+		<PackageReference Include="NSL.Logger" Version="2023.7.26.1030" />
+		<PackageReference Include="NSL.Logger.AspNetCore" Version="2023.7.26.1030" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj" />
+		<ProjectReference Include="..\NSL.Node.RoomServer\NSL.Node.RoomServer.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-﻿using NSL.Node.BridgeServer.Shared.Enums;
+﻿using NSL.Node.BridgeServer.Shared.Message;
 using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
 
@@ -8,21 +8,9 @@ namespace NSL.Node.BridgeServer.RS.Packets
     {
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            var lobbyServerIdentity = data.ReadString16();
+            var message = RoomFinishMessageModel.ReadFullFrom(data);
 
-            byte[] dataBuffer = data.Read(data.DataLength - data.DataPosition);
-
-            var lobby = client.Entry.LobbyManager.GetLobbyById(lobbyServerIdentity);
-
-            if (lobby == null)
-                return; // todo
-
-            var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoomMessage);
-
-            packet.Write(dataBuffer);
-
-            lobby.Network.Send(packet);
-
+            client.GetSession(message.SessionId).SendLobbyFinishRoom(message.Data);
         }
     }
 }

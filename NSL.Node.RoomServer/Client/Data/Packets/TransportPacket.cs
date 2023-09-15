@@ -3,7 +3,7 @@ using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.RoomServer.Client
 {
-    public partial class ClientServerEntry
+    public partial class ClientServerBaseEntry
     {
         private void TransportPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {

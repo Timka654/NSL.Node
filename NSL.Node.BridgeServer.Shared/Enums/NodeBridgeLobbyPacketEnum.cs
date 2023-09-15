@@ -2,10 +2,13 @@
 {
     public enum NodeBridgeLobbyPacketEnum : ushort
     {
-        SignServerRequest = 1,
-        ValidateSessionRequest = 2,
-        RoomStartupInfoRequest = 3,
-        FinishRoomMessage = 4,
-        Response = 5
+        Response = 1,
+        SignServerRequest,
+        CreateRoomSessionRequest,
+        AddPlayerRequest,
+        RemovePlayerRequest,
+        FinishRoomMessage,
+        RoomChangeStateMessage,
+        RoomMessage
     }
 }

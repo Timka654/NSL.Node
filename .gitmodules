@@ -1,0 +1,4 @@
+[submodule "NSL.Node.Core"]
+	path = NSL.Node.Core
+	url = https://github.com/Timka654/NSL.Node.RoomSharedFiles.git
+	branch = main

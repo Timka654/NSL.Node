@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.BridgeServer.Shared", "NSL.Node.BridgeServer.Shared\NSL.Node.BridgeServer.Shared.csproj", "{F145E6A2-CB7A-4F0E-85DA-FF14C921ECBE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Node.Core", "NSL.Node.Core\NSL.Node.Core.csproj", "{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,20 @@ Global
 		{F145E6A2-CB7A-4F0E-85DA-FF14C921ECBE}.Unity|Any CPU.Build.0 = Unity|Any CPU
 		{F145E6A2-CB7A-4F0E-85DA-FF14C921ECBE}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
 		{F145E6A2-CB7A-4F0E-85DA-FF14C921ECBE}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.DebugExamples|Any CPU.ActiveCfg = DebugExamples|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.DebugExamples|Any CPU.Build.0 = DebugExamples|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.DebugRoomServer|Any CPU.ActiveCfg = DebugExamples|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.DebugRoomServer|Any CPU.Build.0 = DebugExamples|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.ReleaseRoomServer|Any CPU.ActiveCfg = Release|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.ReleaseRoomServer|Any CPU.Build.0 = Release|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.Unity|Any CPU.ActiveCfg = Unity|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.Unity|Any CPU.Build.0 = Unity|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.UnityDebug|Any CPU.ActiveCfg = UnityDebug|Any CPU
+		{26A9178B-1C20-4E30-97E6-EF8A6607BEF1}.UnityDebug|Any CPU.Build.0 = UnityDebug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

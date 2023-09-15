@@ -4,13 +4,13 @@ using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 
 namespace NSL.Node.RoomServer.Client
 {
-    public partial class ClientServerEntry
+    public partial class ClientServerBaseEntry
     {
         private void BroadcastPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
             var body = buffer.GetBuffer();
 
-            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.Transport);
+            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.TransportMessage);
 
             pbuf.WriteGuid(client.Id);
 

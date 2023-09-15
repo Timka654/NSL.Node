@@ -1,4 +1,5 @@
 ﻿using NSL.Node.BridgeServer;
+using NSL.Node.BridgeServer.LS;
 
 namespace NSL.Node.BridgeServerExample
 {
@@ -6,7 +7,10 @@ namespace NSL.Node.BridgeServerExample
     {
         static void Main(string[] args)
         {
-            BridgeServerStartupEntry.CreateDefault().RunEntry();
+            NodeBridgeServerEntryBuilder.Create()
+                .WithConsoleLogger()
+                .WithDefaultManagers(string.Empty, string.Empty);
+                
 
             Console.WriteLine(">>> Success initialized");
 

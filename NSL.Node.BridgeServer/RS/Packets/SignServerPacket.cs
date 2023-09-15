@@ -1,41 +1,22 @@
-﻿using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.SocketCore.Utils.Buffer;
-using NSL.SocketCore.Extensions.Buffer;
+﻿using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
+using NSL.Node.BridgeServer.Utils;
+using NSL.Node.BridgeServer.Shared.Requests;
+using NSL.Node.BridgeServer.Shared.Response;
 
 namespace NSL.Node.BridgeServer.RS.Packets
 {
     internal class SignServerPacket
     {
-        public static string GetIdentityKey(NetworkClient client) => client.Entry.Configuration.GetValue<string>("transport_server_identityKey", "AABBCC");
-
         public static void ReceiveHandle(NetworkClient client, InputPacketBuffer data)
         {
-            var response = data.CreateWaitBufferResponse()
-                .WithPid(NodeBridgeRoomPacketEnum.Response);
+            var response = data.CreateResponse();
 
-            client.Id = data.ReadGuid();
+            var request = RoomSignInRequestModel.ReadFullFrom(data);
 
-            client.ConnectionEndPoint = data.ReadString16();
+            bool result = client.Entry.RoomManager.TryRoomServerConnect(client, request);
 
-            var serverIdentityKey = data.ReadString16();
-
-
-            if (!GetIdentityKey(client).Equals(serverIdentityKey))
-            {
-                response.WriteBool(false);
-
-                client.Send(response);
-
-                return;
-            }
-
-            bool result = client.Entry.RoomManager.TryRoomServerConnect(client);
-
-            response.WriteBool(result);
-
-            if (result)
-                response.WriteGuid(client.Id);
+            new RoomSignInResponseModel { Result = result, ServerIdentity = client.Id}.WriteFullTo(response);
 
             client.Send(response);
         }

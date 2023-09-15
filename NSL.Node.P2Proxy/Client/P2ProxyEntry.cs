@@ -9,6 +9,7 @@ using NSL.EndPointBuilder;
 using NSL.SocketServer.Utils;
 using NSL.UDP;
 using NSL.BuilderExtensions.UDPServer;
+using NSL.SocketCore.Utils.Buffer;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 
 namespace NSL.Node.P2Proxy.Client
@@ -50,7 +51,7 @@ namespace NSL.Node.P2Proxy.Client
             Listener = Fill(UDPServerEndPointBuilder.Create()
                 .WithClientProcessor<P2PNetworkClient>()
                 .WithOptions<UDPClientOptions<P2PNetworkClient>>()
-                .WithBindingPoint(p.Address,p.Port))
+                .WithBindingPoint(p.Address, p.Port))
                 .Build();
 
             Listener.Start();
@@ -64,13 +65,26 @@ namespace NSL.Node.P2Proxy.Client
             builder.SetLogger(Logger);
 
             builder.AddPacketHandle(
-                RoomPacketEnum.SignSession, SignInPacketHandle);
+                RoomPacketEnum.SignSessionRequest, SignInPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.Transport, TransportPacketHandle);
+                RoomPacketEnum.TransportMessage, TransportPacketHandle);
             builder.AddPacketHandle(
-                RoomPacketEnum.Broadcast, BroadcastPacketHandle);
+                RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
 
-            builder.AddDefaultEventHandlers<TBuilder, P2PNetworkClient>(null, DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace);
+            builder.AddDefaultEventHandlers<TBuilder, P2PNetworkClient>(null,
+                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
+
+            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            {
+                if (!InputPacketBuffer.IsSystemPID(pid))
+                    Logger.AppendInfo($"Send packet {pid}");
+            });
+
+            builder.AddBaseReceiveHandle((client, pid, len) =>
+            {
+                if (!InputPacketBuffer.IsSystemPID(pid))
+                    Logger.AppendInfo($"Receive packet {pid}");
+            });
 
             return builder;
         }

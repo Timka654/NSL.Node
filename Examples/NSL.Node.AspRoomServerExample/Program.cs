@@ -1,4 +1,5 @@
-using NSL.Node.RoomServer;
+using NSL.Node.RoomServer.AspNetCore;
+using NSL.Node.RoomServer.Bridge;
 
 namespace NSL.Node.AspRoomServerExample
 {
@@ -6,14 +7,11 @@ namespace NSL.Node.AspRoomServerExample
     {
         public static void Main(string[] args)
         {
-            //var x = new RoomConfigurationManager(null);
-            //foreach (var r in x.GetAllValues())
-            //{
-            //    Console.WriteLine($"{r.Path}  ::  {r.Value}");
-            //}
            var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
+
+            builder.Services.AddNodeRoomServer();
 
             var app = builder.Build();
 
@@ -25,7 +23,14 @@ namespace NSL.Node.AspRoomServerExample
 
             app.UseWebSockets();
 
-            AspRoomServerStartupEntry.Create(app, "/room_server").Run();
+            app.RunNodeRoomServer(c => c
+            .WithAspLogger(app.Logger)
+            .WithBridgeDefaultHandles()
+            //.WithCreateSessionHandle(roomInfo=> new GameInfo(roomInfo))
+            .GetPublicAddressFromStun(out var publicAddr)
+            .WithRoomBridgeNetwork("wss://localhost:7023/room_server", publicAddr, string.Empty)
+            .WithClientServerAspBinding(app, "/room_server")
+            );
 
             app.Run();
         }

@@ -1,134 +1,142 @@
-﻿using NSL.Node.BridgeServer.CS;
+﻿using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.RS;
+using NSL.Node.BridgeServer.Shared.Requests;
+using NSL.Node.BridgeServer.Shared.Response;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeServer.Managers
 {
-    internal class RoomManager
+    public class RoomManager
     {
-        private readonly BridgeServerStartupEntry entry;
-
-        private BridgeConfigurationManager Configuration => entry.Configuration;
-
-        public virtual int TransportServerCountPerRoom => Configuration.GetValue("transport_server_count_perRoom", 1);
-
-        public RoomManager(BridgeServerStartupEntry entry)
+        public RoomManager(string identityKey)
         {
-            this.entry = entry;
+            this.identityKey = identityKey;
         }
 
-        public void OnDisconnectedRoomServer(RoomServerNetworkClient client)
+        public async void OnDisconnectedRoomServer(RoomServerNetworkClient client)
         {
-            if (client.Signed)
-                connectedServers.Remove(client.Id, out _);
+            if (!client.Signed)
+                return;
+
+            await Task.Delay(2000);
+
+            if (connectedServers[client.Id] != client)
+                return;
+
+            connectedServers.Remove(client.Id, out _);
+
+            client.Disconnect();
         }
 
-        internal void CreateRoom(ClientServerNetworkClient client)
+        public bool TryRoomServerConnect(RoomServerNetworkClient client, RoomSignInRequestModel request)
         {
-            var lobby = client.LobbyServer;
+            if (!Equals(identityKey, request.IdentityKey))
+                return false;
 
-            client.Room = lobby.Rooms.GetOrAdd(client.RoomId, roomId => new Models.RoomDataModel() { RoomId = client.RoomId });
-
-            client.Room.Clients.TryAdd(client.SessionIdentity, client);
-        }
-
-        internal List<CreateSignResult> CreateSignSession(ClientServerNetworkClient client)
-        {
-            List<CreateSignResult> result = new List<CreateSignResult>();
-
-            var serverArray = connectedServers.Values.ToArray();
-
-            if (serverArray.Length == 0)
-                return result;
-
-            var offset = client.RoomId.GetHashCode() % serverArray.Length;
-
-            var room = client.Room;
-
-            // single server for now - maybe change to multiple later
-
-            var selectedServers = serverArray.Skip(offset).Take(TransportServerCountPerRoom).ToList();
-
-            var missedCount = TransportServerCountPerRoom - selectedServers.Count;
-
-            if (missedCount > 0)
+            if (Guid.Empty.Equals(request.Identity))
+                request.Identity = Guid.NewGuid();
+            else
             {
-                selectedServers.AddRange(serverArray.Take(missedCount).Where(x => !selectedServers.Contains(x)));
+                if (connectedServers.TryGetValue(request.Identity, out var exists))
+                {
+                    if (exists.GetState())
+                        return false;
+
+                    SignRoom(client, request);
+
+                    connectedServers[request.Identity] = client;
+
+                    client.ChangeOwner(exists);
+
+                    return true;
+                }
             }
 
-            if (selectedServers.Any())
+            while (!connectedServers.TryAdd(request.Identity, client))
             {
-                var newId = Guid.NewGuid();
+                request.Identity = Guid.NewGuid();
+            }
 
-                if (client.TransportSessions != default)
+            SignRoom(client, request);
+
+            return true;
+        }
+
+        private void SignRoom(RoomServerNetworkClient client, RoomSignInRequestModel request)
+        {
+            client.Id = request.Identity;
+
+            client.ConnectionEndPoint = request.ConnectionEndPoint;
+
+            client.Signed = true;
+        }
+
+        public CreateRoomSessionResponseModel CreateRoomSession(LobbyServerNetworkClient client, LobbyCreateRoomSessionRequestModel request)
+        {
+            var result = new CreateRoomSessionResponseModel();
+
+            IEnumerable<RoomServerNetworkClient> servers = default;
+
+            if (request.SpecialServer.HasValue)
+            {
+                if (connectedServers.TryGetValue(request.SpecialServer.Value, out var server))
+                    servers = Enumerable.Repeat(server, 1);
+            }
+            else
+            {
+                IEnumerable<RoomServerNetworkClient> serverSelector = connectedServers.Values;
+
+                if (request.Location != default)
+                    serverSelector = serverSelector.Where(x=>request.Location.Equals(x.Location));
+
+                servers = serverSelector.OrderBy(x => x.SessionsCount).Take(request.NeedPointCount);
+            }
+
+            servers = servers.Where(x => x.Network?.GetState() == true);
+
+            result.Result = servers.Any();
+
+            if (result.Result)
+            {
+                var sessions = new List<RoomSession>();
+
+                result.ConnectionPoints = servers.Select(server =>
                 {
-                    foreach (var item in client.TransportSessions)
+                    var session = server.CreateSession(new RoomSession(request.RoomId, client, server)
                     {
-                        item.Dispose();
-                    }
-                }
+                        StartupInfo = new Shared.NodeRoomStartupInfo(request.StartupOptions),
+                        PlayerIds = request.InitialPlayers
+                    });
 
-                client.TransportSessions = new TransportSession[selectedServers.Count];
-
-                int i = 0;
-
-                foreach (var server in selectedServers)
-                {
-                    var tsession = new TransportSession(client) { TransportIdentity = newId };
-
-                    while (!server.TryAddSession(tsession))
+                    session.OnDestroy += session =>
                     {
-                        newId = tsession.TransportIdentity = Guid.NewGuid();
-                    }
+                        sessions.Remove(session);
 
-                    client.TransportSessions[i] = tsession;
+                        if (sessions.Any() == false)
+                            client.Rooms.Remove(session.RoomIdentity, out _);
+                    };
 
-                    result.Add(new CreateSignResult(server.ConnectionEndPoint, newId));
+                    sessions.Add(session);
 
-                    i++;
-                }
+                    return new Shared.RoomServerPointInfo()
+                    {
+                        Endpoint = server.ConnectionEndPoint,
+                        SessionId = session.SessionId
+                    };
+                }).ToList();
+
+                client.Rooms.AddOrUpdate(request.RoomId, k => sessions, (k, o) => sessions);
             }
 
             return result;
         }
 
-        internal bool TryRoomServerConnect(RoomServerNetworkClient client)
-        {
-            if (!Guid.Empty.Equals(client.Id))
-            {
-                if (connectedServers.TryGetValue(client.Id, out var server))
-                {
-                    if (server.GetState())
-                    {
-                        return false;
-                    }
-
-                    connectedServers[client.Id] = client;
-
-                    server.ChangeOwner(client);
-
-                    client.Signed = true;
-
-                    return true;
-                }
-            }
-            else
-                client.Id = Guid.NewGuid();
-
-            while (!connectedServers.TryAdd(client.Id, client))
-            {
-                client.Id = Guid.NewGuid();
-            }
-
-            client.Signed = true;
-
-            return true;
-        }
-
         private ConcurrentDictionary<Guid, RoomServerNetworkClient> connectedServers = new ConcurrentDictionary<Guid, RoomServerNetworkClient>();
+        private readonly string identityKey;
     }
 
     public record CreateSignResult(string endPoint, Guid id);

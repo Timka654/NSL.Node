@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace NSL.Node.BridgeServer.Shared
 {
@@ -14,6 +13,7 @@ namespace NSL.Node.BridgeServer.Shared
         public const string RoomNodeCountVariableName = SystemVariablePrefix + "__node_count";
         public const string RoomStartupTimeoutVariableName = SystemVariablePrefix + "__startup_timeout";
         public const string RoomShutdownOnMissedReadyVariableName = SystemVariablePrefix + "__shutdown_on_missed_ready";
+        public const string RoomDestroyOnEmptyVariableName = SystemVariablePrefix + "__destroy_on_empty";
 
         internal Dictionary<string, string> collection;
 
@@ -26,6 +26,10 @@ namespace NSL.Node.BridgeServer.Shared
         }
 
         public NodeRoomStartupInfo(IEnumerable<KeyValuePair<string, string>> collection)
+             : this(collection.ToDictionary(x => x.Key, x => x.Value))
+        { }
+
+        public NodeRoomStartupInfo(Dictionary<string, string> collection)
         {
             this.collection = collection.ToDictionary(x => x.Key, x => x.Value);
         }
@@ -70,6 +74,9 @@ namespace NSL.Node.BridgeServer.Shared
         public IEnumerable<KeyValuePair<string, string>> GetCollection()
             => collection;
 
+        public Dictionary<string, string> GetDictionary()
+            => collection;
+
         public NodeRoomStartupInfo SetRoomNodeCount(int value)
             => SetValue(RoomNodeCountVariableName, value);
 
@@ -81,6 +88,12 @@ namespace NSL.Node.BridgeServer.Shared
 
         public bool GetRoomWaitReady()
             => GetValue<bool>(RoomWaitReadyVariableName);
+
+        public NodeRoomStartupInfo SetDestroyOnEmpty(bool value)
+            => SetValue(RoomDestroyOnEmptyVariableName, value);
+
+        public bool GetDestroyOnEmpty()
+            => GetValue<bool>(RoomDestroyOnEmptyVariableName);
 
         /// <summary>
         /// 

@@ -1,5 +1,4 @@
-﻿using NSL.Node.BridgeServer.CS;
-using NSL.SocketServer.Utils;
+﻿using NSL.SocketServer.Utils;
 using NSL.WebSockets.Server.AspNetPoint;
 using System;
 using System.Collections.Concurrent;
@@ -14,50 +13,58 @@ namespace NSL.Node.BridgeServer.RS
 
         public string ConnectionEndPoint { get; set; }
 
-        private ConcurrentDictionary<Guid, TransportSession> SessionMap { get; } = new ConcurrentDictionary<Guid, TransportSession>();
-        public BridgeServerStartupEntry Entry { get; internal set; }
+        public string Location { get; set; }
 
-        public bool TryAddSession(TransportSession session)
+        public int SessionsCount => SessionMap.Count;
+
+        private ConcurrentDictionary<Guid, RoomSession> SessionMap { get; set; } = new ConcurrentDictionary<Guid, RoomSession>();
+
+        public NodeBridgeServerEntry Entry { get; internal set; }
+
+        public RoomSession CreateSession(RoomSession session)
         {
-            if (SessionMap.TryAdd(session.TransportIdentity, session))
-            {
-                session.OnDestroy += _ => TryRemoveSession(session.TransportIdentity);
-                return true;
-            }
+            while (!SessionMap.TryAdd(session.SessionId = Guid.NewGuid(), session)) ;
 
-            return false;
+            session.OnDestroy += session => TryRemoveSession(session.SessionId);
+
+            return session;
         }
 
-        public void TryRemoveSession(Guid id)
+        public void TryRemoveSession(Guid sessionId)
         {
-            if (SessionMap.TryRemove(id, out var session))
+            if (SessionMap.TryRemove(sessionId, out var session))
                 session.Dispose();
         }
 
-        public TransportSession GetSession(Guid sessionId)
+        public RoomSession GetSession(Guid sessionId)
         {
             SessionMap.TryGetValue(sessionId, out var session);
 
             return session;
         }
-    }
 
-    public class TransportSession : IDisposable
-    {
-        public TransportSession(ClientServerNetworkClient client)
+        public override void ChangeOwner(IServerNetworkClient from)
         {
-            Client = client;
+            if (from is not RoomServerNetworkClient other)
+                throw new InvalidOperationException($"{nameof(ChangeOwner)} invalid {nameof(from)} type");
+
+            SessionMap = other.SessionMap;
+
+            foreach (var item in SessionMap)
+            {
+                item.Value.OwnedRoomNetwork = this;
+            }
+
+            base.ChangeOwner(from);
         }
 
-        public Guid TransportIdentity { get; set; }
-
-        public ClientServerNetworkClient Client { get; }
-
-        public event Action<TransportSession> OnDestroy = session => { };
-
-        public void Dispose()
+        public void Disconnect()
         {
-            OnDestroy(this);
+            foreach (var item in SessionMap.Values)
+            {
+                item.SendLobbyFinishRoom(null);
+                item.Dispose();
+            }
         }
     }
 }

@@ -1,5 +1,8 @@
 ﻿using NSL.Node.RoomServer;
+using NSL.Node.RoomServer.Bridge;
+using NSL.Node.RoomServer.Client;
 using NSL.Node.RoomServer.Client.Data;
+using NSL.Node.RoomServer.Data;
 
 namespace NSL.Node.BridgeTransportExample
 {
@@ -14,21 +17,23 @@ namespace NSL.Node.BridgeTransportExample
             //    Console.WriteLine($"{r.Path}  ::  {r.Value}");
             //}
 
-            ExampleRoomServerStartupEntry.CreateDefault().RunEntry();
+            //ExampleRoomServerStartupEntry.CreateDefault().RunEntry();
+
+            int clientPort = 9999;
+
+            NodeRoomServerEntryBuilder.Create()
+                .WithConsoleLogger()
+                .WithBridgeDefaultHandles()
+                //.WithCreateSessionHandle(roomInfo=> new GameInfo(roomInfo))
+                .GetPublicAddressFromStun(clientPort,false, out var connectionPoint)
+                .WithRoomBridgeNetwork("wss://localhost:7023/room_server", connectionPoint, string.Empty)
+                .WithClientServerBinding(clientPort)
+                .Run();
+
 
             Console.WriteLine("Success initialized");
 
             Thread.Sleep(Timeout.InfiniteTimeSpan);
         }
-    }
-
-    public class ExampleRoomServerStartupEntry: DefaultRoomServerStartupEntry
-    {
-        public override Task<string> GetProxyRoomId(RoomInfo roomInfo) => Task.FromResult($"{roomInfo.LobbyServerIdentity}_{roomInfo.LobbyServerIdentity}");
-
-        public override Task<IEnumerable<string>> GetProxyEndPoints() => Task.FromResult(Enumerable.Repeat("udp://localhost:5980", 1));
-
-        public static ExampleRoomServerStartupEntry CreateDefault()
-            => new ExampleRoomServerStartupEntry();
     }
 }
