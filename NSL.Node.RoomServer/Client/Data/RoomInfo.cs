@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
@@ -72,23 +73,23 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool AddClient(TransportNetworkClient node)
         {
-            if (nodes.TryAdd(node.Id, node))
+            if (nodes.TryRemove(node.Id, out var oldNode))
             {
-                node.Node = new NodeInfo(node, node.Id);
-
-                if (ar.WaitOne(0))
-                {
-                    ar.Set();
-                }
-
-                broadcastDelegate += node.Send;
-
-                BroadcastConnectNode(node);
-
-                return true;
+                if (oldNode.Network?.GetState() == true)
+                    oldNode.Network.Disconnect();
+                else
+                    OnClientDisconnected(oldNode);
             }
 
-            return false;
+            nodes.TryAdd(node.Id, node);
+
+            node.Node = new NodeInfo(node, node.Id);
+
+            broadcastDelegate += node.Send;
+
+            BroadcastConnectNode(node);
+
+            return true;
         }
 
         public void OnClientDisconnected(TransportNetworkClient node, bool expired = false)
@@ -134,11 +135,10 @@ namespace NSL.Node.RoomServer.Client.Data
 
             Game = Entry.CreateRoomSession(this);
 
-            if (!RoomWaitAllReady)
-                OnRoomReady();
-
             ar.Set();
 
+            if (!RoomWaitAllReady)
+                OnRoomReady();
         }
 
         public Dictionary<string, string> GetClientOptions()
@@ -162,12 +162,14 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (node.Node == null)
             {
+                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {nameof(node.Node)} is null. result = false");
                 await Task.Delay(1_000);
                 return false;
             }
 
             if (!ar.WaitOne(10_000))
             {
+                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} locker not response");
                 throw new Exception();
             }
 
@@ -181,14 +183,14 @@ namespace NSL.Node.RoomServer.Client.Data
                 {
                     if (node.RoomId != RoomId)
                     {
-                        node.Network.Disconnect();
+                        Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} have invalid roomId {node.RoomId} vs {RoomId}");
 
-                        ar.Set();
+                        node.Network.Disconnect();
 
                         return false;
                     }
 
-                    ar.Set();
+                    Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} not signed");
 
                     return false;
                 }
@@ -207,7 +209,7 @@ namespace NSL.Node.RoomServer.Client.Data
                             SendConnectNodeInformation(node, item.Value);
                         }
 
-                        ar.Set();
+                        Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{nameof(ValidateNodeReady)} {node.Id} have invalid node connections count {ConnectedNodesCount} vs {nodeIds.Count()}");
 
                         return false;
                     }
@@ -215,8 +217,6 @@ namespace NSL.Node.RoomServer.Client.Data
                     if (ConnectedNodesCount != RoomNodeCount)
                     {
                         Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
-
-                        ar.Set();
 
                         await Task.Delay(2_000);
 
@@ -503,9 +503,16 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void Execute(TransportNetworkClient client, InputPacketBuffer packet)
         {
-            if (handles.TryGetValue(packet.ReadUInt16(), out var command))
+            try
             {
-                command(client.Node, packet);
+                if (handles.TryGetValue(packet.ReadUInt16(), out var command))
+                {
+                    command(client.Node, packet);
+                }
+            }
+            catch (Exception ex)
+            {
+                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(Execute)} {nameof(client.Id)} throw error\r\n{ex}");
             }
         }
 

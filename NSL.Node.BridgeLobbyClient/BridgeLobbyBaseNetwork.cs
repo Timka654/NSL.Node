@@ -140,7 +140,7 @@ namespace NSL.Node.BridgeLobbyClient
 
                 OnStateChanged(State);
 
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             });
 
             return signResult;
@@ -158,7 +158,7 @@ namespace NSL.Node.BridgeLobbyClient
             {
                 response = CreateRoomSessionResponseModel.ReadFullFrom(data);
 
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             });
 
             return response;
@@ -172,7 +172,7 @@ namespace NSL.Node.BridgeLobbyClient
 
             await PacketWaitBuffer.SendRequestAsync(output, data =>
             {
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             });
         }
 
@@ -184,7 +184,7 @@ namespace NSL.Node.BridgeLobbyClient
 
             await PacketWaitBuffer.SendRequestAsync(output, data =>
             {
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             });
         }
 

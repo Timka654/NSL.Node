@@ -159,7 +159,7 @@ namespace NSL.Node.RoomServer.Bridge
             {
                 response = RoomSignInResponseModel.ReadFullFrom(data);
 
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             });
 
             response ??= new RoomSignInResponseModel();
@@ -188,7 +188,7 @@ namespace NSL.Node.RoomServer.Bridge
             {
                 result = RoomSignSessionResponseModel.ReadFullFrom(data);
 
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             });
 
             return result ?? new RoomSignSessionResponseModel() { Result = false };
@@ -206,7 +206,7 @@ namespace NSL.Node.RoomServer.Bridge
             {
                 result = RoomSignSessionPlayerResponseModel.ReadFullFrom(data);
 
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             });
 
             return result ?? new RoomSignSessionPlayerResponseModel();
