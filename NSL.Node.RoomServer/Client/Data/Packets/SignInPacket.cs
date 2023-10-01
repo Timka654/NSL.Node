@@ -1,8 +1,6 @@
-﻿using NSL.Node.BridgeServer.Shared;
-using NSL.Node.Core.Models.Requests;
+﻿using NSL.Node.Core.Models.Requests;
 using NSL.Node.Core.Models.Response;
 using NSL.Node.RoomServer.Client.Data;
-using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using System;

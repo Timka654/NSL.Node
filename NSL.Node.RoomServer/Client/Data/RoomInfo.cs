@@ -1,4 +1,6 @@
-﻿using NSL.Node.BridgeServer.Shared;
+﻿using Newtonsoft.Json;
+using NSL.Logger;
+using NSL.Node.BridgeServer.Shared;
 using NSL.Node.Core.Models.Message;
 using NSL.Node.RoomServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
@@ -19,11 +21,9 @@ namespace NSL.Node.RoomServer.Client.Data
 {
     public class RoomInfo : IServerRoomInfo, IDisposable
     {
-        private AutoResetEvent ar = new AutoResetEvent(false);
-
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
 
-        public IEnumerable<NodeInfo> GetNodes() { return nodes.Values.Select(x => x.Node).ToArray(); }
+        public IEnumerable<NodeInfo> GetNodes() { return nodes.Values.Select(x => x.Node); }
 
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
@@ -64,6 +64,10 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action OnRoomDisposed = () => { };
 
+        private AutoResetEvent ar = new AutoResetEvent(true);
+
+        private SemaphoreSlim bdLocker = new SemaphoreSlim(1);
+
         public RoomInfo(NodeRoomServerEntry entry, Guid sessionId, Guid roomId)
         {
             Entry = entry;
@@ -71,50 +75,56 @@ namespace NSL.Node.RoomServer.Client.Data
             RoomId = roomId;
         }
 
-        public bool AddClient(TransportNetworkClient node)
+        public bool AddClient(TransportNetworkClient client)
         {
-            if (nodes.TryRemove(node.Id, out var oldNode))
+            if (nodes.TryGetValue(client.Id, out var oldClient))
             {
-                if (oldNode.Network?.GetState() == true)
-                    oldNode.Network.Disconnect();
-                else
-                    OnClientDisconnected(oldNode);
+                if (oldClient.Network?.GetState() == true)
+                {
+                    oldClient.Network?.Disconnect();
+                }
+                else if (oldClient.Network != null)
+                {
+                    OnClientDisconnected(oldClient, true);
+                }
             }
 
-            nodes.TryAdd(node.Id, node);
+            client.Node = new NodeInfo(client, client.Id);
 
-            node.Node = new NodeInfo(node, node.Id);
+            nodes.TryAdd(client.Id, client);
 
-            broadcastDelegate += node.Send;
+            bdLocker.SafeInvoke(() => broadcastDelegate += client.Send);
 
-            BroadcastConnectNode(node);
+            BroadcastConnectNode(client);
 
             return true;
         }
 
-        public void OnClientDisconnected(TransportNetworkClient node, bool expired = false)
+        public void OnClientDisconnected(TransportNetworkClient client, bool expired = false)
         {
-            if (!node.DisconnectedFromNodeSide)
+            if (!client.DisconnectedFromNodeSide)
             {
                 if (!expired)
                 {
-                    BroadcastConnectionLostNode(node);
+                    BroadcastConnectionLostNode(client);
                     return;
                 }
             }
 
-            if (nodes.TryRemove(node.Id, out _))
+            if (nodes.TryRemove(client.Id, out _))
             {
-                node.Room = null;
+                client.Room = null;
 
-                broadcastDelegate -= node.Send;
+                bdLocker.SafeInvoke(() => broadcastDelegate -= client.Send);
 
-                BroadcastDisconnectNode(node);
+                BroadcastDisconnectNode(client);
 
-                OnNodeDisconnect(node.Node);
+                OnNodeDisconnect(client.Node);
 
                 if (StartupInfo.GetDestroyOnEmpty() && !nodes.Any())
+                {
                     Dispose();
+                }
             }
         }
 
@@ -134,8 +144,6 @@ namespace NSL.Node.RoomServer.Client.Data
                 RunDestroyOnMissedTimer();
 
             Game = Entry.CreateRoomSession(this);
-
-            ar.Set();
 
             if (!RoomWaitAllReady)
                 OnRoomReady();
@@ -328,7 +336,10 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void Broadcast(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
-            broadcastDelegate(packet, false);
+            bdLocker.SafeInvoke(() =>
+            {
+                broadcastDelegate(packet, false);
+            });
 
             if (disposeOnSend)
                 packet.Dispose();
