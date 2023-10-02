@@ -23,7 +23,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool Ready { get; set; }
 
-        public bool DisconnectedFromNodeSide { get; set; }
+        public bool RequestedDisconnect { get; set; }
 
         public RoomInfo Room { get; set; }
 
@@ -134,6 +134,13 @@ namespace NSL.Node.RoomServer.Client.Data
                 Room = null;
             }
 
+        }
+
+        public void Disconnect()
+        {
+            RequestedDisconnect = true;
+
+            Network.Disconnect();
         }
     }
 }

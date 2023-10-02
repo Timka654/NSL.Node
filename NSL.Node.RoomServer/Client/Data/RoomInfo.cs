@@ -98,7 +98,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void OnClientDisconnected(TransportNetworkClient client, bool expired = false)
         {
-            if (!client.DisconnectedFromNodeSide)
+            if (!client.RequestedDisconnect)
             {
                 if (!expired)
                 {

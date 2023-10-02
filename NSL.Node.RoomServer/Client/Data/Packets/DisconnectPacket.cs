@@ -7,13 +7,9 @@ namespace NSL.Node.RoomServer.Client
 {
     public partial class ClientServerBaseEntry
     {
-        private async void DisconnectMessagePacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+        private void DisconnectMessagePacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
-            client.DisconnectedFromNodeSide = true;
-
-            await Task.Delay(1000);
-
-            client.Network.Disconnect();
+            client.Disconnect();
         }
     }
 }
