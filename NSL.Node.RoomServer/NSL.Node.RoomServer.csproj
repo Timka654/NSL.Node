@@ -32,9 +32,9 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='UnityDebug' and '$(Configuration)'!='Unity'">
-		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.10.2.133" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.10.2.133" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.10.2.133" />
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2023.10.2.1315" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
@@ -44,12 +44,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2023.10.2.133" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.10.2.133" />
-		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.10.2.133" />
-		<PackageReference Include="NSL.Extensions.Session.Server" Version="2023.10.2.133" />
-		<PackageReference Include="NSL.Logger" Version="2023.10.2.133" />
-		<PackageReference Include="NSL.UDP.Client" Version="2023.10.2.133" />
+		<PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.Extensions.Session.Server" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.Logger" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.UDP.Client" Version="2023.10.2.1315" />
 		<PackageReference Include="STUN" Version="0.5.0" />
 	</ItemGroup>
 

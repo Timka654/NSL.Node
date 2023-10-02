@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json;
-using NSL.Logger;
-using NSL.Node.BridgeServer.Shared;
+﻿using NSL.Node.BridgeServer.Shared;
 using NSL.Node.Core.Models.Message;
-using NSL.Node.RoomServer.Shared;
 using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
@@ -15,7 +12,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
@@ -181,12 +177,11 @@ namespace NSL.Node.RoomServer.Client.Data
                 throw new Exception();
             }
 
-            if (node.Ready)
-                return true;
-
             try
             {
-                //ar.WaitOne();
+                if (node.Ready)
+                    return true;
+
                 if (!nodes.ContainsKey(node.Id))
                 {
                     if (node.RoomId != RoomId)
@@ -233,8 +228,7 @@ namespace NSL.Node.RoomServer.Client.Data
                 }
 
                 node.Ready = true;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(DateTime.UtcNow);
+
                 OnNodeConnect(node.Node);
 
                 if (RoomWaitAllReady)
