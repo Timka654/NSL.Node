@@ -9,6 +9,7 @@ using NSL.Logger.Interface;
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 using NSL.SocketCore.Utils.Buffer;
 using System;
+using NSL.SocketCore.Utils.Logger;
 
 namespace NSL.Node.BridgeServer.LS
 {
@@ -16,7 +17,7 @@ namespace NSL.Node.BridgeServer.LS
     {
         protected INetworkListener Listener { get; set; }
 
-        protected ILogger Logger { get; }
+        protected IBasicLogger Logger { get; }
 
         protected NodeBridgeServerEntry Entry { get; }
 
@@ -31,8 +32,7 @@ namespace NSL.Node.BridgeServer.LS
         public abstract void Run();
 
         protected TBuilder Fill<TBuilder>(TBuilder builder)
-            //where TBuilder : WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>
-            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder
+            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder<NetworkClient>
         {
             builder.SetLogger(Logger);
 
@@ -45,16 +45,16 @@ namespace NSL.Node.BridgeServer.LS
             builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
 
             if (Logger != null)
-                builder.AddDefaultEventHandlers<TBuilder, NetworkClient>(null,
+                builder.AddDefaultEventHandlers((string)null,
                     DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
-            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            builder.AddSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger?.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeLobbyPacketEnum)pid)})");
             });
 
-            builder.AddBaseReceiveHandle((client, pid, len) =>
+            builder.AddReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger?.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeLobbyPacketEnum)pid)})");

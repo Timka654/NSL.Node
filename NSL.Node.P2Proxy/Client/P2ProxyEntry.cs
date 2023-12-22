@@ -61,7 +61,7 @@ namespace NSL.Node.P2Proxy.Client
         }
 
         private TBuilder Fill<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<P2PNetworkClient>, IHandleIOBuilder
+            where TBuilder : IOptionableEndPointBuilder<P2PNetworkClient>, IHandleIOBuilder<P2PNetworkClient>
         {
             builder.SetLogger(Logger);
 
@@ -72,16 +72,16 @@ namespace NSL.Node.P2Proxy.Client
             builder.AddPacketHandle(
                 RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
 
-            builder.AddDefaultEventHandlers<TBuilder, P2PNetworkClient>(null,
+            builder.AddDefaultEventHandlers((string)null,
                 DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
-            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            builder.AddSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Send packet {pid}");
             });
 
-            builder.AddBaseReceiveHandle((client, pid, len) =>
+            builder.AddReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Receive packet {pid}");

@@ -23,8 +23,6 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool Ready { get; set; }
 
-        public bool RequestedDisconnect { get; set; }
-
         public RoomInfo Room { get; set; }
 
         public NodeInfo Node { get; set; }
@@ -138,9 +136,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void Disconnect()
         {
-            RequestedDisconnect = true;
-
-            Network.Disconnect();
+            Network?.Disconnect();
         }
     }
 }

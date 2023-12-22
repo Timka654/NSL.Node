@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -16,9 +16,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.10.2.1315" />
-		<PackageReference Include="NSL.Logger" Version="2023.10.2.1315" />
-		<PackageReference Include="NSL.UDP.Client" Version="2023.10.2.1315" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2023.12.19.1754" />
+		<PackageReference Include="NSL.Logger" Version="2023.12.19.1754" />
+		<PackageReference Include="NSL.UDP.Client" Version="2023.12.19.1754" />
 	</ItemGroup>
 
 	<ItemGroup>

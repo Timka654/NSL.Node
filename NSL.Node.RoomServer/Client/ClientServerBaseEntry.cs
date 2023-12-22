@@ -70,7 +70,7 @@ namespace NSL.Node.RoomServer.Client
         protected NSLSessionManager<TransportNetworkClient> sessionManager;
 
         protected TBuilder Fill<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder
+            where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder<TransportNetworkClient>
         {
             builder.AddConnectHandle(client => client.InitializeObjectBag());
 
@@ -102,7 +102,7 @@ namespace NSL.Node.RoomServer.Client
 
                     options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
 
-                    sSession.Client.Room?.DisconnectClient(sSession.Client);
+                    sSession.Client.Room?.DisconnectNode(sSession.Client);
                 };
             });
 
@@ -123,16 +123,16 @@ namespace NSL.Node.RoomServer.Client
             builder.AddPacketHandle(
                 RoomPacketEnum.NodeChangeEndPointMessage, ChangeConnectionPointPacketHandle);
 
-            builder.AddDefaultEventHandlers<TBuilder, TransportNetworkClient>(null,
+            builder.AddDefaultEventHandlers((string)null,
                 DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
-            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            builder.AddSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Send packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
             });
 
-            builder.AddBaseReceiveHandle((client, pid, len) =>
+            builder.AddReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");

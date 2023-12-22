@@ -43,7 +43,7 @@ namespace NSL.Node.BridgeLobbyClient
 
 
         protected TBuilder FillOptions<TBuilder>(TBuilder builder, Action<TBuilder> onBuild)
-            where TBuilder : IOptionableEndPointBuilder<BridgeLobbyNetworkClient>, IHandleIOBuilder
+            where TBuilder : IOptionableEndPointBuilder<BridgeLobbyNetworkClient>, IHandleIOBuilder<BridgeLobbyNetworkClient>
         {
             builder.AddResponsePacketHandle(
                 NodeBridgeLobbyPacketEnum.Response,

@@ -9,6 +9,7 @@ using NSL.SocketServer.Utils;
 using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils.Buffer;
 using System;
+using NSL.SocketCore.Utils.Logger;
 
 namespace NSL.Node.BridgeServer.RS
 {
@@ -16,7 +17,7 @@ namespace NSL.Node.BridgeServer.RS
     {
         protected INetworkListener Listener { get; set; }
 
-        protected ILogger Logger { get; }
+        protected IBasicLogger Logger { get; }
 
         protected NodeBridgeServerEntry Entry { get; }
 
@@ -32,7 +33,7 @@ namespace NSL.Node.BridgeServer.RS
 
         protected TBuilder Fill<TBuilder>(TBuilder builder)
             //where TBuilder : WebSocketsServerEndPointBuilder<NetworkClient, NetworkOptions>
-            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder
+            where TBuilder : IOptionableEndPointBuilder<NetworkClient>, IHandleIOBuilder<NetworkClient>
         {
             builder.SetLogger(Logger);
 
@@ -45,16 +46,16 @@ namespace NSL.Node.BridgeServer.RS
             builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
 
 
-            builder.AddDefaultEventHandlers<TBuilder, NetworkClient>(null,
+            builder.AddDefaultEventHandlers((string)null,
                 DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
-            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            builder.AddSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
             });
 
-            builder.AddBaseReceiveHandle((client, pid, len) =>
+            builder.AddReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");

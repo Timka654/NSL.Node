@@ -61,7 +61,7 @@ namespace NSL.Node.RoomServer.Bridge
         }
 
         protected TBuilder FillOptions<TBuilder>(TBuilder builder)
-            where TBuilder : IOptionableEndPointBuilder<BridgeRoomNetworkClient>, IHandleIOBuilder
+            where TBuilder : IOptionableEndPointBuilder<BridgeRoomNetworkClient>, IHandleIOBuilder<BridgeRoomNetworkClient>
         {
 
             builder.SetLogger(Logger);
@@ -104,16 +104,16 @@ namespace NSL.Node.RoomServer.Bridge
                 OnStateChanged(State);
             });
 
-            builder.AddDefaultEventHandlers<TBuilder, BridgeRoomNetworkClient>(null,
+            builder.AddDefaultEventHandlers((string)null,
         DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
-            builder.AddBaseSendHandle((client, pid, len, stack) =>
+            builder.AddSendHandle((client, pid, len, stack) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
             });
 
-            builder.AddBaseReceiveHandle((client, pid, len) =>
+            builder.AddReceiveHandle((client, pid, len) =>
             {
                 if (!InputPacketBuffer.IsSystemPID(pid))
                     Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");

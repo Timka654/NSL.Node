@@ -75,13 +75,14 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (nodes.TryGetValue(client.Id, out var oldClient))
             {
+                DisconnectNode(oldClient);
                 if (oldClient.Network?.GetState() == true)
                 {
                     oldClient.Network?.Disconnect();
                 }
                 else if (oldClient.Network != null)
                 {
-                    OnClientDisconnected(oldClient, true);
+                    DisconnectNode(oldClient);
                 }
             }
 
@@ -96,19 +97,17 @@ namespace NSL.Node.RoomServer.Client.Data
             return true;
         }
 
-        public void OnClientDisconnected(TransportNetworkClient client, bool expired = false)
+        public void OnClientDisconnected(TransportNetworkClient client)
         {
-            if (!client.RequestedDisconnect)
-            {
-                if (!expired)
-                {
-                    BroadcastConnectionLostNode(client);
-                    return;
-                }
-            }
+            // implement with session manager
+        }
 
-            if (nodes.TryRemove(client.Id, out _))
+        public void DisconnectNode(TransportNetworkClient client)
+        {
+            if (nodes.TryRemove(client.Id, out var oldClient))
             {
+                BroadcastConnectionLostNode(client);
+
                 client.Room = null;
 
                 bdLocker.SafeInvoke(() => broadcastDelegate -= client.Send);
