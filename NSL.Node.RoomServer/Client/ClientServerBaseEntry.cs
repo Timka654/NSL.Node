@@ -91,7 +91,7 @@ namespace NSL.Node.RoomServer.Client
                     {
                         Task.Delay(1000).ContinueWith((t) =>
                         {
-                            client.Network?.Disconnect();
+                            client?.Disconnect();
                         });
                     }
                 };

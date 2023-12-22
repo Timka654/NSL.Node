@@ -75,15 +75,12 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (nodes.TryGetValue(client.Id, out var oldClient))
             {
-                DisconnectNode(oldClient);
                 if (oldClient.Network?.GetState() == true)
                 {
-                    oldClient.Network?.Disconnect();
+                    oldClient.Disconnect();
                 }
-                else if (oldClient.Network != null)
-                {
+                else
                     DisconnectNode(oldClient);
-                }
             }
 
             client.Node = new NodeInfo(client, client.Id);
@@ -99,6 +96,9 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void OnClientDisconnected(TransportNetworkClient client)
         {
+            if (client.ManualDisconnected)
+                DisconnectNode(client);
+
             // implement with session manager
         }
 
@@ -187,7 +187,7 @@ namespace NSL.Node.RoomServer.Client.Data
                     {
                         Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} have invalid roomId {node.RoomId} vs {RoomId}");
 
-                        node.Network.Disconnect();
+                        node.Disconnect();
 
                         return false;
                     }

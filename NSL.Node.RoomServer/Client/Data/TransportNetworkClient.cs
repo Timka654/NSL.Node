@@ -134,8 +134,12 @@ namespace NSL.Node.RoomServer.Client.Data
 
         }
 
+        internal bool ManualDisconnected { get; private set; }
+
         public void Disconnect()
         {
+            ManualDisconnected = true;
+
             Network?.Disconnect();
         }
     }
