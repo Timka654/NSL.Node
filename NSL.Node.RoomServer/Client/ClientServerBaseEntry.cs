@@ -14,6 +14,7 @@ using NSL.Node.RoomServer.Shared.Client.Core;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketServer;
 using NSL.Extensions.Session.Server;
+using NSL.SocketCore.Utils.Logger;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -23,7 +24,7 @@ namespace NSL.Node.RoomServer.Client
 
         protected NodeRoomServerEntry Entry { get; }
 
-        protected ILogger Logger { get; }
+        protected IBasicLogger Logger { get; }
 
         public ClientServerBaseEntry(NodeRoomServerEntry entry, string logPrefix = null)
         {
@@ -101,7 +102,7 @@ namespace NSL.Node.RoomServer.Client
 
                     options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
 
-                    sSession.Client.Room?.OnClientDisconnected(sSession.Client, true);
+                    sSession.Client.Room?.DisconnectClient(sSession.Client);
                 };
             });
 

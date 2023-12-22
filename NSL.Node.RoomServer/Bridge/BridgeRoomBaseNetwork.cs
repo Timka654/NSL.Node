@@ -13,6 +13,7 @@ using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils;
 using NSL.Node.BridgeServer.Shared.Message;
 using System.Threading;
+using NSL.SocketCore.Utils.Logger;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -27,7 +28,7 @@ namespace NSL.Node.RoomServer.Bridge
 
         protected RequestProcessor PacketWaitBuffer { get; private set; }
 
-        protected ILogger Logger { get; }
+        protected IBasicLogger Logger { get; }
 
         public BridgeRoomBaseNetwork(NodeRoomServerEntry entry, string identityKey, string publicEndPoint, Guid serverId = default, string logPrefix = null)
         {

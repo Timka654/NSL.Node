@@ -11,6 +11,7 @@ using NSL.UDP;
 using NSL.BuilderExtensions.UDPServer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
+using NSL.SocketCore.Utils.Logger;
 
 namespace NSL.Node.P2Proxy.Client
 {
@@ -24,7 +25,7 @@ namespace NSL.Node.P2Proxy.Client
 
         protected RoomServerStartupEntry Entry { get; }
 
-        protected ILogger Logger { get; }
+        protected IBasicLogger Logger { get; }
 
         public static P2ProxyEntry Create(
             RoomServerStartupEntry entry,
