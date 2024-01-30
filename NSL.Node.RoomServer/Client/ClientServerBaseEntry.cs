@@ -15,6 +15,7 @@ using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketServer;
 using NSL.Extensions.Session.Server;
 using NSL.SocketCore.Utils.Logger;
+using Microsoft.AspNetCore.Http;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -76,35 +77,56 @@ namespace NSL.Node.RoomServer.Client
 
             var options = builder.GetCoreOptions() as ServerOptions<TransportNetworkClient>;
 
-            sessionManager = options.AddNSLSessions(c =>
+            if (Entry.ReconnectSessionLifeTime.HasValue)
             {
-                c.CloseSessionDelay = TimeSpan.FromSeconds(3);
-                c.OnRecoverySession += (client, session) =>
+                sessionManager = options.AddNSLSessions(c =>
                 {
-                    var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
+                    c.CloseSessionDelay = Entry.ReconnectSessionLifeTime.Value;
 
-                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Try recovery session {sSession.Session} from {client.Network?.GetRemotePoint()}");
-
-                    client.ChangeOwner(sSession.Client);
-
-                    if (client.Room == null)
+                    c.OnClientValidate += (client) =>
                     {
-                        Task.Delay(1000).ContinueWith((t) =>
+                        if (client.Room == null || client.ManualDisconnected || client.Node == null)
+                            return Task.FromResult(false);
+
+                        bool result = client.Room?.ValidateSession(client.Node) ?? false;
+
+                        return Task.FromResult(result);
+                    };
+
+                    c.OnRecoverySession += (client, session) =>
+                    {
+                        var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
+
+                        options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Try recovery session {sSession.Session} from {client.Network?.GetRemotePoint()}");
+
+                        client.Network.ChangeUserData(sSession.Client);
+                        
+                        client.Room?.RecoverySession(client.Node);
+
+                        if (client.Room == null)
                         {
-                            client?.Disconnect();
-                        });
-                    }
-                };
+                            Task.Delay(1000).ContinueWith((t) =>
+                            {
+                                client?.Disconnect();
+                            });
+                            return Task.CompletedTask;
+                        }
 
-                c.OnExpiredSession += (network, session) =>
-                {
-                    var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
+                        return Task.CompletedTask;
+                    };
 
-                    options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
+                    c.OnExpiredSession += (network, session) =>
+                    {
+                        var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
 
-                    sSession.Client.Room?.DisconnectNode(sSession.Client);
-                };
-            });
+                        options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
+
+                        sSession.Client.Room?.DisconnectNode(sSession.Client);
+
+                        return Task.CompletedTask;
+                    };
+                });
+            }
 
             builder.SetLogger(Logger);
 
@@ -141,7 +163,12 @@ namespace NSL.Node.RoomServer.Client
             builder.AddDisconnectHandle(client =>
             {
                 if (client.Room != null)
-                    client.Room.OnClientDisconnected(client);
+                {
+                    if (Entry.ReconnectSessionLifeTime.HasValue)
+                        client.Room.OnClientDisconnected(client);
+                    else
+                        client.Room?.DisconnectNode(client);
+                }
             });
 
             return builder;

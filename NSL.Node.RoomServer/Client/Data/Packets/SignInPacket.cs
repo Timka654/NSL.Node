@@ -56,7 +56,7 @@ namespace NSL.Node.RoomServer.Client
                         {
                             result.NodeId = client.NodeId;
                             result.Options = roomInfo.GetClientOptions();
-                            var session = sessionManager.CreateSession(client, client.NodeId.ToString());
+                            var session = sessionManager?.CreateSession(client, client.NodeId.ToString());
                             result.SessionInfo = session;
                         }
                     }

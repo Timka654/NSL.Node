@@ -39,6 +39,8 @@ namespace NSL.Node.RoomServer
 
         internal CreateSessionDelegate CreateRoomSession { get; set; } = (serverInfo) => default;
 
+        internal TimeSpan? ReconnectSessionLifeTime { get; set; } = null;
+
         internal void Run()
         {
             if (BridgeNetworkClient == null)

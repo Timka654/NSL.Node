@@ -88,6 +88,16 @@ namespace NSL.Node.RoomServer
             return this;
         }
 
+        public NodeRoomServerEntryBuilder WithReconnectSessionLifeTime(TimeSpan lifetime)
+        {
+            if (processed)
+                throw new System.Exception($"Cannot invoke builder methods after Run");
+
+            Entry.ReconnectSessionLifeTime = lifetime;
+
+            return this;
+        }
+
         public NodeRoomServerEntryBuilder WithClientServerListener(ClientServerBaseEntry entry)
         {
             if (processed)

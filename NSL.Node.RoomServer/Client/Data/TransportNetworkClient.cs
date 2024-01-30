@@ -106,27 +106,6 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public override void ChangeOwner(IServerNetworkClient from)
         {
-            if (!(from is TransportNetworkClient another))
-                throw new Exception($"Invalid type for ChangeOwner - {from.GetType().Name}");
-
-            base.ChangeOwner(from);
-
-            Token = another.Token;
-
-            Id = another.Id;
-
-            RoomId = another.RoomId;
-
-            NodeId = another.NodeId;
-
-            EndPoint = another.EndPoint;
-
-            Ready = another.Ready;
-
-            Node = another.Node?.ChangeTo(this);
-
-            Room = another.Room;
-
             if (Room?.TryRecoverySession(this) != true)
             {
                 Room = null;

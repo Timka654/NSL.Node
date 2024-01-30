@@ -60,6 +60,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action OnRoomDisposed = () => { };
 
+        public event Func<NodeInfo, bool> OnValidateSession = c => true;
+
         private AutoResetEvent ar = new AutoResetEvent(true);
 
         private SemaphoreSlim bdLocker = new SemaphoreSlim(1);
@@ -70,6 +72,9 @@ namespace NSL.Node.RoomServer.Client.Data
             SessionId = sessionId;
             RoomId = roomId;
         }
+
+
+        public event Action<NodeInfo> OnRecoverySession = c => { };
 
         public bool AddClient(TransportNetworkClient client)
         {
@@ -607,6 +612,16 @@ namespace NSL.Node.RoomServer.Client.Data
             client.EndPoint = endPoint;
 
             BroadcastChangeNodeEndPoint(client);
+        }
+
+        public bool ValidateSession(NodeInfo node)
+        {
+            return OnValidateSession(node);
+        }
+
+        public void RecoverySession(NodeInfo node)
+        {
+            OnRecoverySession(node);
         }
     }
 }
