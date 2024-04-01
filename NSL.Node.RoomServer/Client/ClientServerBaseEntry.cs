@@ -16,6 +16,7 @@ using NSL.SocketServer;
 using NSL.Extensions.Session.Server;
 using NSL.SocketCore.Utils.Logger;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -148,17 +149,21 @@ namespace NSL.Node.RoomServer.Client
             builder.AddDefaultEventHandlers((string)null,
                 DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
-            builder.AddSendHandle((client, pid, len, stack) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Send packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
-            });
 
-            builder.AddReceiveHandle((client, pid, len) =>
+            if (Entry.DebugPacketIO)
             {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
-            });
+                builder.AddSendHandle((client, pid, len, stack) =>
+                {
+                    if (!InputPacketBuffer.IsSystemPID(pid))
+                        Logger.AppendInfo($"Send packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
+                });
+
+                builder.AddReceiveHandle((client, pid, len) =>
+                {
+                    if (!InputPacketBuffer.IsSystemPID(pid))
+                        Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
+                });
+            }
 
             builder.AddDisconnectHandle(client =>
             {

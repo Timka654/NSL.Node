@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using static NSL.Node.RoomServer.Shared.Client.Core.IRoomInfo;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
@@ -52,7 +53,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public event Action<NodeInfo> OnNodeConnect = node => { };
 
-        public event Action<NodeInfo> OnNodeDisconnect = node => { };
+        public event OnNodeDisconnectDelegate OnNodeDisconnect = (node, manualDisconnect) => { };
 
         public event Action<NodeInfo> OnNodeConnectionLost = node => { };
 
@@ -119,7 +120,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
                 BroadcastDisconnectNode(client);
 
-                OnNodeDisconnect(client.Node);
+                OnNodeDisconnect(client.Node, client.ManualDisconnected);
 
                 if (StartupInfo.GetDestroyOnEmpty() && !nodes.Any())
                 {

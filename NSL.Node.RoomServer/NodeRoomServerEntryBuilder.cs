@@ -78,6 +78,13 @@ namespace NSL.Node.RoomServer
             return this;
         }
 
+        public NodeRoomServerEntryBuilder WithDebugPacketIO(bool active = true)
+        {
+            Entry.DebugPacketIO = active;
+
+            return this;
+        }
+
         public NodeRoomServerEntryBuilder WithLogger(ILogger logger)
         {
             if (processed)

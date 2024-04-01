@@ -62,7 +62,10 @@ namespace NSL.Node.BridgeServer.RS
         {
             foreach (var item in SessionMap.Values)
             {
-                item.SendLobbyFinishRoom(null);
+                if (item.OwnedRoomNetwork != this)
+                    continue;
+
+                item.SendLobbyFinishRoom(null, false);
                 item.Dispose();
             }
         }

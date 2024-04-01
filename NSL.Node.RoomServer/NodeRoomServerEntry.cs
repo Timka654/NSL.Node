@@ -33,13 +33,15 @@ namespace NSL.Node.RoomServer
 
         internal RoomFinishHandleDelegate RoomFinishHandle { get; set; } = (room, data) => { };
 
-        internal RoomMessageHandleDelegate RoomMessageHandle { get; set; } = (room,data) => { };
+        internal RoomMessageHandleDelegate RoomMessageHandle { get; set; } = (room, data) => { };
 
         internal StateChangeDelegate BridgeConnectionStateChangedHandle { get; set; } = (state) => { };
 
         internal CreateSessionDelegate CreateRoomSession { get; set; } = (serverInfo) => default;
 
         internal TimeSpan? ReconnectSessionLifeTime { get; set; } = null;
+
+        public bool DebugPacketIO { get; set; }
 
         internal void Run()
         {

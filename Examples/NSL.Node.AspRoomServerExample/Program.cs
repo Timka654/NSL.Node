@@ -24,6 +24,7 @@ namespace NSL.Node.AspRoomServerExample
             app.UseWebSockets();
 
             app.RunNodeRoomServer(c => c
+            .WithDebugPacketIO(true)
             .WithAspLogger(app.Logger)
             .WithBridgeDefaultHandles()
             //.WithCreateSessionHandle(roomInfo=> new GameInfo(roomInfo))

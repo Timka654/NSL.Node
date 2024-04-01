@@ -55,14 +55,15 @@ namespace NSL.Node.BridgeServer.RS
             playerIdsLocker.Set();
         }
 
-        internal void SendLobbyFinishRoom(byte[]? dataBuffer)
+        internal void SendLobbyFinishRoom(byte[]? dataBuffer, bool manual)
         {
             var packet = OutputPacketBuffer.Create(NodeBridgeLobbyPacketEnum.FinishRoomMessage);
 
             new RoomFinishMessageModel
             {
                 SessionId = RoomIdentity,
-                Data = dataBuffer
+                Data = dataBuffer,
+                Manual = manual
             }.WriteFullTo(packet);
 
             OwnedLobbyNetwork.Network?.Send(packet);

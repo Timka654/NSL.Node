@@ -14,6 +14,7 @@ namespace NSL.Node.RoomServer.Data
         public abstract Task<RoomSignSessionResponseModel> ValidateSession(RoomSignSessionRequestModel request);
 
         public abstract Task<RoomSignSessionPlayerResponseModel> ValidateSessionPlayer(RoomSignSessionPlayerRequestModel request);
+
         public abstract void FinishRoomHandle(RoomInfo room, byte[] data);
 
         public abstract void RoomMessageHandle(RoomInfo room, byte[] data); 

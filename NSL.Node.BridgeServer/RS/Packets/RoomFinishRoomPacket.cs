@@ -10,7 +10,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
         {
             var message = RoomFinishMessageModel.ReadFullFrom(data);
 
-            client.GetSession(message.SessionId).SendLobbyFinishRoom(message.Data);
+            client.GetSession(message.SessionId).SendLobbyFinishRoom(message.Data, true);
         }
     }
 }

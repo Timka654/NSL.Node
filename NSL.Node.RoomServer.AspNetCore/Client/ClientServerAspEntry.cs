@@ -30,32 +30,33 @@ namespace NSL.Node.RoomServer.AspNetCore.Client
             this.pattern = pattern;
             this.requestHandle = requestHandle;
             this.actionConventionBuilder = actionConventionBuilder;
-
-            var server = Fill(WebSocketsServerEndPointBuilder.Create()
-                .WithClientProcessor<TransportNetworkClient>()
-                .AspWithOptions<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>())
-                .BuildWithoutRoute();
-
-            var acceptDelegate = server.GetAcceptDelegate();
-
-            var convBuilder = builder.MapGet(pattern, async context =>
-            {
-                if (requestHandle != null)
-                    if (!await requestHandle(context))
-                        return;
-
-                await acceptDelegate(context);
-            });
-
-            if (actionConventionBuilder != null)
-                actionConventionBuilder(convBuilder);
-
-
-            Listener = server;
         }
 
         public override void Run()
         {
+            if (Listener == null)
+            {
+                var server = Fill(WebSocketsServerEndPointBuilder.Create()
+                    .WithClientProcessor<TransportNetworkClient>()
+                    .AspWithOptions<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>())
+                    .BuildWithoutRoute();
+
+                Listener = server;
+
+                var acceptDelegate = server.GetAcceptDelegate();
+
+                var convBuilder = builder.MapGet(pattern, async context =>
+                {
+                    if (requestHandle != null)
+                        if (!await requestHandle(context))
+                            return;
+
+                    await acceptDelegate(context);
+                });
+
+                if (actionConventionBuilder != null)
+                    actionConventionBuilder(convBuilder);
+            }
         }
     }
 }

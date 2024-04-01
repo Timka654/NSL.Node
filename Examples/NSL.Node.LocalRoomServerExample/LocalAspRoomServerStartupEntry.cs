@@ -46,6 +46,7 @@ namespace NSL.Node.LocalRoomServerExample
 
         public override void OnBridgeStateChangeHandle(bool state)
         {
+            // ignore on local
         }
     }
 }

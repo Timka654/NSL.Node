@@ -6,15 +6,17 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NSL.Node.BridgeServer.Managers
 {
     public class RoomManager
     {
-        public RoomManager(string identityKey)
+        public RoomManager(string identityKey, int delayMSAfterDisconnectRoomServer)
         {
             this.identityKey = identityKey;
+            this.delayMSAfterDisconnectRoomServer = delayMSAfterDisconnectRoomServer;
         }
 
         public async void OnDisconnectedRoomServer(RoomServerNetworkClient client)
@@ -22,20 +24,28 @@ namespace NSL.Node.BridgeServer.Managers
             if (!client.Signed)
                 return;
 
-            await Task.Delay(2000);
+            await Task.Delay(delayMSAfterDisconnectRoomServer);
 
-            if (connectedServers[client.Id] != client)
+            locker.WaitOne();
+
+            if (connectedServers[client.Id] != client || client.Network?.GetState() == true)
                 return;
 
-            connectedServers.Remove(client.Id, out _);
+            connectedServers.TryRemove(client.Id, out _);
 
             client.Disconnect();
+
+            locker.Set();
         }
+
+        private AutoResetEvent locker = new AutoResetEvent(true);
 
         public bool TryRoomServerConnect(RoomServerNetworkClient client, RoomSignInRequestModel request)
         {
             if (!Equals(identityKey, request.IdentityKey))
                 return false;
+
+            locker.WaitOne();
 
             if (Guid.Empty.Equals(request.Identity))
                 request.Identity = Guid.NewGuid();
@@ -52,6 +62,8 @@ namespace NSL.Node.BridgeServer.Managers
 
                     client.ChangeOwner(exists);
 
+                    locker.Set();
+
                     return true;
                 }
             }
@@ -62,6 +74,8 @@ namespace NSL.Node.BridgeServer.Managers
             }
 
             SignRoom(client, request);
+
+            locker.Set();
 
             return true;
         }
@@ -137,6 +151,7 @@ namespace NSL.Node.BridgeServer.Managers
 
         private ConcurrentDictionary<Guid, RoomServerNetworkClient> connectedServers = new ConcurrentDictionary<Guid, RoomServerNetworkClient>();
         private readonly string identityKey;
+        private readonly int delayMSAfterDisconnectRoomServer;
     }
 
     public record CreateSignResult(string endPoint, Guid id);

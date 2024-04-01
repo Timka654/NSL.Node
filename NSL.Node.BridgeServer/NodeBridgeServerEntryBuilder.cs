@@ -23,9 +23,9 @@ namespace NSL.Node.BridgeServer
             return Entry;
         }
 
-        public NodeBridgeServerEntryBuilder WithDefaultManagers(string lobbyIdentityKey, string roomIdentityKey)
+        public NodeBridgeServerEntryBuilder WithDefaultManagers(string lobbyIdentityKey, string roomIdentityKey, int delayMSAfterDisconnectRoomServer = 10_000)
             => WithLobbyManager(new LobbyManager(lobbyIdentityKey))
-              .WithRoomManager(new RoomManager(roomIdentityKey));
+              .WithRoomManager(new RoomManager(roomIdentityKey, delayMSAfterDisconnectRoomServer));
 
         public NodeBridgeServerEntryBuilder WithLobbyServerListener(LobbyServerBaseEntry entry)
         {

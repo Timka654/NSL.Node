@@ -9,5 +9,7 @@ namespace NSL.Node.BridgeServer.Shared.Message
         public Guid SessionId { get; set; }
 
         public byte[] Data { get; set; }
+
+        public bool Manual { get; set; }
     }
 }
