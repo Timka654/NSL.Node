@@ -45,7 +45,7 @@ namespace NSL.Node.RoomServer.AspNetCore.Client
 
                 var acceptDelegate = server.GetAcceptDelegate();
 
-                var convBuilder = builder.MapGet(pattern, async context =>
+                var convBuilder = builder.Map(pattern, async context =>
                 {
                     if (requestHandle != null)
                         if (!await requestHandle(context))
