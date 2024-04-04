@@ -104,7 +104,8 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             if (client.ManualDisconnected)
                 DisconnectNode(client);
-
+            else
+                OnNodeConnectionLost(client.Node);
             // implement with session manager
         }
 

@@ -120,9 +120,12 @@ namespace NSL.Node.RoomServer.Client
                     {
                         var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
 
-                        options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
+                        if (sSession != null)
+                        {
+                            options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Session expired {sSession.Session}");
+                        }
 
-                        sSession.Client.Room?.DisconnectNode(sSession.Client);
+                        network.Room?.DisconnectNode(network);
 
                         return Task.CompletedTask;
                     };
