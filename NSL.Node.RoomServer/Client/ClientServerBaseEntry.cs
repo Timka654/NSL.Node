@@ -17,6 +17,7 @@ using NSL.Extensions.Session.Server;
 using NSL.SocketCore.Utils.Logger;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using NSL.SocketCore.Extensions.Buffer;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -75,8 +76,10 @@ namespace NSL.Node.RoomServer.Client
             where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder<TransportNetworkClient>
         {
             builder.AddConnectHandle(client => client.InitializeObjectBag());
-
+            
             var options = builder.GetCoreOptions() as ServerOptions<TransportNetworkClient>;
+
+            options.SetDefaultResponsePID();
 
             if (Entry.ReconnectSessionLifeTime.HasValue)
             {
@@ -100,7 +103,7 @@ namespace NSL.Node.RoomServer.Client
 
                         options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Try recovery session {sSession.Session} from {client.Network?.GetRemotePoint()}");
 
-                        client.Network.ChangeUserData(sSession.Client);
+                        //client.Network.ChangeUserData(sSession.Client);
                         
                         client.Room?.RecoverySession(client.Node);
 
@@ -108,6 +111,7 @@ namespace NSL.Node.RoomServer.Client
                         {
                             Task.Delay(1000).ContinueWith((t) =>
                             {
+                                sessionManager.RemoveSession(client);
                                 client?.Disconnect();
                             });
                             return Task.CompletedTask;
