@@ -1,7 +1,7 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
-using NSL.Node.BridgeServer.Utils;
 using NSL.Node.BridgeServer.Shared.Requests;
+using NSL.SocketCore.Extensions.Buffer;
 
 namespace NSL.Node.BridgeServer.LS.Packets
 {

@@ -1,8 +1,8 @@
 ﻿using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
-using NSL.Node.BridgeServer.Utils;
 using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
+using NSL.SocketCore.Extensions.Buffer;
 
 namespace NSL.Node.BridgeServer.RS.Packets
 {

@@ -1,5 +1,5 @@
 ﻿using NSL.Node.BridgeServer.Shared.Requests;
-using NSL.Node.BridgeServer.Utils;
+using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using NetworkClient = NSL.Node.BridgeServer.LS.LobbyServerNetworkClient;
 
