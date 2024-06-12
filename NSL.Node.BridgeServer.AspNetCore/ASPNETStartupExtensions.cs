@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using NSL.Logger.AspNet;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.RS;
 using System;
@@ -58,6 +59,6 @@ namespace NSL.Node.BridgeServer
 
         public static NodeBridgeServerEntryBuilder WithAspLogger(
             this NodeBridgeServerEntryBuilder builder, Microsoft.Extensions.Logging.ILogger logger)
-            => builder.WithLogger(new NSL.Logger.AspNetCore.ILoggerWrapper(logger));
+            => builder.WithLogger(new ILoggerWrapper(logger));
     }
 }

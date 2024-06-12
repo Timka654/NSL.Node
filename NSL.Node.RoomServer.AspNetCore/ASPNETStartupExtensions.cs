@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System;
 using NSL.Node.RoomServer.AspNetCore.Client;
 using Microsoft.Extensions.DependencyInjection;
+using NSL.Logger.AspNet;
 
 namespace NSL.Node.RoomServer.AspNetCore
 {
@@ -46,7 +47,7 @@ namespace NSL.Node.RoomServer.AspNetCore
             => builder.WithClientServerListener(new ClientServerAspEntry(builder.Entry, aspBuilder, pattern, requestHandle, actionConventionBuilder, logPrefix));
 
         public static NodeRoomServerEntryBuilder WithAspLogger(this NodeRoomServerEntryBuilder builder, Microsoft.Extensions.Logging.ILogger logger)
-            => builder.WithLogger(new NSL.Logger.AspNetCore.ILoggerWrapper(logger));
+            => builder.WithLogger(new ILoggerWrapper(logger));
 
     }
 }

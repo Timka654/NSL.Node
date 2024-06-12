@@ -30,10 +30,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.BuilderExtensions.UDPServer" Version="2024.4.23.1244" />
-		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2024.4.23.1244" />
-		<PackageReference Include="NSL.Logger" Version="2024.4.23.1244" />
-		<PackageReference Include="NSL.SocketCore" Version="2024.4.23.1244" />
+		<PackageReference Include="NSL.BuilderExtensions.UDPServer" Version="2024.5.21.1442" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2024.5.21.1442" />
+		<PackageReference Include="NSL.Logger" Version="2024.5.21.1442" />
+		<PackageReference Include="NSL.SocketCore" Version="2024.5.21.1442" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using NSL.BuilderExtensions.SocketCore;
 using NSL.BuilderExtensions.WebSocketsClient;
 using NSL.LocalBridge;
-using NSL.Logger.AspNetCore;
+using NSL.Logger.AspNet;
 using NSL.Node.BridgeLobbyClient.Models;
 using NSL.SocketCore.Utils;
 using NSL.WebSockets.Client;
