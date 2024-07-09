@@ -27,7 +27,7 @@ namespace NSL.Node.BridgeTransportExample
                 //.WithCreateSessionHandle(roomInfo=> new GameInfo(roomInfo))
                 .GetPublicAddressFromStun(clientPort,false, out var connectionPoint)
                 .WithRoomBridgeNetwork("wss://localhost:7023/room_server", connectionPoint, string.Empty)
-                .WithClientServerBinding(clientPort)
+                .WithTCPClientServerBinding(clientPort)
                 .Run();
 
 
