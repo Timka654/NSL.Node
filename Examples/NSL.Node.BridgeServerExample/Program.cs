@@ -9,7 +9,7 @@ namespace NSL.Node.BridgeServerExample
         {
             NodeBridgeServerEntryBuilder.Create()
                 .WithConsoleLogger()
-                .WithDefaultManagers(string.Empty, string.Empty);
+                .WithDefaultManagers(string.Empty);
                 
 
             Console.WriteLine(">>> Success initialized");

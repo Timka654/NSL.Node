@@ -2,6 +2,7 @@
 using NSL.Node.BridgeServer.RS;
 using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.Node.BridgeServer.Shared.Response;
+using NSL.SocketCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,36 +14,65 @@ namespace NSL.Node.BridgeServer.Managers
 {
     public class RoomManager
     {
-        public RoomManager(string identityKey, int delayMSAfterDisconnectRoomServer)
-        {
-            this.identityKey = identityKey;
-            this.delayMSAfterDisconnectRoomServer = delayMSAfterDisconnectRoomServer;
-        }
+        public delegate Task<bool> SignInServerValidatorDelegate(RoomSignInRequestModel request);
+        public delegate Task ServerSignedHandlerDelegate(RoomServerNetworkClient room, RoomSignInRequestModel request);
+        public delegate Task<IEnumerable<RoomServerNetworkClient>> ServerMissedHandlerDelegate(LobbyCreateRoomSessionRequestModel request, MissedServerReasonEnum reasone);
+
+        public delegate Task ServerConnectionLostHandlerDelegate(RoomServerNetworkClient room);
+
+        public SignInServerValidatorDelegate SignInServerValidator { get; set; }
+            = (request) => Task.FromResult(true);
+
+        public ServerSignedHandlerDelegate ServerSignedHandler { get; set; }
+            = (instance, request) => Task.CompletedTask;
+
+        public ServerMissedHandlerDelegate ServerMissedHandler { get; set; }
+            = (instance, request) => Task.FromResult(Enumerable.Empty<RoomServerNetworkClient>());
+
+        public ServerConnectionLostHandlerDelegate ServerConnectionLostHandler { get; set; }
+            = (instance) => Task.CompletedTask;
+
+        public ServerConnectionLostHandlerDelegate ServerDisconnectedHandler { get; set; }
+            = (instance) => Task.CompletedTask;
 
         public async void OnDisconnectedRoomServer(RoomServerNetworkClient client)
         {
             if (!client.Signed)
                 return;
 
+            await ServerConnectionLostHandler(client);
+
             await Task.Delay(delayMSAfterDisconnectRoomServer);
 
             locker.WaitOne();
+            try
+            {
+                if (connectedServers[client.Id] != client || client.Network?.GetState() == true)
+                    return;
 
-            if (connectedServers[client.Id] != client || client.Network?.GetState() == true)
-                return;
+                connectedServers.TryRemove(client.Id, out _);
 
-            connectedServers.TryRemove(client.Id, out _);
+                client.Disconnect();
 
-            client.Disconnect();
+                await ServerDisconnectedHandler(client);
 
-            locker.Set();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                locker.Set();
+            }
         }
 
         private AutoResetEvent locker = new AutoResetEvent(true);
 
-        public bool TryRoomServerConnect(RoomServerNetworkClient client, RoomSignInRequestModel request)
+        public async Task<bool> TryRoomServerConnect(RoomServerNetworkClient client, RoomSignInRequestModel request)
         {
-            if (!Equals(identityKey, request.IdentityKey))
+            if (!await SignInServerValidator(request))
                 return false;
 
             locker.WaitOne();
@@ -62,6 +92,8 @@ namespace NSL.Node.BridgeServer.Managers
 
                     client.ChangeOwner(exists);
 
+                    await ServerSignedHandler(client, request);
+
                     locker.Set();
 
                     return true;
@@ -74,6 +106,8 @@ namespace NSL.Node.BridgeServer.Managers
             }
 
             SignRoom(client, request);
+
+            await ServerSignedHandler(client, request);
 
             locker.Set();
 
@@ -89,7 +123,7 @@ namespace NSL.Node.BridgeServer.Managers
             client.Signed = true;
         }
 
-        public CreateRoomSessionResponseModel CreateRoomSession(LobbyServerNetworkClient client, LobbyCreateRoomSessionRequestModel request)
+        public async Task<CreateRoomSessionResponseModel> CreateRoomSession(LobbyServerNetworkClient client, LobbyCreateRoomSessionRequestModel request)
         {
             var result = new CreateRoomSessionResponseModel();
 
@@ -99,18 +133,36 @@ namespace NSL.Node.BridgeServer.Managers
             {
                 if (connectedServers.TryGetValue(request.SpecialServer.Value, out var server))
                     servers = Enumerable.Repeat(server, 1);
+                else
+                    servers = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundSpecialInstance);
             }
             else
             {
                 IEnumerable<RoomServerNetworkClient> serverSelector = connectedServers.Values;
 
                 if (request.Location != default)
-                    serverSelector = serverSelector.Where(x=>request.Location.Equals(x.Location));
+                {
+                    serverSelector = serverSelector.Where(x => request.Location.Equals(x.Location));
 
-                servers = serverSelector.OrderBy(x => x.SessionsCount).Take(request.NeedPointCount);
+                    if (!serverSelector.Any())
+                        serverSelector = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundLocationInstance);
+                }
+
+                servers = serverSelector.OrderBy(x => x.SessionsCount);
             }
 
-            servers = servers.Where(x => x.Network?.GetState() == true);
+            if (request.InstanceWeight.HasValue)
+            {
+                servers = servers.Where(x => x.MaxWeight.HasValue).Where(x => x.MaxWeight - x.Weight > request.InstanceWeight);
+
+                if (!servers.Any())
+                    servers = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundInstanceWeight);
+            }
+
+            servers = servers.Where(x => x.Network?.GetState() == true).Take(request.NeedPointCount);
+
+            if (!servers.Any())
+                servers = await ServerMissedHandler(request, MissedServerReasonEnum.UnavailableInstances);
 
             result.Result = servers.Any();
 
@@ -120,6 +172,9 @@ namespace NSL.Node.BridgeServer.Managers
 
                 result.ConnectionPoints = servers.Select(server =>
                 {
+                    if (request.InstanceWeight.HasValue)
+                        server.Weight += request.InstanceWeight.Value;
+
                     var session = server.CreateSession(new RoomSession(request.RoomId, client, server)
                     {
                         StartupInfo = new Shared.NodeRoomStartupInfo(request.StartupOptions),
@@ -150,9 +205,61 @@ namespace NSL.Node.BridgeServer.Managers
         }
 
         private ConcurrentDictionary<Guid, RoomServerNetworkClient> connectedServers = new ConcurrentDictionary<Guid, RoomServerNetworkClient>();
-        private readonly string identityKey;
-        private readonly int delayMSAfterDisconnectRoomServer;
+        private int delayMSAfterDisconnectRoomServer = 10_000;
+
+
+
+        public RoomManager WithSignInServerValidator(SignInServerValidatorDelegate value)
+        {
+            SignInServerValidator = value;
+
+            return this;
+        }
+
+        public RoomManager WithServerSignedHandler(ServerSignedHandlerDelegate value)
+        {
+            ServerSignedHandler = value;
+
+            return this;
+        }
+
+        public RoomManager WithServerMissedHandler(ServerMissedHandlerDelegate value)
+        {
+            ServerMissedHandler = value;
+
+            return this;
+        }
+
+        public RoomManager WithServerConnectionLostHandler(ServerConnectionLostHandlerDelegate value)
+        {
+            ServerConnectionLostHandler = value;
+
+            return this;
+        }
+
+        public RoomManager WithServerDisconnectedHandler(ServerConnectionLostHandlerDelegate value)
+        {
+            ServerDisconnectedHandler = value;
+
+            return this;
+        }
+
+        public RoomManager WithWaitServerRecoverySession(int delay)
+        {
+            delayMSAfterDisconnectRoomServer = delay;
+            return this;
+        }
     }
 
     public record CreateSignResult(string endPoint, Guid id);
+
+    public enum MissedServerReasonEnum
+    {
+        CannotFoundSpecialInstance,
+        CannotFoundInstanceWeight,
+        CannotFoundInstanceCount,
+        CannotFoundLocationInstance,
+        UnavailableInstances
+
+    }
 }

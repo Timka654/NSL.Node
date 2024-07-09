@@ -2,6 +2,7 @@
 using NSL.Logger;
 using NSL.WebSockets.Client;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer.Bridge
@@ -11,7 +12,7 @@ namespace NSL.Node.RoomServer.Bridge
         private readonly Uri wsUrl;
         private WSNetworkClient<BridgeRoomNetworkClient, WSClientOptions<BridgeRoomNetworkClient>> wsNetwork;
 
-        public BridgeRoomNetwork(NodeRoomServerEntry entry, Uri wsUrl, string publicEndPoint, string identityKey, Guid serverId = default, string logPrefix = null) : base(entry, identityKey, publicEndPoint, serverId, logPrefix)
+        public BridgeRoomNetwork(NodeRoomServerEntry entry, Uri wsUrl, Dictionary<string, string> identityData, string publicEndPoint, Guid serverId = default, string logPrefix = null) : base(entry, identityData, publicEndPoint, serverId, logPrefix)
         {
             this.wsUrl = wsUrl;
         }

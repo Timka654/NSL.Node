@@ -7,7 +7,7 @@ namespace NSL.Node.AspRoomServerExample
     {
         public static void Main(string[] args)
         {
-           var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
 
@@ -29,7 +29,7 @@ namespace NSL.Node.AspRoomServerExample
             .WithBridgeDefaultHandles()
             //.WithCreateSessionHandle(roomInfo=> new GameInfo(roomInfo))
             .GetPublicAddressFromStun(out var publicAddr)
-            .WithRoomBridgeNetwork("wss://localhost:7023/room_server", publicAddr, string.Empty)
+            .WithRoomBridgeNetwork("wss://localhost:7023/room_server", new Dictionary<string, string>(), publicAddr)
             .WithClientServerAspBinding(app, "/room_server")
             );
 

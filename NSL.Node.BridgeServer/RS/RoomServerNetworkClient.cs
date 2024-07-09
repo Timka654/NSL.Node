@@ -2,6 +2,7 @@
 using NSL.WebSockets.Server.AspNetPoint;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace NSL.Node.BridgeServer.RS
 {
@@ -15,7 +16,13 @@ namespace NSL.Node.BridgeServer.RS
 
         public string Location { get; set; }
 
+        public long? MaxWeight { get; set; }
+
+        public long Weight { get; set; }
+
         public int SessionsCount => SessionMap.Count;
+
+        public Dictionary<string, string> SigningData { get; set; } = new();
 
         private ConcurrentDictionary<Guid, RoomSession> SessionMap { get; set; } = new ConcurrentDictionary<Guid, RoomSession>();
 

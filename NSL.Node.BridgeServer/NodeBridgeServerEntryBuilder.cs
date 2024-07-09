@@ -3,6 +3,7 @@ using NSL.Logger.Interface;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.Managers;
 using NSL.Node.BridgeServer.RS;
+using System;
 
 namespace NSL.Node.BridgeServer
 {
@@ -23,9 +24,9 @@ namespace NSL.Node.BridgeServer
             return Entry;
         }
 
-        public NodeBridgeServerEntryBuilder WithDefaultManagers(string lobbyIdentityKey, string roomIdentityKey, int delayMSAfterDisconnectRoomServer = 10_000)
+        public NodeBridgeServerEntryBuilder WithDefaultManagers(string lobbyIdentityKey)
             => WithLobbyManager(new LobbyManager(lobbyIdentityKey))
-              .WithRoomManager(new RoomManager(roomIdentityKey, delayMSAfterDisconnectRoomServer));
+              .WithRoomManager(new RoomManager());
 
         public NodeBridgeServerEntryBuilder WithLobbyServerListener(LobbyServerBaseEntry entry)
         {

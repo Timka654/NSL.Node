@@ -14,6 +14,7 @@ using NSL.SocketCore.Utils;
 using NSL.Node.BridgeServer.Shared.Message;
 using System.Threading;
 using NSL.SocketCore.Utils.Logger;
+using System.Collections.Generic;
 
 namespace NSL.Node.RoomServer.Bridge
 {
@@ -21,7 +22,7 @@ namespace NSL.Node.RoomServer.Bridge
     {
         public Guid ServerIdentity { get; private set; } = Guid.Empty;
 
-        private readonly string identityKey;
+        private readonly Dictionary<string, string> identityData;
         private readonly string publicEndPoint;
 
         protected INetworkClient network { get; private set; }
@@ -30,9 +31,9 @@ namespace NSL.Node.RoomServer.Bridge
 
         protected IBasicLogger Logger { get; }
 
-        public BridgeRoomBaseNetwork(NodeRoomServerEntry entry, string identityKey, string publicEndPoint, Guid serverId = default, string logPrefix = null)
+        public BridgeRoomBaseNetwork(NodeRoomServerEntry entry, Dictionary<string, string> identityData, string publicEndPoint, Guid serverId = default, string logPrefix = null)
         {
-            this.identityKey = identityKey;
+            this.identityData = identityData;
             this.publicEndPoint = publicEndPoint;
             ServerIdentity = serverId;
 
@@ -149,7 +150,7 @@ namespace NSL.Node.RoomServer.Bridge
             {
                 Identity = ServerIdentity,
                 ConnectionEndPoint = publicEndPoint,
-                IdentityKey = identityKey
+                IdentityData = identityData
             }.WriteFullTo(output);
 
             _signResult = false;

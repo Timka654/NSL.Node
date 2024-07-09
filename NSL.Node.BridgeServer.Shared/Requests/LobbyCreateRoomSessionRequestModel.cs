@@ -17,6 +17,8 @@ namespace NSL.Node.BridgeServer.Shared.Requests
 
         public int NeedPointCount { get; set; } = 1;
 
+        public int? InstanceWeight { get; set; }
+
         public Dictionary<string, string> StartupOptions { get; set; }
     }
 }

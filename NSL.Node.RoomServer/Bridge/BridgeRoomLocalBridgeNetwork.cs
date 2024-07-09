@@ -4,6 +4,7 @@ using NSL.LocalBridge;
 using NSL.SocketCore.Utils;
 using NSL.WebSockets.Client;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer.Bridge
@@ -14,7 +15,7 @@ namespace NSL.Node.RoomServer.Bridge
         private LocalBridgeClient<TServerClient, BridgeRoomNetworkClient> serverNetwork;
         LocalBridgeClient<BridgeRoomNetworkClient, TServerClient> localNetwork;
 
-        public BridgeRoomLocalBridgeNetwork(NodeRoomServerEntry entry, string publicEndPoint, string identityKey, Guid serverId = default, string logPrefix = null) : base(entry, publicEndPoint, identityKey, serverId, logPrefix)
+        public BridgeRoomLocalBridgeNetwork(NodeRoomServerEntry entry, Dictionary<string, string> identityData, string publicEndPoint, Guid serverId = default, string logPrefix = null) : base(entry, identityData, publicEndPoint, serverId, logPrefix)
         {
         }
 

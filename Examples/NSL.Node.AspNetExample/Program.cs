@@ -64,7 +64,7 @@ namespace NSL.Node.AspNetExample
 
             builder.RunNodeBridgeServer(c => c
                 .WithAspLogger(logger)
-                .WithDefaultManagers(string.Empty, string.Empty)
+                .WithDefaultManagers(string.Empty)
                 .WithRoomServerAspBinding(builder, "/room_server")
                 .WithLobbyServerLocalBridgeBinding(out nodeLocalLobbyServerClient));
 
