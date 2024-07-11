@@ -22,7 +22,7 @@ namespace NSL.Node.RoomServer.Bridge
     {
         public Guid ServerIdentity { get; private set; } = Guid.Empty;
 
-        private readonly Dictionary<string, string> identityData;
+        private Dictionary<string, string> identityData;
         private readonly string publicEndPoint;
 
         protected INetworkClient network { get; private set; }
@@ -171,7 +171,10 @@ namespace NSL.Node.RoomServer.Bridge
             IdentityFailed = !_signResult;
 
             if (_signResult)
+            {
                 ServerIdentity = response.ServerIdentity;
+                identityData = response.IdentityData;
+            }
 
             OnStateChanged(State);
 

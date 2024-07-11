@@ -14,20 +14,20 @@ namespace NSL.Node.BridgeServer.Managers
 {
     public class RoomManager
     {
-        public delegate Task<bool> SignInServerValidatorDelegate(RoomSignInRequestModel request);
+        public delegate Task<bool> SignInServerValidatorDelegate(RoomServerNetworkClient room, RoomSignInRequestModel request);
         public delegate Task ServerSignedHandlerDelegate(RoomServerNetworkClient room, RoomSignInRequestModel request);
-        public delegate Task<IEnumerable<RoomServerNetworkClient>> ServerMissedHandlerDelegate(LobbyCreateRoomSessionRequestModel request, MissedServerReasonEnum reasone);
+        public delegate Task<IEnumerable<RoomServerNetworkClient>> ServerMissedHandlerDelegate(LobbyCreateRoomSessionRequestModel request, MissedServerReasonEnum reason);
 
         public delegate Task ServerConnectionLostHandlerDelegate(RoomServerNetworkClient room);
 
         public SignInServerValidatorDelegate SignInServerValidator { get; set; }
-            = (request) => Task.FromResult(true);
+            = (instance, request) => Task.FromResult(true);
 
         public ServerSignedHandlerDelegate ServerSignedHandler { get; set; }
             = (instance, request) => Task.CompletedTask;
 
         public ServerMissedHandlerDelegate ServerMissedHandler { get; set; }
-            = (instance, request) => Task.FromResult(Enumerable.Empty<RoomServerNetworkClient>());
+            = (request, reason) => Task.FromResult(Enumerable.Empty<RoomServerNetworkClient>());
 
         public ServerConnectionLostHandlerDelegate ServerConnectionLostHandler { get; set; }
             = (instance) => Task.CompletedTask;
@@ -72,44 +72,55 @@ namespace NSL.Node.BridgeServer.Managers
 
         public async Task<bool> TryRoomServerConnect(RoomServerNetworkClient client, RoomSignInRequestModel request)
         {
-            if (!await SignInServerValidator(request))
+            if (!await SignInServerValidator(client, request))
                 return false;
 
             locker.WaitOne();
 
-            if (Guid.Empty.Equals(request.Identity))
-                request.Identity = Guid.NewGuid();
-            else
+            try
             {
-                if (connectedServers.TryGetValue(request.Identity, out var exists))
+                if (Guid.Empty.Equals(request.Identity))
+                    request.Identity = Guid.NewGuid();
+                else
                 {
-                    if (exists.GetState())
-                        return false;
+                    if (connectedServers.TryGetValue(request.Identity, out var exists))
+                    {
+                        if (exists.GetState())
+                            return false;
 
-                    SignRoom(client, request);
+                        SignRoom(client, request);
 
-                    connectedServers[request.Identity] = client;
+                        connectedServers[request.Identity] = client;
 
-                    client.ChangeOwner(exists);
+                        client.ChangeOwner(exists);
 
-                    await ServerSignedHandler(client, request);
+                        await ServerSignedHandler(client, request);
 
-                    locker.Set();
+                        locker.Set();
 
-                    return true;
+                        return true;
+                    }
                 }
-            }
 
-            while (!connectedServers.TryAdd(request.Identity, client))
+                while (!connectedServers.TryAdd(request.Identity, client))
+                {
+                    request.Identity = Guid.NewGuid();
+                }
+
+                SignRoom(client, request);
+
+                await ServerSignedHandler(client, request);
+
+            }
+            catch (Exception)
             {
-                request.Identity = Guid.NewGuid();
+
+                throw;
             }
-
-            SignRoom(client, request);
-
-            await ServerSignedHandler(client, request);
-
-            locker.Set();
+            finally
+            {
+                locker.Set();
+            }
 
             return true;
         }
@@ -127,78 +138,94 @@ namespace NSL.Node.BridgeServer.Managers
         {
             var result = new CreateRoomSessionResponseModel();
 
-            IEnumerable<RoomServerNetworkClient> servers = default;
 
-            if (request.SpecialServer.HasValue)
-            {
-                if (connectedServers.TryGetValue(request.SpecialServer.Value, out var server))
-                    servers = Enumerable.Repeat(server, 1);
-                else
-                    servers = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundSpecialInstance);
-            }
-            else
-            {
-                IEnumerable<RoomServerNetworkClient> serverSelector = connectedServers.Values;
+            locker.WaitOne();
 
-                if (request.Location != default)
+            try
+            {
+                IEnumerable<RoomServerNetworkClient> servers = default;
+
+                if (request.SpecialServer.HasValue)
                 {
-                    serverSelector = serverSelector.Where(x => request.Location.Equals(x.Location));
+                    if (connectedServers.TryGetValue(request.SpecialServer.Value, out var server))
+                        servers = Enumerable.Repeat(server, 1);
+                    else
+                        servers = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundSpecialInstance);
+                }
+                else
+                {
+                    IEnumerable<RoomServerNetworkClient> serverSelector = connectedServers.Values;
 
-                    if (!serverSelector.Any())
-                        serverSelector = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundLocationInstance);
+                    if (request.Location != default)
+                    {
+                        serverSelector = serverSelector.Where(x => request.Location.Equals(x.Location));
+
+                        if (!serverSelector.Any())
+                            serverSelector = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundLocationInstance);
+                    }
+
+                    servers = serverSelector.OrderBy(x => x.SessionsCount);
                 }
 
-                servers = serverSelector.OrderBy(x => x.SessionsCount);
-            }
+                if (request.InstanceWeight.HasValue)
+                {
+                    servers = servers.Where(x => x.MaxWeight.HasValue).Where(x => x.MaxWeight - x.Weight > request.InstanceWeight);
 
-            if (request.InstanceWeight.HasValue)
-            {
-                servers = servers.Where(x => x.MaxWeight.HasValue).Where(x => x.MaxWeight - x.Weight > request.InstanceWeight);
+                    if (!servers.Any())
+                        servers = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundInstanceWeight);
+                }
+
+                servers = servers.Where(x => x.Network?.GetState() == true).Take(request.NeedPointCount);
 
                 if (!servers.Any())
-                    servers = await ServerMissedHandler(request, MissedServerReasonEnum.CannotFoundInstanceWeight);
-            }
+                    servers = await ServerMissedHandler(request, MissedServerReasonEnum.UnavailableInstances);
 
-            servers = servers.Where(x => x.Network?.GetState() == true).Take(request.NeedPointCount);
+                result.Result = servers.Any();
 
-            if (!servers.Any())
-                servers = await ServerMissedHandler(request, MissedServerReasonEnum.UnavailableInstances);
-
-            result.Result = servers.Any();
-
-            if (result.Result)
-            {
-                var sessions = new List<RoomSession>();
-
-                result.ConnectionPoints = servers.Select(server =>
+                if (result.Result)
                 {
-                    if (request.InstanceWeight.HasValue)
-                        server.Weight += request.InstanceWeight.Value;
+                    var sessions = new List<RoomSession>();
 
-                    var session = server.CreateSession(new RoomSession(request.RoomId, client, server)
+                    result.ConnectionPoints = servers.Select(server =>
                     {
-                        StartupInfo = new Shared.NodeRoomStartupInfo(request.StartupOptions),
-                        PlayerIds = request.InitialPlayers
-                    });
+                        if (request.InstanceWeight.HasValue)
+                            server.Weight += request.InstanceWeight.Value;
 
-                    session.OnDestroy += session =>
-                    {
-                        sessions.Remove(session);
+                        var session = server.CreateSession(new RoomSession(request.RoomId, client, server)
+                        {
+                            StartupInfo = new Shared.NodeRoomStartupInfo(request.StartupOptions),
+                            PlayerIds = request.InitialPlayers
+                        });
 
-                        if (sessions.Any() == false)
-                            client.Rooms.Remove(session.RoomIdentity, out _);
-                    };
+                        session.OnDestroy += session =>
+                        {
+                            sessions.Remove(session);
 
-                    sessions.Add(session);
+                            if (sessions.Any() == false)
+                                client.Rooms.Remove(session.RoomIdentity, out _);
+                        };
 
-                    return new Shared.RoomServerPointInfo()
-                    {
-                        Endpoint = server.ConnectionEndPoint,
-                        SessionId = session.SessionId
-                    };
-                }).ToList();
+                        sessions.Add(session);
 
-                client.Rooms.AddOrUpdate(request.RoomId, k => sessions, (k, o) => sessions);
+                        return new Shared.RoomServerPointInfo()
+                        {
+                            Endpoint = server.ConnectionEndPoint,
+                            SessionId = session.SessionId
+                        };
+                    }).ToList();
+
+                    client.Rooms.AddOrUpdate(request.RoomId, k => sessions, (k, o) => sessions);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                locker.Set();
             }
 
             return result;

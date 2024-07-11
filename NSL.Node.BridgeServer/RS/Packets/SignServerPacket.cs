@@ -17,7 +17,7 @@ namespace NSL.Node.BridgeServer.RS.Packets
 
             bool result = await client.Entry.RoomManager.TryRoomServerConnect(client, request);
 
-            new RoomSignInResponseModel { Result = result, ServerIdentity = client.Id}.WriteFullTo(response);
+            new RoomSignInResponseModel { Result = result, ServerIdentity = client.Id, IdentityData = request.IdentityData }.WriteFullTo(response);
 
             client.Send(response);
         }
