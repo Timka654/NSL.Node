@@ -25,7 +25,7 @@ namespace NSL.Node.RoomServer.Client.Data
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
 
-        private Action<OutputPacketBuffer, bool> broadcastDelegate = (packet, disposeOnSend) => { };
+        private event Action<OutputPacketBuffer, bool> broadcastDelegate = (packet, disposeOnSend) => { };
 
         private IRoomSession Game;
 
@@ -65,8 +65,6 @@ namespace NSL.Node.RoomServer.Client.Data
 
         private AutoResetEvent ar = new AutoResetEvent(true);
 
-        private SemaphoreSlim bdLocker = new SemaphoreSlim(1);
-
         public RoomInfo(NodeRoomServerEntry entry, Guid sessionId, Guid roomId)
         {
             Entry = entry;
@@ -93,7 +91,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             nodes.TryAdd(client.Id, client);
 
-            bdLocker.SafeInvoke(() => broadcastDelegate += client.Send);
+            broadcastDelegate += client.Send;
 
             BroadcastConnectNode(client);
 
@@ -117,7 +115,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
                 client.Room = null;
 
-                bdLocker.SafeInvoke(() => broadcastDelegate -= client.Send);
+                broadcastDelegate -= client.Send;
 
                 BroadcastDisconnectNode(client);
 
@@ -334,15 +332,16 @@ namespace NSL.Node.RoomServer.Client.Data
 
         #region Broadcast
 
-        public void Broadcast(OutputPacketBuffer packet, bool disposeOnSend = true)
+        public async void Broadcast(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
-            bdLocker.SafeInvoke(() =>
+            await Task.Run(() =>
             {
-                broadcastDelegate(packet, false);
-            });
 
-            if (disposeOnSend)
-                packet.Dispose();
+                broadcastDelegate(packet, false);
+
+                if (disposeOnSend)
+                    packet.Dispose();
+            });
         }
 
         public void Broadcast(DgramOutputPacketBuffer packet, bool disposeOnSend = true)
