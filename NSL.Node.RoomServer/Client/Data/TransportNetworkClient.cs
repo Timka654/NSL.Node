@@ -6,6 +6,11 @@ using NSL.WebSockets.Server.AspNetPoint;
 using NSL.UDP.Enums;
 using NSL.UDP;
 using NSL.SocketServer.Utils;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Linq;
+using System.Diagnostics;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
@@ -30,6 +35,32 @@ namespace NSL.Node.RoomServer.Client.Data
         public bool IsLocalNode => false;
 
         public INodeNetworkClient UDPClient => throw new NotImplementedException();
+
+        //static ConcurrentBag<long> items = new ();
+
+        //static TransportNetworkClient()
+        //{
+        //    new Timer(state =>
+        //    {
+        //        var r = items.ToArray();
+
+        //        Console.WriteLine($"Send time - {items.ToArray().Min()} - {items.ToArray().Max()} - {items.ToArray().Average()}");
+        //    }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+        //}
+
+
+        public void Send(byte[] buffer)
+        {
+            //var sw = Stopwatch.StartNew();
+            Network.Send(buffer);
+
+            //items.Add(sw.ElapsedMilliseconds);
+        }
+
+        public void Send(byte[] buffer, int offset, int len)
+        {
+            Network.Send(buffer, offset, len);
+        }
 
         public void Send(DgramOutputPacketBuffer packet, UDPChannelEnum channel = UDPChannelEnum.ReliableOrdered, bool disposeOnSend = true)
         {

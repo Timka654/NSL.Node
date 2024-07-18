@@ -50,7 +50,7 @@ namespace NSL.Node.RoomServer.Client
                         client.Id = client.NodeId = nodeId;
                         client.Token = string.Join(':', splitedToken.Skip(1).ToArray());
 
-                        result.Success = client.Room.AddClient(client);
+                        result.Success = await client.Room.AddClient(client);
 
                         if (result.Success)
                         {

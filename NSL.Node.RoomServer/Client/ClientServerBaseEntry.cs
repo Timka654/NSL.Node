@@ -18,6 +18,7 @@ using NSL.SocketCore.Utils.Logger;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using NSL.SocketCore.Extensions.Buffer;
+using NSL.Utils;
 
 namespace NSL.Node.RoomServer.Client
 {
@@ -51,23 +52,27 @@ namespace NSL.Node.RoomServer.Client
 
                 if (result.Result == true)
                 {
-                    roomInfo = roomMap.GetOrAdd(sessionId, id => new Lazy<RoomInfo>(() =>
+                    roomInfo = roomMap.GetOrAdd(sessionId, id => new Lazy<Task<RoomInfo>>(async () =>
                     {
                         var room = new RoomInfo(Entry, sessionId, roomId);
 
                         room.OnRoomDisposed += () =>
                         {
                             roomMap.TryRemove(id, out _);
+                            return Task.CompletedTask;
                         };
 
-                        room.SetStartupInfo(new NodeRoomStartupInfo(result.Options));
+                        await room.SetStartupInfo(new NodeRoomStartupInfo(result.Options));
 
                         return room;
-                    }));
+                    }, true));
                 }
             }
 
-            return roomInfo?.Value;
+            if (roomInfo == null)
+                return null;
+
+            return await roomInfo.Value;
         }
 
         protected NSLSessionManager<TransportNetworkClient> sessionManager;
@@ -76,7 +81,7 @@ namespace NSL.Node.RoomServer.Client
             where TBuilder : IOptionableEndPointBuilder<TransportNetworkClient>, IHandleIOBuilder<TransportNetworkClient>
         {
             builder.AddConnectHandle(client => client.InitializeObjectBag());
-            
+
             var options = builder.GetCoreOptions() as ServerOptions<TransportNetworkClient>;
 
             options.SetDefaultResponsePID();
@@ -97,27 +102,29 @@ namespace NSL.Node.RoomServer.Client
                         return Task.FromResult(result);
                     };
 
-                    c.OnRecoverySession += (client, session) =>
+                    c.OnRecoverySession += async (client, session) =>
                     {
                         var sSession = session as NSLServerSessionInfo<TransportNetworkClient>;
 
                         options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Try recovery session {sSession.Session} from {client.Network?.GetRemotePoint()}");
 
                         //client.Network.ChangeUserData(sSession.Client);
-                        
-                        client.Room?.RecoverySession(client.Node);
 
-                        if (client.Room == null)
+                        var room = client.Room;
+
+                        if (room == null)
                         {
                             Task.Delay(1000).ContinueWith((t) =>
                             {
                                 sessionManager.RemoveSession(client);
                                 client?.Disconnect();
-                            });
-                            return Task.CompletedTask;
+                            }).RunAsync();
+
+                            return;
                         }
 
-                        return Task.CompletedTask;
+                        await room.RecoverySession(client.Node);
+
                     };
 
                     c.OnExpiredSession += (network, session) =>
@@ -174,18 +181,19 @@ namespace NSL.Node.RoomServer.Client
 
             builder.AddDisconnectHandle(client =>
             {
-                if (client.Room != null)
+                var room = client.Room;
+                if (room != null)
                 {
                     if (Entry.ReconnectSessionLifeTime.HasValue)
-                        client.Room.OnClientDisconnected(client);
+                        room.OnClientDisconnected(client);
                     else
-                        client.Room?.DisconnectNode(client);
+                        room.DisconnectNode(client);
                 }
             });
 
             return builder;
         }
 
-        private ConcurrentDictionary<Guid, Lazy<RoomInfo>> roomMap = new();
+        private ConcurrentDictionary<Guid, Lazy<Task<RoomInfo>>> roomMap = new();
     }
 }

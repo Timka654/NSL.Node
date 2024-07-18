@@ -30,7 +30,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.SocketCore" Version="2024.7.15.2311" />
+		<PackageReference Include="NSL.SocketCore" Version="2024.7.17.2312" />
 	</ItemGroup>
 
 </Project>

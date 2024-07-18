@@ -12,10 +12,24 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static NSL.Node.RoomServer.Shared.Client.Core.IRoomInfo;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
+    public static class AsyncDelegateExtensions
+    {
+        public static async Task InvokeAsync<TDelegate>(this TDelegate t, Func<TDelegate, Task> invoke)
+            where TDelegate : Delegate
+        {
+            foreach (var item in t.GetInvocationList())
+            {
+                await invoke((TDelegate)item);
+            }
+        }
+    }
+
+
     public class RoomInfo : IServerRoomInfo, IDisposable
     {
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
@@ -25,7 +39,7 @@ namespace NSL.Node.RoomServer.Client.Data
         private Dictionary<ushort,
             ReciveHandleDelegate> handles = new Dictionary<ushort, ReciveHandleDelegate>();
 
-        private event Action<OutputPacketBuffer, bool> broadcastDelegate = (packet, disposeOnSend) => { };
+        private event Action<byte[], int, int> broadcastDelegate = (buf, offset, len) => { };
 
         private IRoomSession Game;
 
@@ -51,17 +65,19 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public Guid LocalNodeId => Guid.Empty;
 
-        public event Action<NodeInfo> OnNodeConnect = node => { };
+        public event OnNodeDelegate OnNodeConnect = node => Task.CompletedTask;
 
-        public event OnNodeDisconnectDelegate OnNodeDisconnect = (node, manualDisconnect) => { };
+        public event OnNodeDisconnectDelegate OnNodeDisconnect = (node, manualDisconnect) => Task.CompletedTask;
 
-        public event Action<NodeInfo> OnNodeConnectionLost = node => { };
+        public event OnNodeDelegate OnNodeConnectionLost = node => Task.CompletedTask;
 
-        public event Action OnRoomReady = () => { };
+        public event Func<Task> OnRoomReady = () => Task.CompletedTask;
 
-        public event Action OnRoomDisposed = () => { };
+        public event Func<Task> OnRoomDisposed = () => Task.CompletedTask;
 
         public event Func<NodeInfo, bool> OnValidateSession = c => true;
+
+        public event OnNodeDelegate OnRecoverySession = node => Task.CompletedTask;
 
         private AutoResetEvent ar = new AutoResetEvent(true);
 
@@ -72,10 +88,7 @@ namespace NSL.Node.RoomServer.Client.Data
             RoomId = roomId;
         }
 
-
-        public event Action<NodeInfo> OnRecoverySession = c => { };
-
-        public bool AddClient(TransportNetworkClient client)
+        public async Task<bool> AddClient(TransportNetworkClient client)
         {
             if (nodes.TryGetValue(client.Id, out var oldClient))
             {
@@ -84,7 +97,7 @@ namespace NSL.Node.RoomServer.Client.Data
                     oldClient.Disconnect();
                 }
                 else
-                    DisconnectNode(oldClient);
+                    await disconnectNode(oldClient);
             }
 
             client.Node = new NodeInfo(client, client.Id);
@@ -98,16 +111,21 @@ namespace NSL.Node.RoomServer.Client.Data
             return true;
         }
 
-        public void OnClientDisconnected(TransportNetworkClient client)
+        public async void OnClientDisconnected(TransportNetworkClient client)
         {
             if (client.ManualDisconnected)
-                DisconnectNode(client);
+                await disconnectNode(client);
             else
-                OnNodeConnectionLost(client.Node);
+                await OnNodeConnectionLost.InvokeAsync(x => x(client.Node));
             // implement with session manager
         }
 
-        public void DisconnectNode(TransportNetworkClient client)
+        public async void DisconnectNode(TransportNetworkClient client)
+        {
+            await disconnectNode(client);
+        }
+
+        private async Task disconnectNode(TransportNetworkClient client)
         {
             if (nodes.TryRemove(client.Id, out var oldClient))
             {
@@ -119,7 +137,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
                 BroadcastDisconnectNode(client);
 
-                OnNodeDisconnect(client.Node, client.ManualDisconnected);
+                await OnNodeDisconnect.InvokeAsync(x => x(client.Node, client.ManualDisconnected));
 
                 if (StartupInfo.GetDestroyOnEmpty() && !nodes.Any())
                 {
@@ -128,7 +146,7 @@ namespace NSL.Node.RoomServer.Client.Data
             }
         }
 
-        internal void SetStartupInfo(NodeRoomStartupInfo startupInfo)
+        internal async Task SetStartupInfo(NodeRoomStartupInfo startupInfo)
         {
             RoomWaitAllReady = startupInfo.GetRoomWaitReady();
 
@@ -146,7 +164,7 @@ namespace NSL.Node.RoomServer.Client.Data
             Game = Entry.CreateRoomSession(this);
 
             if (!RoomWaitAllReady)
-                OnRoomReady();
+                await OnRoomReady.InvokeAsync(x => x());
         }
 
         public Dictionary<string, string> GetClientOptions()
@@ -233,13 +251,14 @@ namespace NSL.Node.RoomServer.Client.Data
 
                 node.Ready = true;
 
-                OnNodeConnect(node.Node);
+                await OnNodeConnect.InvokeAsync(x => x(node.Node));
 
                 if (RoomWaitAllReady)
                 {
                     if (Nodes.All(x => x.Ready))
                     {
-                        OnRoomReady();
+                        await OnRoomReady.InvokeAsync(x => x());
+
                         Broadcast(CreateReadyRoomPacket());
                     }
                 }
@@ -334,10 +353,12 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public async void Broadcast(OutputPacketBuffer packet, bool disposeOnSend = true)
         {
+
             await Task.Run(() =>
             {
+                var buf = packet.CompilePacket();
 
-                broadcastDelegate(packet, false);
+                broadcastDelegate(buf, 0, buf.Length);
 
                 if (disposeOnSend)
                     packet.Dispose();
@@ -469,6 +490,26 @@ namespace NSL.Node.RoomServer.Client.Data
             return SendTo(nodeId, packet);
         }
 
+
+        public bool SendTo(NodeInfo node, byte[] buffer)
+        {
+            if (node.Network != null)
+            {
+                (node.Network as TransportNetworkClient).Send(buffer);
+                return true;
+            }
+            return false;
+        }
+        public bool SendTo(NodeInfo node, byte[] buffer, int offset, int len)
+        {
+            if (node.Network != null)
+            {
+                (node.Network as TransportNetworkClient).Send(buffer, offset, len);
+                return true;
+            }
+            return false;
+        }
+
         public bool SendTo(Guid nodeId, ushort command, UDPChannelEnum channel, Action<DgramOutputPacketBuffer> build)
         {
             return SendTo(nodeId, command, build);
@@ -561,14 +602,14 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool Destroyed { get; private set; }
 
-        public void Dispose(byte[] data)
+        public async void Dispose(byte[] data)
         {
             if (Destroyed)
                 return;
 
             Destroyed = true;
 
-            OnRoomDisposed();
+            await OnRoomDisposed.InvokeAsync(x => x());
 
             BroadcastRoomDestroy();
 
@@ -620,9 +661,9 @@ namespace NSL.Node.RoomServer.Client.Data
             return OnValidateSession(node);
         }
 
-        public void RecoverySession(NodeInfo node)
+        public async Task RecoverySession(NodeInfo node)
         {
-            OnRecoverySession(node);
+            await OnRecoverySession.InvokeAsync(x => x(node));
         }
     }
 }
