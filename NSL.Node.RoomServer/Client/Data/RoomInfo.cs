@@ -5,6 +5,7 @@ using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.UDP;
 using NSL.UDP.Enums;
+using NSL.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -17,19 +18,6 @@ using static NSL.Node.RoomServer.Shared.Client.Core.IRoomInfo;
 
 namespace NSL.Node.RoomServer.Client.Data
 {
-    public static class AsyncDelegateExtensions
-    {
-        public static async Task InvokeAsync<TDelegate>(this TDelegate t, Func<TDelegate, Task> invoke)
-            where TDelegate : Delegate
-        {
-            foreach (var item in t.GetInvocationList())
-            {
-                await invoke((TDelegate)item);
-            }
-        }
-    }
-
-
     public class RoomInfo : IServerRoomInfo, IDisposable
     {
         private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
