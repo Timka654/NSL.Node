@@ -27,14 +27,14 @@ namespace NSL.Node.BridgeServer.RS
 
         public NodeRoomStartupInfo StartupInfo { get; set; }
 
-        public List<Guid>? PlayerIds { get; set; } = default;
+        public List<string>? PlayerIds { get; set; } = default;
 
-        public void AddPlayerId(Guid playerId)
+        public void AddPlayerId(string playerId)
         {
             playerIdsLocker.WaitOne();
 
             if (PlayerIds == default)
-                PlayerIds = new List<Guid>();
+                PlayerIds = new List<string>();
 
             if (!PlayerIds.Contains(playerId))
                 PlayerIds.Add(playerId);
@@ -42,7 +42,7 @@ namespace NSL.Node.BridgeServer.RS
             playerIdsLocker.Set();
         }
 
-        public void RemovePlayerId(Guid playerId)
+        public void RemovePlayerId(string playerId)
         {
             if (PlayerIds == default)
                 return;
@@ -97,7 +97,7 @@ namespace NSL.Node.BridgeServer.RS
             OnDestroy(this);
         }
 
-        internal bool ValidatePlayer(Guid playerId)
+        internal bool ValidatePlayer(string playerId)
         {
             if (PlayerIds == default)
                 return true;

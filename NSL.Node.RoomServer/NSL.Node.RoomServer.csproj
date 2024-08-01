@@ -32,11 +32,11 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='UnityDebug' and '$(Configuration)'!='Unity'">
-		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.BuilderExtensions.TcpClient" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.BuilderExtensions.TcpServer" Version="2024.7.26.336" />
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.BuilderExtensions.TcpClient" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.BuilderExtensions.TcpServer" Version="2024.7.29.126" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
@@ -46,12 +46,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.Extensions.Session.Server" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.Logger" Version="2024.7.26.336" />
-		<PackageReference Include="NSL.UDP.Client" Version="2024.7.26.336" />
+		<PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsServer.AspNet" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.ConfigurationEngine.Providers.Json" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.Extensions.Session.Server" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.Logger" Version="2024.7.29.126" />
+		<PackageReference Include="NSL.UDP.Client" Version="2024.7.29.126" />
 		<PackageReference Include="STUN" Version="0.5.0" />
 	</ItemGroup>
 

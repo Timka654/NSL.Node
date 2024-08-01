@@ -27,38 +27,37 @@ namespace NSL.Node.RoomServer.Client
             {
                 var splitedToken = request.Token.Split(':');
 
-                if (Guid.TryParse(splitedToken.First(), out var nodeId))
+                var nodeId = splitedToken.First();
+
+                var validatePlayer = await Entry.ValidateSessionPlayer(new BridgeServer.Shared.Requests.RoomSignSessionPlayerRequestModel()
                 {
-                    var validatePlayer = await Entry.ValidateSessionPlayer(new BridgeServer.Shared.Requests.RoomSignSessionPlayerRequestModel()
-                    {
-                        SessionId = request.SessionId,
-                        PlayerId = nodeId
-                    });
+                    SessionId = request.SessionId,
+                    PlayerId = nodeId
+                });
 
-                    if (!validatePlayer.ExistsSession)
+                if (!validatePlayer.ExistsSession)
+                {
+                    if (roomMap.TryRemove(request.SessionId, out var expiredSession))
                     {
-                        if (roomMap.TryRemove(request.SessionId, out var expiredSession))
-                        {
-                            client.Network?.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $" - [SignIn] Remove session {request.SessionId} by no exists information on Bridge");
-                            expiredSession.Value.Dispose();
-                        }
+                        client.Network?.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $" - [SignIn] Remove session {request.SessionId} by no exists information on Bridge");
+                        expiredSession.Value.Dispose();
                     }
+                }
 
-                    if (validatePlayer.ExistsPlayer)
+                if (validatePlayer.ExistsPlayer)
+                {
+                    client.Room = roomInfo;
+                    client.Id = client.NodeId = nodeId;
+                    client.Token = string.Join(':', splitedToken.Skip(1).ToArray());
+
+                    result.Success = await client.Room.AddClient(client);
+
+                    if (result.Success)
                     {
-                        client.Room = roomInfo;
-                        client.Id = client.NodeId = nodeId;
-                        client.Token = string.Join(':', splitedToken.Skip(1).ToArray());
-
-                        result.Success = await client.Room.AddClient(client);
-
-                        if (result.Success)
-                        {
-                            result.NodeId = client.NodeId;
-                            result.Options = roomInfo.GetClientOptions();
-                            var session = sessionManager?.CreateSession(client, client.NodeId.ToString());
-                            result.SessionInfo = session;
-                        }
+                        result.NodeId = client.NodeId;
+                        result.Options = roomInfo.GetClientOptions();
+                        var session = sessionManager?.CreateSession(client, client.NodeId.ToString());
+                        result.SessionInfo = session;
                     }
                 }
             }

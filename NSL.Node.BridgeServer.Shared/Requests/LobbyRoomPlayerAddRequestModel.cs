@@ -8,6 +8,6 @@ namespace NSL.Node.BridgeServer.Shared.Requests
     {
         public Guid RoomId { get; set; }
 
-        public Guid PlayerId { get; set; }
+        public string PlayerId { get; set; }
     }
 }

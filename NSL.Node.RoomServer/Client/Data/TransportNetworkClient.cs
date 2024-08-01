@@ -18,11 +18,11 @@ namespace NSL.Node.RoomServer.Client.Data
     {
         public string Token { get; set; }
 
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public Guid RoomId { get; set; }
 
-        public Guid NodeId { get; set; }
+        public string NodeId { get; set; }
 
         public string EndPoint { get; set; }
 
@@ -83,7 +83,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var packet = new DgramOutputPacketBuffer();
 
-            packet.WriteGuid(Id);
+            packet.WriteString(Id);
 
             build(packet);
 
@@ -121,7 +121,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var packet = new DgramOutputPacketBuffer();
 
-            packet.WriteGuid(Id);
+            packet.WriteString(Id);
 
             build(packet);
 

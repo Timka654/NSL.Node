@@ -20,7 +20,7 @@ namespace NSL.Node.RoomServer.Client.Data
 {
     public class RoomInfo : IServerRoomInfo, IDisposable
     {
-        private ConcurrentDictionary<Guid, TransportNetworkClient> nodes = new ConcurrentDictionary<Guid, TransportNetworkClient>();
+        private ConcurrentDictionary<string, TransportNetworkClient> nodes = new ConcurrentDictionary<string, TransportNetworkClient>();
 
         public IEnumerable<NodeInfo> GetNodes() { return nodes.Values.Select(x => x.Node); }
 
@@ -32,7 +32,9 @@ namespace NSL.Node.RoomServer.Client.Data
         private IRoomSession Game;
 
         public NodeRoomServerEntry Entry { get; }
+
         public Guid SessionId { get; }
+
         public Guid RoomId { get; }
 
         public int ConnectedNodesCount => nodes.Count;
@@ -51,7 +53,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool ShutdownOnMissedReady { get; private set; }
 
-        public Guid LocalNodeId => Guid.Empty;
+        public string LocalNodeId => Guid.Empty.ToString();
 
         public event OnNodeDelegate OnNodeConnect = node => Task.CompletedTask;
 
@@ -172,7 +174,7 @@ namespace NSL.Node.RoomServer.Client.Data
             Dispose();
         }
 
-        public async Task<bool> ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<Guid> nodeIds)
+        public async Task<bool> ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<string> nodeIds)
         {
             if (node.Node == null)
             {
@@ -313,7 +315,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeConnectionLostMessage);
 
-            buffer.WriteGuid(node.NodeId);
+            buffer.WriteString(node.NodeId);
 
             Broadcast(buffer);
         }
@@ -322,7 +324,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeChangeEndPointMessage);
 
-            buffer.WriteGuid(node.NodeId);
+            buffer.WriteString(node.NodeId);
             buffer.WriteString(node.EndPoint);
 
             Broadcast(buffer);
@@ -332,7 +334,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var buffer = OutputPacketBuffer.Create(RoomPacketEnum.NodeDisconnectMessage);
 
-            buffer.WriteGuid(node.NodeId);
+            buffer.WriteString(node.NodeId);
 
             Broadcast(buffer);
         }
@@ -399,7 +401,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
         #region SendTo
 
-        public bool SendTo(Guid nodeId, OutputPacketBuffer packet, bool disposeOnSend = true)
+        public bool SendTo(string nodeId, OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             if (nodes.TryGetValue(nodeId, out var node))
                 return SendTo(node, packet, disposeOnSend);
@@ -409,7 +411,7 @@ namespace NSL.Node.RoomServer.Client.Data
             return false;
         }
 
-        public bool SendTo(Guid nodeId, UDPChannelEnum channel, OutputPacketBuffer packet, bool disposeOnSend = true)
+        public bool SendTo(string nodeId, UDPChannelEnum channel, OutputPacketBuffer packet, bool disposeOnSend = true)
         {
             return SendTo(nodeId, packet, disposeOnSend);
         }
@@ -442,7 +444,7 @@ namespace NSL.Node.RoomServer.Client.Data
             return SendTo(node, packet, disposeOnSend);
         }
 
-        public bool SendTo(Guid nodeId, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        public bool SendTo(string nodeId, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
         {
             if (nodes.TryGetValue(nodeId, out var node))
                 return SendTo(node, packet, disposeOnSend);
@@ -452,7 +454,7 @@ namespace NSL.Node.RoomServer.Client.Data
             return false;
         }
 
-        public bool SendTo(Guid nodeId, UDPChannelEnum channel, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
+        public bool SendTo(string nodeId, UDPChannelEnum channel, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
             => SendTo(nodeId, packet, disposeOnSend);
 
         public bool SendTo(NodeInfo node, DgramOutputPacketBuffer packet, bool disposeOnSend = true)
@@ -465,7 +467,7 @@ namespace NSL.Node.RoomServer.Client.Data
             return SendTo(node, packet, disposeOnSend);
         }
 
-        public bool SendTo(Guid nodeId, ushort command, Action<DgramOutputPacketBuffer> build)
+        public bool SendTo(string nodeId, ushort command, Action<DgramOutputPacketBuffer> build)
         {
             DgramOutputPacketBuffer packet = new DgramOutputPacketBuffer();
 
@@ -498,7 +500,7 @@ namespace NSL.Node.RoomServer.Client.Data
             return false;
         }
 
-        public bool SendTo(Guid nodeId, ushort command, UDPChannelEnum channel, Action<DgramOutputPacketBuffer> build)
+        public bool SendTo(string nodeId, ushort command, UDPChannelEnum channel, Action<DgramOutputPacketBuffer> build)
         {
             return SendTo(nodeId, command, build);
         }
@@ -559,7 +561,7 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             var body = packet.GetBuffer();
 
-            var to = packet.ReadGuid();
+            var to = packet.ReadString();
 
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.TransportMessage);
 
@@ -575,7 +577,7 @@ namespace NSL.Node.RoomServer.Client.Data
                 throw new Exception($"code {code} already contains in {nameof(handles)}");
         }
 
-        public NodeInfo GetNode(Guid id)
+        public NodeInfo GetNode(string id)
         {
             if (nodes.TryGetValue(id, out var node))
                 return node.Node;

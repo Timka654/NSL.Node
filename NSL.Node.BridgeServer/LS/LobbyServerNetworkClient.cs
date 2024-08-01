@@ -37,7 +37,7 @@ namespace NSL.Node.BridgeServer.LS
             }
         }
 
-        public void AddPlayerId(Guid roomId, Guid playerId)
+        public void AddPlayerId(Guid roomId, string playerId)
         {
             if (Rooms.TryGetValue(roomId, out var room))
             {
@@ -48,7 +48,7 @@ namespace NSL.Node.BridgeServer.LS
             }
         }
 
-        public void RemovePlayerId(Guid roomId, Guid playerId)
+        public void RemovePlayerId(Guid roomId, string playerId)
         {
             if (Rooms.TryGetValue(roomId, out var room))
             {
