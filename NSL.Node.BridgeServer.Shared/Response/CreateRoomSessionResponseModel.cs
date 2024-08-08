@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NSL.Node.BridgeServer.Shared.Response
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class CreateRoomSessionResponseModel
     {
         public bool Result { get; set; }

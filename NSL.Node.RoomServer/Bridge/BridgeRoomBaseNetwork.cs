@@ -105,8 +105,9 @@ namespace NSL.Node.RoomServer.Bridge
                 OnStateChanged(State);
             });
 
-            builder.AddDefaultEventHandlers((string)null,
-        DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
+            if (Logger != null)
+                builder.AddDefaultEventHandlers((string)null,
+            DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
             builder.AddSendHandle((client, pid, len, stack) =>
             {

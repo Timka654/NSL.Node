@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NSL.Node.BridgeServer.Shared.Requests
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class RoomSignInRequestModel
     {
         public Guid Identity { get; set; }

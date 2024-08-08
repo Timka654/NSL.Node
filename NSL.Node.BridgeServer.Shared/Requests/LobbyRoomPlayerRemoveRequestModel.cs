@@ -2,7 +2,7 @@
 
 namespace NSL.Node.BridgeServer.Shared.Requests
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class LobbyRoomPlayerRemoveRequestModel : LobbyRoomPlayerAddRequestModel
     {
     }

@@ -2,7 +2,7 @@
 
 namespace NSL.Node.BridgeServer.Shared.Message
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class RoomFinishMessageModel : RoomMessageModel
     {
     }

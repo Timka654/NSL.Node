@@ -2,7 +2,7 @@
 
 namespace NSL.Node.BridgeServer.Shared.Response
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class RoomSignSessionPlayerResponseModel
     {
         public bool ExistsSession { get; set; }

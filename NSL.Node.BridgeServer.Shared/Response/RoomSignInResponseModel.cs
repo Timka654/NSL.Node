@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NSL.Node.BridgeServer.Shared.Response
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class RoomSignInResponseModel
     {
         public bool Result { get; set; }

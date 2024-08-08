@@ -151,8 +151,8 @@ namespace NSL.Node.RoomServer.Client
                 RoomPacketEnum.TransportMessage, TransportPacketHandle);
             builder.AddPacketHandle(
                 RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
-            builder.AddAsyncPacketHandle(
-                RoomPacketEnum.ReadyNodeRequest, ReadyPacketHandle);
+            //builder.AddAsyncPacketHandle(
+            //    RoomPacketEnum.ReadyNodeRequest, ReadyPacketHandle);
             builder.AddPacketHandle(
                 RoomPacketEnum.ExecuteMessage, ExecutePacketHandle);
             builder.AddPacketHandle(
@@ -160,8 +160,9 @@ namespace NSL.Node.RoomServer.Client
             builder.AddPacketHandle(
                 RoomPacketEnum.NodeChangeEndPointMessage, ChangeConnectionPointPacketHandle);
 
-            builder.AddDefaultEventHandlers((string)null,
-                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
+            if (Logger != null)
+                builder.AddDefaultEventHandlers((string)null,
+                    DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
 
 
             if (Entry.DebugPacketIO)

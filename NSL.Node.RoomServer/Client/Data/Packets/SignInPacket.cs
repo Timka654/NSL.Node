@@ -21,6 +21,8 @@ namespace NSL.Node.RoomServer.Client
 
             client.EndPoint = request.ConnectionEndPoint;
 
+            Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"RoomId {request.RoomId}, Token {request.Token} connect");
+
             var roomInfo = await TryLoadRoomAsync(request.RoomId, request.SessionId);
 
             if (roomInfo != null)
@@ -37,6 +39,8 @@ namespace NSL.Node.RoomServer.Client
 
                 if (!validatePlayer.ExistsSession)
                 {
+                    Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - not found session!!");
+
                     if (roomMap.TryRemove(request.SessionId, out var expiredSession))
                     {
                         client.Network?.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $" - [SignIn] Remove session {request.SessionId} by no exists information on Bridge");
@@ -50,7 +54,9 @@ namespace NSL.Node.RoomServer.Client
                     client.Id = client.NodeId = nodeId;
                     client.Token = string.Join(':', splitedToken.Skip(1).ToArray());
 
+
                     result.Success = await client.Room.AddClient(client);
+
 
                     if (result.Success)
                     {
@@ -59,8 +65,14 @@ namespace NSL.Node.RoomServer.Client
                         var session = sessionManager?.CreateSession(client, client.NodeId.ToString());
                         result.SessionInfo = session;
                     }
+                    else
+                        Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - cannot add to room");
                 }
+                else
+                    Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - not exists player!!");
             }
+            else
+                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - room info not found!!");
 
             result.WriteFullTo(response);
 

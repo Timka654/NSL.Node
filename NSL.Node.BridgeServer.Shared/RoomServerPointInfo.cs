@@ -3,7 +3,7 @@ using System;
 
 namespace NSL.Node.BridgeServer.Shared
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class RoomServerPointInfo
     {
         public string Endpoint { get; set; }

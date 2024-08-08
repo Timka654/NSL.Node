@@ -49,6 +49,8 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public bool RoomWaitAllReady { get; private set; }
 
+        public bool RoomReady { get; private set; }
+
         public int StartupTimeout { get; private set; }
 
         public bool ShutdownOnMissedReady { get; private set; }
@@ -80,23 +82,30 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public async Task<bool> AddClient(TransportNetworkClient client)
         {
-            if (nodes.TryGetValue(client.Id, out var oldClient))
-            {
-                if (oldClient.Network?.GetState() == true)
-                {
-                    oldClient.Disconnect();
-                }
-                else
-                    await disconnectNode(oldClient);
-            }
-
             client.Node = new NodeInfo(client, client.Id);
 
-            nodes.TryAdd(client.Id, client);
+            var current = nodes.GetOrAdd(client.Id, client);
+
+            if (current != client)
+            {
+                if (current.Network?.GetState() == true)
+                {
+                    current.Disconnect();
+                }
+                else
+                    await disconnectNode(current);
+
+                current = nodes.AddOrUpdate(client.Id, client, (k, o) => client);
+            }
+
+            if (current != client)
+                return false;
 
             broadcastDelegate += client.Send;
 
             BroadcastConnectNode(client);
+
+            connectPlayer(client);
 
             return true;
         }
@@ -140,6 +149,8 @@ namespace NSL.Node.RoomServer.Client.Data
         {
             RoomWaitAllReady = startupInfo.GetRoomWaitReady();
 
+            RoomReady = !RoomWaitAllReady;
+
             RoomNodeCount = startupInfo.GetRoomNodeCount();
 
             StartupTimeout = startupInfo.GetRoomStartupTimeout();
@@ -153,7 +164,7 @@ namespace NSL.Node.RoomServer.Client.Data
 
             Game = Entry.CreateRoomSession(this);
 
-            if (!RoomWaitAllReady)
+            if (RoomReady)
                 await OnRoomReady.InvokeAsync(x => x());
         }
 
@@ -174,80 +185,31 @@ namespace NSL.Node.RoomServer.Client.Data
             Dispose();
         }
 
-        public async Task<bool> ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<string> nodeIds)
+        private async void connectPlayer(TransportNetworkClient node)
         {
-            if (node.Node == null)
+            if (node.Ready)
+                return;
+
+            await Task.Delay(1_000); // response wait for send
+
+            bool isLocked = RoomWaitAllReady && !RoomReady;
+
+            if (isLocked)
+                ar.WaitOne();
+
+            if (nodes.TryGetValue(node.Id, out var current) && current == node)
             {
-                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {nameof(node.Node)} is null. result = false");
-                await Task.Delay(1_000);
-                return false;
-            }
-
-            if (!ar.WaitOne(10_000))
-            {
-                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} locker not response");
-                throw new Exception();
-            }
-
-            try
-            {
-                if (node.Ready)
-                    return true;
-
-                if (!nodes.ContainsKey(node.Id))
-                {
-                    if (node.RoomId != RoomId)
-                    {
-                        Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} have invalid roomId {node.RoomId} vs {RoomId}");
-
-                        node.Disconnect();
-
-                        return false;
-                    }
-
-                    Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} not signed");
-
-                    return false;
-                }
-
-                if (RoomWaitAllReady)
-                {
-                    if (ConnectedNodesCount != nodeIds.Count())
-                    {
-                        Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
-
-                        foreach (var item in nodes)
-                        {
-                            if (nodeIds.Contains(item.Key))
-                                continue;
-
-                            SendConnectNodeInformation(node, item.Value);
-                        }
-
-                        Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{nameof(ValidateNodeReady)} {node.Id} have invalid node connections count {ConnectedNodesCount} vs {nodeIds.Count()}");
-
-                        return false;
-                    }
-
-                    if (ConnectedNodesCount != RoomNodeCount)
-                    {
-                        Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
-
-                        await Task.Delay(2_000);
-
-                        return false;
-                    }
-                }
-
                 node.Ready = true;
 
                 await OnNodeConnect.InvokeAsync(x => x(node.Node));
 
-                if (RoomWaitAllReady)
+                if (RoomWaitAllReady && !RoomReady)
                 {
                     if (Nodes.All(x => x.Ready))
                     {
-                        await OnRoomReady.InvokeAsync(x => x());
+                        RoomReady = true;
+
+                        await OnRoomReady.InvokeAsync();
 
                         Broadcast(CreateReadyRoomPacket());
                     }
@@ -255,18 +217,109 @@ namespace NSL.Node.RoomServer.Client.Data
                 else
                     SendTo(node, CreateReadyRoomPacket());
             }
-            catch (Exception ex)
-            {
-                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
-                return false;
-            }
-            finally
-            {
-                ar.Set();
-            }
 
-            return true;
+            if (isLocked)
+                ar.Set();
+
         }
+
+        //public async Task<bool> ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<string> nodeIds)
+        //{
+        //    if (node.Node == null)
+        //    {
+        //        Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {nameof(node.Node)} is null. result = false");
+        //        await Task.Delay(1_000);
+        //        return false;
+        //    }
+
+        //    if (RoomWaitAllReady)
+        //    {
+        //        if (!ar.WaitOne(10_000))
+        //        {
+        //            Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} locker not response");
+        //            throw new Exception();
+        //        }
+        //    }
+
+        //    try
+        //    {
+        //        if (node.Ready)
+        //            return true;
+
+        //        if (!nodes.ContainsKey(node.Id))
+        //        {
+        //            if (node.RoomId != RoomId)
+        //            {
+        //                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} have invalid roomId {node.RoomId} vs {RoomId}");
+
+        //                node.Disconnect();
+
+        //                return false;
+        //            }
+
+        //            Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} not signed");
+
+        //            return false;
+        //        }
+
+        //        if (RoomWaitAllReady)
+        //        {
+        //            if (ConnectedNodesCount != nodeIds.Count())
+        //            {
+        //                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
+
+        //                foreach (var item in nodes)
+        //                {
+        //                    if (nodeIds.Contains(item.Key))
+        //                        continue;
+
+        //                    SendConnectNodeInformation(node, item.Value);
+        //                }
+
+        //                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{nameof(ValidateNodeReady)} {node.Id} have invalid node connections count {ConnectedNodesCount} vs {nodeIds.Count()}");
+
+        //                return false;
+        //            }
+
+        //            if (ConnectedNodesCount != RoomNodeCount)
+        //            {
+        //                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
+
+        //                await Task.Delay(2_000);
+
+        //                return false;
+        //            }
+        //        }
+
+        //        node.Ready = true;
+
+        //        await OnNodeConnect.InvokeAsync(x => x(node.Node));
+
+        //        if (RoomWaitAllReady)
+        //        {
+        //            if (Nodes.All(x => x.Ready))
+        //            {
+        //                await OnRoomReady.InvokeAsync(x => x());
+
+        //                Broadcast(CreateReadyRoomPacket());
+        //            }
+        //        }
+        //        else
+        //            SendTo(node, CreateReadyRoomPacket());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
+        //        return false;
+        //    }
+        //    finally
+        //    {
+        //        if (RoomWaitAllReady)
+        //            ar.Set();
+        //    }
+
+        //    return true;
+        //}
 
         protected OutputPacketBuffer CreateReadyRoomPacket()
         {

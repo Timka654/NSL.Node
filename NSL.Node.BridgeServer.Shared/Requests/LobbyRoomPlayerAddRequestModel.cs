@@ -3,7 +3,7 @@ using System;
 
 namespace NSL.Node.BridgeServer.Shared.Requests
 {
-    [BinaryIOType, BinaryIOMethodsFor]
+    [NSLBIOType]
     public partial class LobbyRoomPlayerAddRequestModel
     {
         public Guid RoomId { get; set; }
