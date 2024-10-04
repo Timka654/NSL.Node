@@ -117,6 +117,7 @@ namespace NSL.Node.RoomServer.Client
                             Task.Delay(1000).ContinueWith((t) =>
                             {
                                 sessionManager.RemoveSession(client);
+
                                 client?.Disconnect();
                             }).RunAsync();
 

@@ -28,7 +28,7 @@ namespace NSL.Node.LocalRoomServerExample
             .WithAspLogger(app.Logger)
             .WithHandleProcessor(new LocalAspRoomServerStartupEntry())
             //.WithCreateSessionHandle(roomInfo => new GameInfo(roomInfo))
-            .GetPublicAddressFromStun(out var publicAddr)
+            //.GetPublicAddressFromStun(out var publicAddr)
             .WithClientServerAspBinding(app, "/room_server")
             );
 

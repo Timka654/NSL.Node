@@ -1,7 +1,6 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.EndPointBuilder;
 using NSL.Logger;
-using NSL.Node.BridgeServer.LS.Packets;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.SocketServer.Utils;
 using NSL.Logger.Interface;
@@ -13,7 +12,7 @@ using NSL.SocketCore.Utils.Logger;
 
 namespace NSL.Node.BridgeServer.LS
 {
-    public abstract class LobbyServerBaseEntry
+    public abstract partial class LobbyServerBaseEntry
     {
         protected INetworkListener Listener { get; set; }
 
@@ -60,10 +59,10 @@ namespace NSL.Node.BridgeServer.LS
                     Logger?.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeLobbyPacketEnum)pid)})");
             });
 
-            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionRequestPacket.ReceiveHandle);
-            builder.AddAsyncPacketHandle(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest, CreateRoomSessionRequestPacket.ReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.AddPlayerRequest, AddPlayerRequestPacket.ReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.RemovePlayerRequest, RemovePlayerRequestPacket.ReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionRequestReceiveHandle);
+            builder.AddAsyncPacketHandle(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest, CreateRoomSessionRequestReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.AddPlayerRequest, AddPlayerRequestReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.RemovePlayerRequest, RemovePlayerRequestReceiveHandle);
 
             builder.AddResponsePacketHandle(
                 NodeBridgeLobbyPacketEnum.Response,

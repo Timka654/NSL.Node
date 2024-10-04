@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<Configurations>Debug;Release;UnityDebug;Unity;DebugExamples</Configurations>
+		<Configurations>Debug;Release;UnityDebug;Unity;DebugExamples;Dev</Configurations>
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
@@ -10,6 +10,10 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageId>$(MSBuildProjectName)_Debug</PackageId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Dev'">
+	  <PackageId>$(MSBuildProjectName)_Debug</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='DebugExamples'">
@@ -28,17 +32,17 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='UnityDebug' and '$(Configuration)'!='Unity'">
-		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2024.8.6.1532" />
-		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2024.8.6.1532" />
+		<PackageReference Include="NSL.BuilderExtensions.SocketCore" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.BuilderExtensions.WebSocketsClient" Version="2024.10.4.1349" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='UnityDebug' or '$(Configuration)'=='Unity'">
-		<PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2023.4.12.1611" />
-		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2023.4.12.1611" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.SocketCore" Version="2024.10.4.1349" />
+		<PackageReference Include="Unity.NSL.BuilderExtensions.WebSocketsClient" Version="2024.10.4.1349" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2024.8.6.1532" />
+	  <PackageReference Include="NSL.BuilderExtensions.LocalBridge" Version="2024.10.4.1349" />
 	</ItemGroup>
 
 	<ItemGroup>

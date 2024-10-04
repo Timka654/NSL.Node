@@ -14,6 +14,7 @@ namespace NSL.Node.RoomServer
     {
         public delegate Task<RoomSignSessionResponseModel> ValidateSessionDelegate(RoomSignSessionRequestModel query);
         public delegate Task<RoomSignSessionPlayerResponseModel> ValidateSessionPlayerDelegate(RoomSignSessionPlayerRequestModel query);
+
         public delegate void RoomFinishHandleDelegate(RoomInfo roomInfo, byte[] data);
         public delegate void RoomMessageHandleDelegate(RoomInfo roomInfo, byte[] data);
 
@@ -23,7 +24,7 @@ namespace NSL.Node.RoomServer
 
         internal BridgeRoomBaseNetwork BridgeNetworkClient { get; set; }
 
-        public ClientServerBaseEntry ClientServerListener { get; set; }
+        internal ClientServerBaseEntry ClientServerListener { get; set; }
 
         internal ILogger Logger { get; set; }
 
@@ -41,7 +42,7 @@ namespace NSL.Node.RoomServer
 
         internal TimeSpan? ReconnectSessionLifeTime { get; set; } = null;
 
-        public bool DebugPacketIO { get; set; }
+        internal bool DebugPacketIO { get; set; }
 
         internal void Run()
         {

@@ -1,4 +1,5 @@
 ﻿using NSL.Generators.BinaryTypeIOGenerator.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace NSL.Node.BridgeServer.Shared.Response
@@ -9,5 +10,7 @@ namespace NSL.Node.BridgeServer.Shared.Response
         public bool Result { get; set; }
 
         public List<RoomServerPointInfo> ConnectionPoints { get; set; }
+
+        public DateTime CreateTime { get; set; }
     }
 }

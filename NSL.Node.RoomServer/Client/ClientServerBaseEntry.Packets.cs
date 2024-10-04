@@ -1,17 +1,46 @@
 ﻿using NSL.Node.Core.Models.Requests;
 using NSL.Node.Core.Models.Response;
 using NSL.Node.RoomServer.Client.Data;
+using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace NSL.Node.RoomServer.Client
 {
-    public partial class ClientServerBaseEntry
+    public abstract partial class ClientServerBaseEntry
     {
-        private async Task SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+        private void BroadcastPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+        {
+            var body = buffer.GetBuffer();
+
+            OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.TransportMessage);
+
+            pbuf.WriteString(client.Id);
+
+            pbuf.Write(body);
+
+            client.Room.Broadcast(pbuf);
+        }
+
+        void ChangeConnectionPointPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+            => client.Room?.ChangeNodeConnectionPoint(client, buffer.ReadString());
+
+        void DisconnectMessagePacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+            => client.Disconnect();
+
+        void ExecutePacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+            => client.Room?.Execute(client, buffer);
+
+        void TransportPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
+            => client.Room?.Transport(client, buffer);
+
+        TimeSpan signInPerfMax = TimeSpan.Zero;
+
+        async Task SignInPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
             var response = buffer.CreateResponse();
 
@@ -22,6 +51,8 @@ namespace NSL.Node.RoomServer.Client
             client.EndPoint = request.ConnectionEndPoint;
 
             Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"RoomId {request.RoomId}, Token {request.Token} connect");
+
+            var test = Stopwatch.StartNew();
 
             var roomInfo = await TryLoadRoomAsync(request.RoomId, request.SessionId);
 
@@ -74,6 +105,11 @@ namespace NSL.Node.RoomServer.Client
             else
                 Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"RoomId {request.RoomId}, Token {request.Token} - room info not found!!");
 
+            if (signInPerfMax < test.Elapsed)
+            {
+                signInPerfMax = test.Elapsed;
+                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"perfMax {signInPerfMax.TotalMilliseconds}ms");
+            }
             result.WriteFullTo(response);
 
             client.Network.Send(response);

@@ -14,11 +14,11 @@ namespace NSL.Node.BridgeServer.Managers
 {
     public class RoomManager
     {
-        public delegate Task<bool> SignInServerValidatorDelegate(RoomServerNetworkClient room, RoomSignInRequestModel request);
-        public delegate Task ServerSignedHandlerDelegate(RoomServerNetworkClient room, RoomSignInRequestModel request);
+        public delegate Task<bool> SignInServerValidatorDelegate(RoomServerNetworkClient roomServer, RoomSignInRequestModel request);
+        public delegate Task ServerSignedHandlerDelegate(RoomServerNetworkClient roomServer, RoomSignInRequestModel request);
         public delegate Task<IEnumerable<RoomServerNetworkClient>> ServerMissedHandlerDelegate(LobbyCreateRoomSessionRequestModel request, MissedServerReasonEnum reason);
 
-        public delegate Task ServerConnectionLostHandlerDelegate(RoomServerNetworkClient room);
+        public delegate Task ServerConnectionLostHandlerDelegate(RoomServerNetworkClient roomServer);
 
         public SignInServerValidatorDelegate SignInServerValidator { get; set; }
             = (instance, request) => Task.FromResult(true);
@@ -186,16 +186,14 @@ namespace NSL.Node.BridgeServer.Managers
                 {
                     var sessions = new List<RoomSession>();
 
+                    result.CreateTime = DateTime.UtcNow;
+
                     result.ConnectionPoints = servers.Select(server =>
                     {
                         if (request.InstanceWeight.HasValue)
                             server.Weight += request.InstanceWeight.Value;
 
-                        var session = server.CreateSession(new RoomSession(request.RoomId, client, server)
-                        {
-                            StartupInfo = new Shared.NodeRoomStartupInfo(request.StartupOptions),
-                            PlayerIds = request.InitialPlayers
-                        });
+                        var session = server.CreateSession(new RoomSession(client, server, request));
 
                         session.OnDestroy += session =>
                         {
@@ -232,9 +230,10 @@ namespace NSL.Node.BridgeServer.Managers
         }
 
         private ConcurrentDictionary<Guid, RoomServerNetworkClient> connectedServers = new ConcurrentDictionary<Guid, RoomServerNetworkClient>();
+
         private int delayMSAfterDisconnectRoomServer = 10_000;
 
-
+        #region Builder
 
         public RoomManager WithSignInServerValidator(SignInServerValidatorDelegate value)
         {
@@ -276,6 +275,8 @@ namespace NSL.Node.BridgeServer.Managers
             delayMSAfterDisconnectRoomServer = delay;
             return this;
         }
+
+        #endregion
     }
 
     public record CreateSignResult(string endPoint, Guid id);

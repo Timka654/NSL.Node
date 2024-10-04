@@ -9,6 +9,7 @@ using NSL.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -185,6 +186,9 @@ namespace NSL.Node.RoomServer.Client.Data
             Dispose();
         }
 
+        static TimeSpan perfMax = TimeSpan.Zero;
+
+
         private async void connectPlayer(TransportNetworkClient node)
         {
             if (node.Ready)
@@ -192,12 +196,14 @@ namespace NSL.Node.RoomServer.Client.Data
 
             await Task.Delay(1_000); // response wait for send
 
+            var test = Stopwatch.StartNew();
+
             bool isLocked = RoomWaitAllReady && !RoomReady;
 
             if (isLocked)
                 ar.WaitOne();
 
-            if (nodes.TryGetValue(node.Id, out var current) && current == node)
+            if (nodes.TryGetValue(node.Id, out var current) && current == node) // check for player can duplicate connection and replace previous
             {
                 node.Ready = true;
 
@@ -216,110 +222,18 @@ namespace NSL.Node.RoomServer.Client.Data
                 }
                 else
                     SendTo(node, CreateReadyRoomPacket());
+
+                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"connectPlayer {node.Id} send ready on {test.ElapsedMilliseconds}ms");
+            }
+            else
+            {
+                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"connectPlayer {node.Id} not equals");
             }
 
             if (isLocked)
                 ar.Set();
 
         }
-
-        //public async Task<bool> ValidateNodeReady(TransportNetworkClient node, int totalNodeCount, IEnumerable<string> nodeIds)
-        //{
-        //    if (node.Node == null)
-        //    {
-        //        Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {nameof(node.Node)} is null. result = false");
-        //        await Task.Delay(1_000);
-        //        return false;
-        //    }
-
-        //    if (RoomWaitAllReady)
-        //    {
-        //        if (!ar.WaitOne(10_000))
-        //        {
-        //            Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} locker not response");
-        //            throw new Exception();
-        //        }
-        //    }
-
-        //    try
-        //    {
-        //        if (node.Ready)
-        //            return true;
-
-        //        if (!nodes.ContainsKey(node.Id))
-        //        {
-        //            if (node.RoomId != RoomId)
-        //            {
-        //                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} have invalid roomId {node.RoomId} vs {RoomId}");
-
-        //                node.Disconnect();
-
-        //                return false;
-        //            }
-
-        //            Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, $"{nameof(ValidateNodeReady)} {node.Id} not signed");
-
-        //            return false;
-        //        }
-
-        //        if (RoomWaitAllReady)
-        //        {
-        //            if (ConnectedNodesCount != nodeIds.Count())
-        //            {
-        //                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
-
-        //                foreach (var item in nodes)
-        //                {
-        //                    if (nodeIds.Contains(item.Key))
-        //                        continue;
-
-        //                    SendConnectNodeInformation(node, item.Value);
-        //                }
-
-        //                Entry.Logger.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{nameof(ValidateNodeReady)} {node.Id} have invalid node connections count {ConnectedNodesCount} vs {nodeIds.Count()}");
-
-        //                return false;
-        //            }
-
-        //            if (ConnectedNodesCount != RoomNodeCount)
-        //            {
-        //                Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"{node.Id} ConnectedNodesCount {ConnectedNodesCount} vs {nodeIds.Count()} == false");
-
-        //                await Task.Delay(2_000);
-
-        //                return false;
-        //            }
-        //        }
-
-        //        node.Ready = true;
-
-        //        await OnNodeConnect.InvokeAsync(x => x(node.Node));
-
-        //        if (RoomWaitAllReady)
-        //        {
-        //            if (Nodes.All(x => x.Ready))
-        //            {
-        //                await OnRoomReady.InvokeAsync(x => x());
-
-        //                Broadcast(CreateReadyRoomPacket());
-        //            }
-        //        }
-        //        else
-        //            SendTo(node, CreateReadyRoomPacket());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Entry.Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Error, ex.ToString());
-        //        return false;
-        //    }
-        //    finally
-        //    {
-        //        if (RoomWaitAllReady)
-        //            ar.Set();
-        //    }
-
-        //    return true;
-        //}
 
         protected OutputPacketBuffer CreateReadyRoomPacket()
         {

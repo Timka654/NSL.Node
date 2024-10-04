@@ -8,7 +8,7 @@
 
 		<Version>$(VersionSuffix)</Version>
 		<Authors>Relife87</Authors>
-		<Configurations>Debug;Release;DebugExamples</Configurations>
+		<Configurations>Debug;Release;DebugExamples;Dev</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>

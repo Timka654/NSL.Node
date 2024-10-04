@@ -1,4 +1,4 @@
-﻿using NSL.Node.P2Proxy.Client.Data;
+﻿using NSL.Node.P2Proxy.Proxy.Data;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Extensions.Buffer;
 using NSL.SocketCore.Utils.Buffer;
@@ -6,7 +6,7 @@ using System;
 
 namespace NSL.Node.P2Proxy.Client
 {
-    public partial class P2ProxyEntry
+    public partial class P2ProxyServerEntry
     {
         private void SignInPacketHandle(P2PNetworkClient client, InputPacketBuffer buffer)
         {

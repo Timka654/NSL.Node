@@ -4,7 +4,7 @@ using NSL.UDP;
 using System;
 using System.Collections.Concurrent;
 
-namespace NSL.Node.P2Proxy.Client.Data
+namespace NSL.Node.P2Proxy.Proxy.Data
 {
     public class ProxyRoomInfo
     {
@@ -12,7 +12,7 @@ namespace NSL.Node.P2Proxy.Client.Data
 
         public ProxyRoomInfo(string id)
         {
-            this.ID = id;
+            ID = id;
         }
 
         event Action<DgramOutputPacketBuffer> BroadcastDelegate = data => { };

@@ -43,7 +43,7 @@ namespace NSL.Node.BridgeServer.RS
                 session.Dispose();
         }
 
-        public RoomSession GetSession(Guid sessionId)
+        public RoomSession? GetSession(Guid sessionId)
         {
             SessionMap.TryGetValue(sessionId, out var session);
 

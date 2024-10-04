@@ -6,7 +6,7 @@ namespace NSL.Node.P2ProxyExample
     {
         static void Main(string[] args)
         {
-            DefaultP2ProxyStartupEntry.CreateDefault().RunEntry();
+            //DefaultP2ProxyStartupEntry.CreateDefault().RunEntry();
 
             Console.WriteLine("Success initialized");
 

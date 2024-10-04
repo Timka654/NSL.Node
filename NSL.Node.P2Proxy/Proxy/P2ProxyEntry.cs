@@ -1,7 +1,6 @@
 ﻿using NSL.BuilderExtensions.SocketCore;
 using NSL.Logger.Interface;
 using NSL.Logger;
-using NSL.Node.P2Proxy.Client.Data;
 using System;
 using System.Collections.Concurrent;
 using NSL.Utils;
@@ -12,27 +11,24 @@ using NSL.BuilderExtensions.UDPServer;
 using NSL.SocketCore.Utils.Buffer;
 using NSL.Node.RoomServer.Shared.Client.Core.Enums;
 using NSL.SocketCore.Utils.Logger;
+using NSL.Node.P2Proxy.Proxy.Data;
 
 namespace NSL.Node.P2Proxy.Client
 {
-    public partial class P2ProxyEntry
+    public partial class P2ProxyServerEntry
     {
         protected INetworkListener Listener { get; private set; }
 
-        public int ClientBindingPort => Entry.Configuration.GetValue<int>("client_binding_port", 5980);
-
-        public string ClientBindingPoint => Entry.Configuration.GetValue("client_binding_point", default(string));
-
-        protected RoomServerStartupEntry Entry { get; }
+        protected NodeP2PProxyEntry Entry { get; }
 
         protected IBasicLogger Logger { get; }
 
-        public static P2ProxyEntry Create(
-            RoomServerStartupEntry entry,
+        public static P2ProxyServerEntry Create(
+            NodeP2PProxyEntry entry,
             string logPrefix = "[P2Proxy]")
-            => new P2ProxyEntry(entry, logPrefix);
+            => new P2ProxyServerEntry(entry, logPrefix);
 
-        public P2ProxyEntry(RoomServerStartupEntry entry, string logPrefix = "[P2Proxy]")
+        public P2ProxyServerEntry(NodeP2PProxyEntry entry, string logPrefix = "[P2Proxy]")
         {
             Entry = entry;
 
@@ -40,22 +36,22 @@ namespace NSL.Node.P2Proxy.Client
                 Logger = new PrefixableLoggerProxy(Entry.Logger, logPrefix);
         }
 
-        public P2ProxyEntry Run()
+        public P2ProxyServerEntry Run()
         {
-            string bindingPoint = ClientBindingPoint;
+            //string bindingPoint = ClientBindingPoint;
 
-            if (bindingPoint == default)
-                bindingPoint = $"udp://0.0.0.0:{ClientBindingPort}/";
+            //if (bindingPoint == default)
+            //    bindingPoint = $"udp://0.0.0.0:{ClientBindingPort}/";
 
-            var p = NSLEndPoint.FromUrl(bindingPoint);
+            //var p = NSLEndPoint.FromUrl(bindingPoint);
 
-            Listener = Fill(UDPServerEndPointBuilder.Create()
-                .WithClientProcessor<P2PNetworkClient>()
-                .WithOptions<UDPClientOptions<P2PNetworkClient>>()
-                .WithBindingPoint(p.Address, p.Port))
-                .Build();
+            //Listener = Fill(UDPServerEndPointBuilder.Create()
+            //    .WithClientProcessor<P2PNetworkClient>()
+            //    .WithOptions<UDPClientOptions<P2PNetworkClient>>()
+            //    .WithBindingPoint(p.Address, p.Port))
+            //    .Build();
 
-            Listener.Start();
+            //Listener.Start();
 
             return this;
         }

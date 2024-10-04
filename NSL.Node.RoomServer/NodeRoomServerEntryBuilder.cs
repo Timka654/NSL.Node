@@ -37,112 +37,69 @@ namespace NSL.Node.RoomServer
                 .WithRoomFinishHandle(value.FinishRoomHandle);
 
         public NodeRoomServerEntryBuilder WithCreateSessionHandle(NodeRoomServerEntry.CreateSessionDelegate value)
-        {
-            Entry.CreateRoomSession = value;
-
-            return this;
-        }
+            => Set(() => Entry.CreateRoomSession = value);
 
         public NodeRoomServerEntryBuilder WithBridgeStateChangedHandle(NodeRoomServerEntry.StateChangeDelegate value)
-        {
-            Entry.BridgeConnectionStateChangedHandle = value;
-
-            return this;
-        }
+            => Set(() => Entry.BridgeConnectionStateChangedHandle = value);
 
         public NodeRoomServerEntryBuilder WithValidateSessionHandle(NodeRoomServerEntry.ValidateSessionDelegate value)
-        {
-            Entry.ValidateSession = value;
-
-            return this;
-        }
+            => Set(() => Entry.ValidateSession = value);
 
         public NodeRoomServerEntryBuilder WithValidateSessionPlayerHandle(NodeRoomServerEntry.ValidateSessionPlayerDelegate value)
-        {
-            Entry.ValidateSessionPlayer = value;
-
-            return this;
-        }
+            => Set(() => Entry.ValidateSessionPlayer = value);
 
         public NodeRoomServerEntryBuilder WithRoomMessageHandle(NodeRoomServerEntry.RoomMessageHandleDelegate value)
-        {
-            Entry.RoomMessageHandle = value;
-
-            return this;
-        }
+            => Set(() => Entry.RoomMessageHandle = value);
 
         public NodeRoomServerEntryBuilder WithRoomFinishHandle(NodeRoomServerEntry.RoomFinishHandleDelegate value)
-        {
-            Entry.RoomFinishHandle = value;
-
-            return this;
-        }
+            => Set(() => Entry.RoomFinishHandle = value);
 
         public NodeRoomServerEntryBuilder WithDebugPacketIO(bool active = true)
-        {
-            Entry.DebugPacketIO = active;
-
-            return this;
-        }
+            => Set(() => Entry.DebugPacketIO = active);
 
         public NodeRoomServerEntryBuilder WithLogger(ILogger logger)
-        {
-            if (processed)
-                throw new System.Exception($"Cannot invoke builder methods after Run");
-
-            Entry.Logger = logger;
-
-            return this;
-        }
+            => Set(() => Entry.Logger = logger);
 
         public NodeRoomServerEntryBuilder WithReconnectSessionLifeTime(TimeSpan lifetime)
-        {
-            if (processed)
-                throw new System.Exception($"Cannot invoke builder methods after Run");
-
-            Entry.ReconnectSessionLifeTime = lifetime;
-
-            return this;
-        }
+            => Set(() => Entry.ReconnectSessionLifeTime = lifetime);
 
         public NodeRoomServerEntryBuilder WithClientServerListener(ClientServerBaseEntry entry)
-        {
-            if (processed)
-                throw new System.Exception($"Cannot invoke builder methods after Run");
-
-            Entry.ClientServerListener = entry;
-
-            return this;
-        }
+            => Set(() => Entry.ClientServerListener = entry);
 
         public NodeRoomServerEntryBuilder WithBridgeRoomClient(BridgeRoomBaseNetwork entry)
+            => Set(() => Entry.BridgeNetworkClient = entry);
+
+        private NodeRoomServerEntryBuilder Set(Action setAction)
         {
             if (processed)
                 throw new System.Exception($"Cannot invoke builder methods after Run");
 
-            Entry.BridgeNetworkClient = entry;
+            setAction();
 
             return this;
         }
 
         public NodeRoomServerEntryBuilder WithConsoleLogger()
             => WithLogger(new ConsoleLogger());
+    }
 
-        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(int port, bool isHttps, out string address, StunServerInfo[] stunServers = null)
+    public class NodeRoomServerSTUN
+    {
+
+        internal static StunServerInfo[] defaultStunServers = new[]
         {
-            GetPublicAddressFromStun(out address, stunServers);
+            new StunServerInfo("stun.l.google.com:19302"),
+            new StunServerInfo("stun1.l.google.com:19302"),
+            new StunServerInfo("stun2.l.google.com:19302"),
+            new StunServerInfo("stun3.l.google.com:19302"),
+            new StunServerInfo("stun4.l.google.com:19302"),
+        };
 
-            if (address != default)
-                address = $"ws{(isHttps ? "s" : "")}://{address}:{port}/";
-
-            return this;
-        }
-
-        public NodeRoomServerEntryBuilder GetPublicAddressFromStun(out string address, StunServerInfo[] stunServers = null)
+        public static bool GetPublicAddressFromStun(out string address, StunServerInfo[] stunServers = null, int timeout = 700)
         {
             STUNQueryResult stunResult = default;
 
-            STUNClient.ReceiveTimeout = 700;
+            STUNClient.ReceiveTimeout = timeout;
 
             stunServers ??= defaultStunServers;
 
@@ -157,20 +114,55 @@ namespace NSL.Node.RoomServer
             }
 
             if (stunResult?.QueryError != STUNQueryError.Success)
-                throw new Exception($"Not found or error received from all stun servers");
+            {
+                address = null;
+                return false;
+            }
 
             address = stunResult.PublicEndPoint.Address.ToString();
-
-            return this;
+            return true;
         }
+    }
 
-        static StunServerInfo[] defaultStunServers = new[]
+    public class NodeRoomWSServerSTUN
+    {
+        public static bool GetPublicAddressFromStun(int port, bool isHttps, out string address, StunServerInfo[] stunServers = null, int timeout = 700)
         {
-            new StunServerInfo("stun.l.google.com:19302"),
-            new StunServerInfo("stun1.l.google.com:19302"),
-            new StunServerInfo("stun2.l.google.com:19302"),
-            new StunServerInfo("stun3.l.google.com:19302"),
-            new StunServerInfo("stun4.l.google.com:19302"),
-        };
+            if (NodeRoomServerSTUN.GetPublicAddressFromStun(out address, stunServers, timeout))
+            {
+                address = $"ws{(isHttps ? "s" : "")}://{address}:{port}/";
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class NodeRoomTCPServerSTUN
+    {
+        public static bool GetPublicAddressFromStun(int port, out string address, StunServerInfo[] stunServers = null, int timeout = 700)
+        {
+            if (NodeRoomServerSTUN.GetPublicAddressFromStun(out address, stunServers, timeout))
+            {
+                address = $"tcp://{address}:{port}/";
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class NodeRoomUDPServerSTUN
+    {
+        public static bool GetPublicAddressFromStun(int port, out string address, StunServerInfo[] stunServers = null, int timeout = 700)
+        {
+            if (NodeRoomServerSTUN.GetPublicAddressFromStun(out address, stunServers, timeout))
+            {
+                address = $"udp://{address}:{port}/";
+                return true;
+            }
+
+            return false;
+        }
     }
 }

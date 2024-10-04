@@ -1,9 +1,9 @@
-﻿using NSL.Node.P2Proxy.Client.Data;
+﻿using NSL.Node.P2Proxy.Proxy.Data;
 using NSL.SocketCore.Utils.Buffer;
 
 namespace NSL.Node.P2Proxy.Client
 {
-    public partial class P2ProxyEntry
+    public partial class P2ProxyServerEntry
     {
         private void BroadcastPacketHandle(P2PNetworkClient client, InputPacketBuffer buffer)
         {

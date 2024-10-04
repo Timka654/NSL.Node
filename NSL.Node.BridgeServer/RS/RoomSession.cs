@@ -2,6 +2,7 @@
 using NSL.Node.BridgeServer.Shared;
 using NSL.Node.BridgeServer.Shared.Enums;
 using NSL.Node.BridgeServer.Shared.Message;
+using NSL.Node.BridgeServer.Shared.Requests;
 using NSL.SocketCore.Utils.Buffer;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,8 @@ namespace NSL.Node.BridgeServer.RS
         public NodeRoomStartupInfo StartupInfo { get; set; }
 
         public List<string>? PlayerIds { get; set; } = default;
+
+        public DateTime CreateTime { get; } = DateTime.UtcNow;
 
         public void AddPlayerId(string playerId)
         {
@@ -82,15 +85,26 @@ namespace NSL.Node.BridgeServer.RS
             OwnedLobbyNetwork.Network?.Send(packet);
         }
 
-        public RoomSession(Guid roomIdentity, LobbyServerNetworkClient ownedLobbyNetwork, RoomServerNetworkClient ownedRoomNetwork)
+        public RoomSession(LobbyServerNetworkClient ownedLobbyNetwork, RoomServerNetworkClient ownedRoomNetwork, LobbyCreateRoomSessionRequestModel request)
         {
-            RoomIdentity = roomIdentity;
+            RoomIdentity = request.RoomId;
             OwnedLobbyNetwork = ownedLobbyNetwork;
             OwnedRoomNetwork = ownedRoomNetwork;
+            StartupInfo = new Shared.NodeRoomStartupInfo(request.StartupOptions);
+            PlayerIds = request.InitialPlayers;
 
             // Destroy session timer
-            new Timer(state => { if (!Active) Dispose(); }, default, TimeSpan.FromSeconds(30), Timeout.InfiniteTimeSpan);
+            if (request.DelaySecondsForInactiveDestroy.HasValue)
+                inactiveDestroyTimer = new Timer(state =>
+                {
+                    if (Active) return;
+
+                    Dispose();
+                    SendLobbyFinishRoom(null, false);
+                }, default, TimeSpan.FromSeconds(request.DelaySecondsForInactiveDestroy.Value), Timeout.InfiniteTimeSpan);
         }
+
+        Timer? inactiveDestroyTimer = null;
 
         public void Dispose()
         {
@@ -105,7 +119,7 @@ namespace NSL.Node.BridgeServer.RS
             playerIdsLocker.WaitOne();
 
             bool result = PlayerIds.Contains(playerId);
-             
+
             playerIdsLocker.Set();
 
             return result;

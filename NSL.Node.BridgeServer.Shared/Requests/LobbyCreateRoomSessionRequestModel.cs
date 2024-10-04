@@ -20,5 +20,7 @@ namespace NSL.Node.BridgeServer.Shared.Requests
         public int? InstanceWeight { get; set; }
 
         public Dictionary<string, string> StartupOptions { get; set; }
+
+        public int? DelaySecondsForInactiveDestroy { get; set; }
     }
 }

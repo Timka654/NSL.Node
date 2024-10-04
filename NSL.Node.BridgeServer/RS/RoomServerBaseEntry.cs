@@ -4,7 +4,6 @@ using NSL.BuilderExtensions.SocketCore;
 
 using NetworkClient = NSL.Node.BridgeServer.RS.RoomServerNetworkClient;
 using NSL.Node.BridgeServer.Shared.Enums;
-using NSL.Node.BridgeServer.RS.Packets;
 using NSL.SocketServer.Utils;
 using NSL.EndPointBuilder;
 using NSL.SocketCore.Utils.Buffer;
@@ -13,7 +12,7 @@ using NSL.SocketCore.Utils.Logger;
 
 namespace NSL.Node.BridgeServer.RS
 {
-    public abstract class RoomServerBaseEntry
+    public abstract partial class RoomServerBaseEntry
     {
         protected INetworkListener Listener { get; set; }
 
@@ -61,11 +60,11 @@ namespace NSL.Node.BridgeServer.RS
                     Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
             });
 
-            builder.AddAsyncPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, SignServerPacket.ReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionPacket.ReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, RoomFinishRoomPacket.ReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, RoomMessagePacket.ReceiveHandle);
-            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPlayerRequest, SignSessionPlayerPacket.ReceiveHandle);
+            builder.AddAsyncPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, SignServerReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, FinishRoomReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.RoomMessage, RoomMessageReceiveHandle);
+            builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionPlayerRequest, SignSessionPlayerReceiveHandle);
 
             return builder;
         }
