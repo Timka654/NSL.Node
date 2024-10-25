@@ -32,22 +32,22 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='Unity' and '$(Configuration)'!='UnityDebug'">
-		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator" Version="2024.10.4.1349">
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator" Version="2024.10.25.1449">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2024.10.4.1349" />
-		<PackageReference Include="NSL.SocketCore" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2024.10.25.1449" />
+		<PackageReference Include="NSL.SocketCore" Version="2024.10.25.1449" />
 	</ItemGroup>
 
 
 	<ItemGroup Condition="'$(Configuration)'=='Unity' or '$(Configuration)'=='UnityDebug'">
-		<PackageReference Include="Unity.NSL.Generators.BinaryTypeIOGenerator" Version="2024.10.4.1349">
+		<PackageReference Include="Unity.NSL.Generators.BinaryTypeIOGenerator" Version="2024.10.25.1449">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Unity.NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2024.10.4.1349" />
-		<PackageReference Include="Unity.NSL.SocketCore" Version="2024.10.4.1349" />
+		<PackageReference Include="Unity.NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2024.10.25.1449" />
+		<PackageReference Include="Unity.NSL.SocketCore" Version="2024.10.25.1449" />
 	</ItemGroup>
 
 </Project>
