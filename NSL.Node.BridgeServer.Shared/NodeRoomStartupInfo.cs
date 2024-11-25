@@ -1,7 +1,11 @@
-﻿using System;
+﻿using NSL.SocketCore.Utils;
+using NSL.SocketCore;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using NSL.EndPointBuilder;
 
 namespace NSL.Node.BridgeServer.Shared
 {
@@ -111,5 +115,58 @@ namespace NSL.Node.BridgeServer.Shared
 
         public bool GetRoomShutdownOnMissed()
             => GetValue<bool>(RoomShutdownOnMissedReadyVariableName);
+    }
+
+    public class NodeNetworkHandles<TClient>
+        where TClient : INetworkClient, new()
+    {
+        public CoreOptions<TClient>.ClientConnectAsync OnConnectAsync = (client) => Task.CompletedTask;
+
+        public CoreOptions<TClient>.ClientDisconnectAsync OnDisconnectAsync = (client) => Task.CompletedTask;
+
+        public CoreOptions<TClient>.ReceivePacketHandle OnReceive = (client, pid, len) => { };
+
+        public CoreOptions<TClient>.SendPacketHandle OnSend = (client, pid, len, stack) => { };
+
+        public CoreOptions<TClient>.ExceptionHandle OnException = (ex, client) => { };
+
+        public TBuilder Fill<TBuilder>(TBuilder builder)
+            where TBuilder : IOptionableEndPointBuilder<TClient>
+        {
+            var options = builder.GetCoreOptions();
+
+            options.OnSendPacket += OnSend;
+            options.OnReceivePacket += OnReceive;
+            options.OnClientConnectAsyncEvent += OnConnectAsync;
+            options.OnClientDisconnectAsyncEvent += OnDisconnectAsync;
+            options.OnExceptionEvent += OnException;
+
+            return builder;
+        }
+
+        public static NodeNetworkHandles<TClient> Create()
+            => new NodeNetworkHandles<TClient>();
+
+        public NodeNetworkHandles<TClient> WithConnectHandle(CoreOptions<TClient>.ClientConnectAsync value)
+            => Set(() => OnConnectAsync = value);
+
+        public NodeNetworkHandles<TClient> WithDisconnectHandle(CoreOptions<TClient>.ClientDisconnectAsync value)
+            => Set(() => OnDisconnectAsync = value);
+
+        public NodeNetworkHandles<TClient> WithReceiveHandle(CoreOptions<TClient>.ReceivePacketHandle value)
+            => Set(() => OnReceive = value);
+
+        public NodeNetworkHandles<TClient> WithSendHandle(CoreOptions<TClient>.SendPacketHandle value)
+            => Set(() => OnSend = value);
+
+        public NodeNetworkHandles<TClient> WithExceptionHandle(CoreOptions<TClient>.ExceptionHandle value)
+            => Set(() => OnException = value);
+
+        private NodeNetworkHandles<TClient> Set(Action action)
+        {
+            action();
+
+            return this;
+        }
     }
 }

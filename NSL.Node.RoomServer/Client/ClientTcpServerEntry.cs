@@ -1,4 +1,5 @@
 ﻿using NSL.BuilderExtensions.TCPServer;
+using NSL.Node.BridgeServer.Shared;
 using NSL.Node.RoomServer.Client.Data;
 using NSL.SocketServer;
 
@@ -6,10 +7,12 @@ namespace NSL.Node.RoomServer.Client
 {
     public class ClientTcpServerEntry : ClientServerBaseEntry
     {
+        private readonly NodeNetworkHandles<TransportNetworkClient> handles;
         private readonly int bindingPort;
 
-        public ClientTcpServerEntry(NodeRoomServerEntry entry, int bindingPort, string logPrefix = null) : base(entry, logPrefix)
+        public ClientTcpServerEntry(NodeRoomServerEntry entry, NodeNetworkHandles<TransportNetworkClient> handles, int bindingPort, string logPrefix = null) : base(entry, logPrefix)
         {
+            this.handles = handles;
             this.bindingPort = bindingPort;
         }
 
@@ -18,10 +21,10 @@ namespace NSL.Node.RoomServer.Client
             if (Listener != null)
                 return;
 
-            Listener = Fill(TCPServerEndPointBuilder.Create()
+            Listener = handles.Fill(Fill(TCPServerEndPointBuilder.Create()
                 .WithClientProcessor<TransportNetworkClient>()
                 .WithOptions<ServerOptions<TransportNetworkClient>>()
-                .WithBindingPoint(bindingPort))
+                .WithBindingPoint(bindingPort)))
                 .Build();
 
             Listener.Start();

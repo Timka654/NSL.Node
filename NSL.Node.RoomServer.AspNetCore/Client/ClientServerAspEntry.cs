@@ -10,6 +10,7 @@ using NSL.BuilderExtensions.WebSocketsServer.AspNet;
 using NSL.WebSockets.Server;
 using NSL.WebSockets.Server.AspNetPoint;
 using System.Net;
+using NSL.Node.BridgeServer.Shared;
 
 namespace NSL.Node.RoomServer.AspNetCore.Client
 {
@@ -17,6 +18,7 @@ namespace NSL.Node.RoomServer.AspNetCore.Client
     {
         private readonly IEndpointRouteBuilder builder;
         private readonly string pattern;
+        private readonly NodeNetworkHandles<TransportNetworkClient> handles;
         private readonly Func<HttpContext, Task<bool>> requestHandle;
         private readonly Action<IEndpointConventionBuilder> actionConventionBuilder;
 
@@ -26,12 +28,14 @@ namespace NSL.Node.RoomServer.AspNetCore.Client
             NodeRoomServerEntry entry,
             IEndpointRouteBuilder builder,
             string pattern,
+            NodeNetworkHandles<TransportNetworkClient> handles,
             Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConventionBuilder = null,
             string logPrefix = null) : base(entry, logPrefix)
         {
             this.builder = builder;
             this.pattern = pattern;
+            this.handles = handles;
             this.requestHandle = requestHandle;
             this.actionConventionBuilder = actionConventionBuilder;
 
@@ -54,9 +58,9 @@ namespace NSL.Node.RoomServer.AspNetCore.Client
         {
             if (Listener == null)
             {
-                var server = Fill(WebSocketsServerEndPointBuilder.Create()
+                var server = handles.Fill(Fill(WebSocketsServerEndPointBuilder.Create()
                     .WithClientProcessor<TransportNetworkClient>()
-                    .AspWithOptions<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>())
+                    .AspWithOptions<TransportNetworkClient, WSServerOptions<TransportNetworkClient>>()))
                     .BuildWithoutRoute();
 
                 Listener = server;

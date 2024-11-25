@@ -25,7 +25,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NSL.Logger.AspNet" Version="2024.10.25.1449" />
+	  <PackageReference Include="NSL.Logger.AspNet" Version="2024.11.25.1306" />
 	</ItemGroup>
 
 	<ItemGroup>

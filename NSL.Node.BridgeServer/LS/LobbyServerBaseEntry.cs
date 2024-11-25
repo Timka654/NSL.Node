@@ -43,22 +43,6 @@ namespace NSL.Node.BridgeServer.LS
 
             builder.AddDisconnectHandle(Entry.LobbyManager.OnDisconnectedLobbyServer);
 
-            if (Logger != null)
-                builder.AddDefaultEventHandlers((string)null,
-                    DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
-
-            builder.AddSendHandle((client, pid, len, stack) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger?.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeLobbyPacketEnum)pid)})");
-            });
-
-            builder.AddReceiveHandle((client, pid, len) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger?.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeLobbyPacketEnum)pid)})");
-            });
-
             builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.SignServerRequest, SignSessionRequestReceiveHandle);
             builder.AddAsyncPacketHandle(NodeBridgeLobbyPacketEnum.CreateRoomSessionRequest, CreateRoomSessionRequestReceiveHandle);
             builder.AddPacketHandle(NodeBridgeLobbyPacketEnum.AddPlayerRequest, AddPlayerRequestReceiveHandle);

@@ -68,22 +68,6 @@ namespace NSL.Node.P2Proxy.Client
             builder.AddPacketHandle(
                 RoomPacketEnum.BroadcastMessage, BroadcastPacketHandle);
 
-            if (Logger != null)
-                builder.AddDefaultEventHandlers((string)null,
-                    DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
-
-            builder.AddSendHandle((client, pid, len, stack) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Send packet {pid}");
-            });
-
-            builder.AddReceiveHandle((client, pid, len) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Receive packet {pid}");
-            });
-
             return builder;
         }
 

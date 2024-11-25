@@ -42,8 +42,6 @@ namespace NSL.Node.RoomServer
 
         internal TimeSpan? ReconnectSessionLifeTime { get; set; } = null;
 
-        internal bool DebugPacketIO { get; set; }
-
         internal void Run()
         {
             if (BridgeNetworkClient == null)

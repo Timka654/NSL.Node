@@ -6,6 +6,8 @@ using System;
 using NSL.Node.RoomServer.AspNetCore.Client;
 using Microsoft.Extensions.DependencyInjection;
 using NSL.Logger.AspNet;
+using NSL.Node.BridgeServer.Shared;
+using NSL.Node.RoomServer.Client.Data;
 
 namespace NSL.Node.RoomServer.AspNetCore
 {
@@ -38,13 +40,14 @@ namespace NSL.Node.RoomServer.AspNetCore
         }
 
         public static NodeRoomServerEntryBuilder WithClientServerAspBinding(
-            this NodeRoomServerEntryBuilder builder,
-            IEndpointRouteBuilder aspBuilder,
-            string pattern,
-            Func<HttpContext, Task<bool>> requestHandle = null,
-            Action<IEndpointConventionBuilder> actionConventionBuilder = null,
-            string logPrefix = null)
-            => builder.WithClientServerListener(new ClientServerAspEntry(builder.Entry, aspBuilder, pattern, requestHandle, actionConventionBuilder, logPrefix));
+            this NodeRoomServerEntryBuilder builder
+            , IEndpointRouteBuilder aspBuilder
+            , string pattern
+            , NodeNetworkHandles<TransportNetworkClient> handles
+            , Func<HttpContext, Task<bool>> requestHandle = null
+            , Action<IEndpointConventionBuilder> actionConventionBuilder = null
+            , string logPrefix = null)
+            => builder.WithClientServerListener(new ClientServerAspEntry(builder.Entry, aspBuilder, pattern, handles, requestHandle, actionConventionBuilder, logPrefix));
 
         public static NodeRoomServerEntryBuilder WithAspLogger(this NodeRoomServerEntryBuilder builder, Microsoft.Extensions.Logging.ILogger logger)
             => builder.WithLogger(new ILoggerWrapper(logger));

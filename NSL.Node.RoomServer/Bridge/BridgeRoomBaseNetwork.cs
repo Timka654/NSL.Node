@@ -105,22 +105,6 @@ namespace NSL.Node.RoomServer.Bridge
                 OnStateChanged(State);
             });
 
-            if (Logger != null)
-                builder.AddDefaultEventHandlers((string)null,
-            DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
-
-            builder.AddSendHandle((client, pid, len, stack) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
-            });
-
-            builder.AddReceiveHandle((client, pid, len) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
-            });
-
             return builder;
         }
 

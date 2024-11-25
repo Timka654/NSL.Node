@@ -161,26 +161,6 @@ namespace NSL.Node.RoomServer.Client
             builder.AddPacketHandle(
                 RoomPacketEnum.NodeChangeEndPointMessage, ChangeConnectionPointPacketHandle);
 
-            if (Logger != null)
-                builder.AddDefaultEventHandlers((string)null,
-                    DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
-
-
-            if (Entry.DebugPacketIO)
-            {
-                builder.AddSendHandle((client, pid, len, stack) =>
-                {
-                    if (!InputPacketBuffer.IsSystemPID(pid))
-                        Logger.AppendInfo($"Send packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
-                });
-
-                builder.AddReceiveHandle((client, pid, len) =>
-                {
-                    if (!InputPacketBuffer.IsSystemPID(pid))
-                        Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((RoomPacketEnum)pid)})");
-                });
-            }
-
             builder.AddDisconnectHandle(client =>
             {
                 var room = client.Room;

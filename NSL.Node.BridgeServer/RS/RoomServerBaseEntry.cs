@@ -44,22 +44,6 @@ namespace NSL.Node.BridgeServer.RS
 
             builder.AddDisconnectHandle(Entry.RoomManager.OnDisconnectedRoomServer);
 
-
-            builder.AddDefaultEventHandlers((string)null,
-                DefaultEventHandlersEnum.All & ~DefaultEventHandlersEnum.HasSendStackTrace & ~DefaultEventHandlersEnum.Receive & ~DefaultEventHandlersEnum.Send);
-
-            builder.AddSendHandle((client, pid, len, stack) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Send packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
-            });
-
-            builder.AddReceiveHandle((client, pid, len) =>
-            {
-                if (!InputPacketBuffer.IsSystemPID(pid))
-                    Logger.AppendInfo($"Receive packet {pid}({Enum.GetName((NodeBridgeRoomPacketEnum)pid)})");
-            });
-
             builder.AddAsyncPacketHandle(NodeBridgeRoomPacketEnum.SignServerRequest, SignServerReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.SignSessionRequest, SignSessionReceiveHandle);
             builder.AddPacketHandle(NodeBridgeRoomPacketEnum.FinishRoomMessage, FinishRoomReceiveHandle);

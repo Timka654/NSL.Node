@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using NSL.Logger.AspNet;
 using NSL.Node.BridgeServer.LS;
 using NSL.Node.BridgeServer.RS;
+using NSL.Node.BridgeServer.Shared;
+using NSL.SocketCore.Utils;
 using System;
 using System.Threading.Tasks;
 
@@ -40,12 +42,13 @@ namespace NSL.Node.BridgeServer
 
         public static NodeBridgeServerEntryBuilder WithLobbyServerAspBinding(
             this NodeBridgeServerEntryBuilder builder,
-            IEndpointRouteBuilder aspBuilder,
-            string pattern,
-            Func<HttpContext, Task<bool>> requestHandle = null,
+        IEndpointRouteBuilder aspBuilder,
+            string pattern
+            , NodeNetworkHandles<LobbyServerNetworkClient> handles
+            , Func<HttpContext, Task<bool>> requestHandle = null,
             Action<IEndpointConventionBuilder> actionConventionBuilder = null,
             string logPrefix = null)
-            => builder.WithLobbyServerListener(new LobbyServerAspEntry(builder.Entry, aspBuilder, pattern, requestHandle, actionConventionBuilder, logPrefix));
+            => builder.WithLobbyServerListener(new LobbyServerAspEntry(builder.Entry, aspBuilder, pattern, handles, requestHandle, actionConventionBuilder, logPrefix));
 
         public static NodeBridgeServerEntryBuilder WithRoomServerAspBinding(
             this NodeBridgeServerEntryBuilder builder,

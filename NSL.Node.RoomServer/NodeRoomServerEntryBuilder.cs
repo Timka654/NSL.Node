@@ -54,9 +54,6 @@ namespace NSL.Node.RoomServer
         public NodeRoomServerEntryBuilder WithRoomFinishHandle(NodeRoomServerEntry.RoomFinishHandleDelegate value)
             => Set(() => Entry.RoomFinishHandle = value);
 
-        public NodeRoomServerEntryBuilder WithDebugPacketIO(bool active = true)
-            => Set(() => Entry.DebugPacketIO = active);
-
         public NodeRoomServerEntryBuilder WithLogger(ILogger logger)
             => Set(() => Entry.Logger = logger);
 
