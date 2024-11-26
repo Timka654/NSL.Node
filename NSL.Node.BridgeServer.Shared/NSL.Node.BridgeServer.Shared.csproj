@@ -32,13 +32,13 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'!='Unity' and '$(Configuration)'!='UnityDebug'">
-		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator" Version="2024.11.25.1306">
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator" Version="2024.11.26.1245">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2024.11.25.1306" />
-		<PackageReference Include="NSL.SocketCore" Version="2024.11.25.1306" />
-		<PackageReference Include="NSL.EndPointBuilder" Version="2024.11.25.1306" />
+		<PackageReference Include="NSL.Generators.BinaryTypeIOGenerator.Attributes" Version="2024.11.26.1245" />
+		<PackageReference Include="NSL.SocketCore" Version="2024.11.26.1245" />
+		<PackageReference Include="NSL.EndPointBuilder" Version="2024.11.26.1245" />
 	</ItemGroup>
 
 
