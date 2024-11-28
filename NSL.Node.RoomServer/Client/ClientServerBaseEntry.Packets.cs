@@ -15,7 +15,7 @@ namespace NSL.Node.RoomServer.Client
     {
         private void BroadcastPacketHandle(TransportNetworkClient client, InputPacketBuffer buffer)
         {
-            var body = buffer.GetBuffer();
+            var body = buffer.Data;
 
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.TransportMessage);
 

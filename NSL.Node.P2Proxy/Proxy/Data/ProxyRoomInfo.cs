@@ -53,7 +53,7 @@ namespace NSL.Node.P2Proxy.Proxy.Data
 
                 output.Channel = dgram.SourceChannel;
 
-                output.Write(buffer.GetBody());
+                output.Write(buffer.Data);
 
                 BroadcastDelegate(output);
             }

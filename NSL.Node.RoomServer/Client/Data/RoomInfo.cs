@@ -526,13 +526,13 @@ namespace NSL.Node.RoomServer.Client.Data
 
         public void Transport(TransportNetworkClient client, InputPacketBuffer packet)
         {
-            var body = packet.GetBuffer();
+            var body = packet.Data;
 
             var to = packet.ReadString();
 
             OutputPacketBuffer pbuf = OutputPacketBuffer.Create(RoomPacketEnum.TransportMessage);
 
-            pbuf.Write(body[7..]);
+            pbuf.Write(body);
 
             SendTo(to, pbuf);
         }
