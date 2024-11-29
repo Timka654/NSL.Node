@@ -108,7 +108,7 @@ namespace NSL.Node.RoomServer.Client
             if (signInPerfMax < test.Elapsed)
             {
                 signInPerfMax = test.Elapsed;
-                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Debug, $"perfMax {signInPerfMax.TotalMilliseconds}ms");
+                Logger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"perfMax {signInPerfMax.TotalMilliseconds}ms");
             }
             result.WriteFullTo(response);
 

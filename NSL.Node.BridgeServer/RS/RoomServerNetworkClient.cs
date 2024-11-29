@@ -32,7 +32,9 @@ namespace NSL.Node.BridgeServer.RS
         {
             while (!SessionMap.TryAdd(session.SessionId = Guid.NewGuid(), session)) ;
 
-            session.OnDestroy += session => TryRemoveSession(session.SessionId);
+            base.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Create new session Active: {session.Active}, CreateTime: {session.CreateTime}, RoomIdentity: {session.RoomIdentity}, SessionId: {session.SessionId}");
+
+            session.OnDestroy += session => removeSession(session);
 
             return session;
         }
@@ -40,7 +42,15 @@ namespace NSL.Node.BridgeServer.RS
         public void TryRemoveSession(Guid sessionId)
         {
             if (SessionMap.TryRemove(sessionId, out var session))
+            {
                 session.Dispose();
+            }
+        }
+
+        private void removeSession(RoomSession session )
+        {
+            base.Network.Options.HelperLogger?.Append(SocketCore.Utils.Logger.Enums.LoggerLevel.Info, $"Remove session Active: {session.Active}, CreateTime: {session.CreateTime}, RoomIdentity: {session.RoomIdentity}, SessionId: {session.SessionId} {Environment.StackTrace}");
+
         }
 
         public RoomSession? GetSession(Guid sessionId)
